@@ -7,25 +7,28 @@ namespace TennisCrmApi
         public string? ProductImageUrl { get; set; }
         public string? ProductModel { get; set; }
         public int ProductId { get; set; }
+        public int ProductStockAmount { get; set; }
         public decimal ProductPrice { get; set; }
+        public DateTime LastModified { get; set; }  = DateTime.Now; 
+        public bool IsDeleted { get; set; } = false;
     }
 
 
     public class Racket : Product
     {
         public string StringPattern { get; set; } = string.Empty;
-        public string GripSize { get; set; } = string.Empty;
+        public string? GripSize { get; set; }
         public int HeadSize { get; set; }
         public int Weight { get; set; }
-        public int SwingWeight { get; set; }
-        public int BeamThickness { get; set; }
-        public int Flex { get; set; }
-        public decimal Length { get; set; }
+        public int? SwingWeight { get; set; }
+        public int? BeamThickness { get; set; }
+        public int? Flex { get; set; }
+        public decimal? Length { get; set; }
     }
 
     public class TennisString : Product
     {
-        public StringMaterial Material { get; set; }
+        public StringMaterial? Material { get; set; }
         public bool IsReel { get; set; }
         public decimal Gauge { get; set; }
     }

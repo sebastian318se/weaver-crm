@@ -10,6 +10,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 var app = builder.Build();
 
 app.MapSJEndpoints();
+app.MapSalesEndpoints();
+app.MapInventoryEndpoints();
+app.MapCustomerEndpoints();
 
 app.Run();
 // GET: All Sales, Sales by ID; Each order all entries, by ID; All customers, customers by ID

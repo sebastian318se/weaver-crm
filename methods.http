@@ -1,5 +1,5 @@
-GET http://localhost:5000//orders/stringjobs/1
+GET http://localhost:5000/api/customers
 
 ###
 
-POST http://localhost:5000/kaboom?name=Sebas
+POST http://localhost:5000/api/customers?name=Sebas

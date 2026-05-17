@@ -6,33 +6,35 @@ namespace TennisCrmApi
 
         // Define foreign key and respective object to retrieve data from
         public int CustomerId { get; set; }
-        public Customer? Customer { get; set; }
+        public required Customer Customer { get; set; }
 
         public decimal OrderPrice { get; set; }
         public OrderStatus Status { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime CompletedAt { get; set; }
+        public DateTime CreatedAt { get; set; }  = DateTime.Now; 
+        public DateTime? CompletedAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 
     public class StringJob : Order
     {
         public int MainTension { get; set; }
         public int CrossTension { get; set; }
+        public DateTime? ExpectedAt { get; set; }
 
         // Foreign key to reference racket strung
         public int RacketId { get; set; }
-        public Racket? Racket { get; set; }
+        public required Racket Racket { get; set; }
 
         // Foreign key to reference string used
         public int StringId { get; set; }
-        public TennisString? TenisString { get; set; }
+        public required TennisString TenisString { get; set; }
     }
 
     public class Sale : Order
     {
         public int ProductId { get; set; }
-        public Product? Product { get; set; }
+        public required List<Product> SaleProducts { get; set; }
     }
 
     public enum OrderStatus
