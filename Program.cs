@@ -7,7 +7,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    Console.Write($"Environment = Development");
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+else Console.Write("Environment is Production");
+
 
 app.MapSJEndpoints();
 app.MapSalesEndpoints();
@@ -15,8 +28,3 @@ app.MapInventoryEndpoints();
 app.MapCustomerEndpoints();
 
 app.Run();
-// GET: All Sales, Sales by ID; Each order all entries, by ID; All customers, customers by ID
-// POST: Orders, Sales, Customers
-// PUT: Orders, Sales, Customers
-// DELETE: Make method to make backup of deletes entries
-// -> MAKE STASH TABLE IN DB. "Import" entries deleted from DB 

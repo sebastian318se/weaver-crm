@@ -66,8 +66,8 @@ namespace TennisCrmApiEndpoints
                 updatedCustomer.IsDeleted,
                 LastModified = DateTime.Now
             });
-            await db.SaveChangesAsync();
 
+            await db.SaveChangesAsync();
             return Results.Ok("Successfully updated customer.");
         }
     }

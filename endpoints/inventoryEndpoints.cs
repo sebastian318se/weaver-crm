@@ -28,7 +28,7 @@ namespace TennisCrmApiEndpoints
             app.MapPost("/api/inventory/balls", PostItem<Ball>);
             app.MapPost("/api/inventory/misc", PostItem<MiscGear>);
 
-            app.MapPut("/api/customers/{id}", PutItem);
+            app.MapPut("/api/inventory/{id}", PutItem);
 
             return app;
         }

@@ -11,7 +11,9 @@ namespace TennisCrmApiEndpoints
             app.MapGet("/api/strung", GetSJ);
             app.MapGet("/api/strung/{id}", GetSJById);
             
-            app.MapPost("/api/strung", PostSJ);
+            app.MapPost("/api/strung/", PostSJ);
+
+            app.MapPut("api/strung/{id}", PutSJ);
 
             return app;
         }
@@ -72,7 +74,7 @@ namespace TennisCrmApiEndpoints
 
             sj.Racket = null;
             sj.TennisString = null;
-            
+
             await db.SaveChangesAsync();
 
             return Results.Ok("Successfully updated sale entry");
