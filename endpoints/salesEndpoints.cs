@@ -57,9 +57,18 @@ namespace TennisCrmApiEndpoints
 
             if (existingSale is null) return Results.NotFound("Could not locate sale entry.");
 
-            db.Entry(existingSale).CurrentValues.SetValues(updatedSale);
-            await db.SaveChangesAsync();
+            db.Entry(existingSale).CurrentValues.SetValues(new
+            {
+                updatedSale.OrderPrice,
+                updatedSale.Status,
+                updatedSale.CompletedAt,
+                updatedSale.IsDeleted
+            });
 
+            // SetValues does not supports List<T> Ts properties
+            existingSale.SaleProducts = updatedSale.SaleProducts;
+            
+            await db.SaveChangesAsync();
             return Results.Ok("Successfully updated sale entry.");
         }
     }

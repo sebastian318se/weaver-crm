@@ -57,7 +57,22 @@ namespace TennisCrmApiEndpoints
 
             if (sj is null) return Results.NotFound("Could not locate sale entry");
 
-            db.Entry(sj).CurrentValues.SetValues(updatedSJ);
+            db.Entry(sj).CurrentValues.SetValues(new
+            {
+                updatedSJ.OrderPrice,
+                updatedSJ.Status,
+                updatedSJ.CompletedAt,
+                updatedSJ.IsDeleted,
+                updatedSJ.MainTension,
+                updatedSJ.CrossTension,
+                updatedSJ.ExpectedAt,
+                updatedSJ.RacketId,
+                updatedSJ.StringId
+            });
+
+            sj.Racket = null;
+            sj.TennisString = null;
+            
             await db.SaveChangesAsync();
 
             return Results.Ok("Successfully updated sale entry");

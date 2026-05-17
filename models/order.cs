@@ -24,11 +24,13 @@ namespace TennisCrmApi
 
         // Foreign key to reference racket strung
         public int RacketId { get; set; }
-        public required Racket Racket { get; set; }
+        // Navigator prop
+        public Racket? Racket { get; set; }
 
         // Foreign key to reference string used
         public int StringId { get; set; }
-        public required TennisString TenisString { get; set; }
+        // Navigator prop
+        public TennisString? TennisString { get; set; }
     }
 
     public class Sale : Order

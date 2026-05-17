@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using TennisCrmApi;
 
 namespace TennisCrmApiEndpoints
@@ -88,10 +89,17 @@ namespace TennisCrmApiEndpoints
                 .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
-
+            
+            if (existingProduct.GetType() != updatedProduct.GetType()) return Results.BadRequest("Producy entry types do not match.");
+            
+            var originalId = existingProduct.ProductId;
             db.Entry(existingProduct).CurrentValues.SetValues(updatedProduct);
-            await db.SaveChangesAsync();
+            
+            // Exception properties
+            existingProduct.ProductId = originalId;
+            existingProduct.LastModified = DateTime.Now;
 
+            await db.SaveChangesAsync();
             return Results.Ok("Successfully updated customer entry");
         }
     }

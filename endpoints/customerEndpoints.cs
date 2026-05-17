@@ -51,13 +51,21 @@ namespace TennisCrmApiEndpoints
         // Edit customer entry on ID match
         public static async Task<IResult> PutCustomer(AppDbContext db, Customer updatedCustomer, int id)
         {
+            // PROPERLY HANDLE OVERWRITES AND P KEY EXEMPTION
             var existingCustomer = await db.Customers
                 .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(x => x.CustomerId == id);
             
             if (existingCustomer is null) return Results.NotFound("Could not locate customer entry");
 
-            db.Entry(existingCustomer).CurrentValues.SetValues(updatedCustomer);
+            db.Entry(existingCustomer).CurrentValues.SetValues(new
+            {
+                updatedCustomer.CustomerName,
+                updatedCustomer.CustomerEmail,
+                updatedCustomer.CustomerPhone,
+                updatedCustomer.IsDeleted,
+                LastModified = DateTime.Now
+            });
             await db.SaveChangesAsync();
 
             return Results.Ok("Successfully updated customer.");
