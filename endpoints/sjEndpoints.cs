@@ -10,7 +10,8 @@ namespace TennisCrmApiEndpoints
 
             app.MapGet("/api/strung", GetSJ);
             app.MapGet("/api/strung/{id}", GetSJById);
-            
+            app.MapGet("api/strung/deleted", GetDeleted);
+
             app.MapPost("/api/strung/", PostSJ);
 
             app.MapPut("api/strung/{id}", PutSJ);
@@ -41,6 +42,18 @@ namespace TennisCrmApiEndpoints
                 : Results.NotFound("Could not locate string job.");
         }
 
+        // Get stringjob on IsDeleted == true
+        public static async Task<IResult> GetDeleted(AppDbContext db)
+        {
+            var sj = await db.StringJobs
+                .Where(x => x.IsDeleted)
+                .ToListAsync();
+
+            return sj is not null
+                ? Results.Ok(sj)
+                : Results.NotFound("Could not locate deleted stringjob entries.");
+        }
+
         // Post new SJ entry
         public static async Task<IResult> PostSJ(AppDbContext db, StringJob newSJ)
         {
@@ -54,7 +67,6 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> PutSJ(AppDbContext db, StringJob updatedSJ, int id)
         {
             var sj = await db.StringJobs
-                .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(x => x.OrderId == id);
 
             if (sj is null) return Results.NotFound("Could not locate sale entry");

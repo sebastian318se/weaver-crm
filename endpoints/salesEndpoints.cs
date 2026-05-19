@@ -9,6 +9,7 @@ namespace TennisCrmApiEndpoints
         {
             app.MapGet("/api/sales", GetSales);
             app.MapGet("/api/sales/{id}", GetSalesById);
+            app.MapGet("api/sales/deleted", GetDeleted);
 
             app.MapPost("/api/sales/", PostSale);
 
@@ -36,8 +37,21 @@ namespace TennisCrmApiEndpoints
             
             return sale is not null
                 ? Results.Ok(sale)
-                : Results.NotFound("Could not locate sale entry");
+                : Results.NotFound("Could not locate sale entry.");
         }
+
+        // Get sales on IsDeleted == true
+        public static async Task<IResult> GetDeleted(AppDbContext db)
+        {
+            var sale = await db.Sales
+                .Where(x => x.IsDeleted)
+                .ToListAsync();
+
+            return sale is not null
+                ? Results.Ok(sale)
+                : Results.NotFound("Could not locate deleted sale entries.");
+        }
+
 
         // Post new sale entry
         public static async Task<IResult> PostSale(AppDbContext db, Sale newSale)
@@ -45,14 +59,13 @@ namespace TennisCrmApiEndpoints
             db.Sales.Add(newSale);
             await db.SaveChangesAsync();
             
-            return Results.Created($"Successfully added {newSale} to database", newSale);
+            return Results.Created($"Successfully added {newSale} to database.", newSale);
         }
 
         // Edit sale entry on ID match
         public static async Task<IResult> PutSale(AppDbContext db, Sale updatedSale, int id)
         {
             var existingSale = await db.Sales
-                .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (existingSale is null) return Results.NotFound("Could not locate sale entry.");

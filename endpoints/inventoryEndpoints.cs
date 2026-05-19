@@ -11,6 +11,7 @@ namespace TennisCrmApiEndpoints
             // Name all endpoint paths .WithName()
             app.MapGet("/api/inventory", GetItems);
             app.MapGet("/api/inventory/{id}", GetItemById);
+            app.MapGet("api/inventory/deleted", GetDeleted);
 
             app.MapGet("/api/inventory/rackets", GetAll<Racket>);
             app.MapGet("/api/inventory/strings", GetAll<TennisString>);
@@ -60,6 +61,18 @@ namespace TennisCrmApiEndpoints
                 : Results.NotFound("Could not locate item");
         }
 
+        // Get inventory on IsDeleted == true
+        public static async Task<IResult> GetDeleted(AppDbContext db)
+        {
+            var items = await db.Products
+                .Where(x => x.IsDeleted)
+                .ToListAsync();
+
+            return items is not null
+                ? Results.Ok(items)
+                : Results.NotFound("Could not locate deleted inventory entries");
+        }
+
         // Get all items per category
         public static async Task<IResult> GetAll<T>(AppDbContext db)
             where T : Product
@@ -85,7 +98,6 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> PutItem(AppDbContext db, Product updatedProduct, int id)
         {
             var existingProduct = await db.Products
-                .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(x => x.ProductId == id);
 
             if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");

@@ -9,6 +9,7 @@ namespace TennisCrmApiEndpoints
         {
             app.MapGet("/api/customers", GetCustomers);
             app.MapGet("/api/customers/{id}", GetCustomersById);
+            app.MapGet("api/customers/deleted" GetDeleted);
 
             app.MapPost("/api/customers", PostCustomer);
 
@@ -39,6 +40,18 @@ namespace TennisCrmApiEndpoints
                 : Results.NotFound("Could not locate customer");
         }
 
+        // Get customers on IsDeleted == true
+        public static async Task<IResult> GetDeleted(AppDbContext db)
+        {
+            var customer = await db.Customers
+                .Where(x => x.IsDeleted)
+                .ToListAsync();
+
+            return customer is not null
+                ? Results.Ok(customer)
+                : Results.NotFound("Could not locate deleted customer entries.");
+        }
+
         // Post customer entry
         public static async Task<IResult> PostCustomer(AppDbContext db, Customer newCustomer)
         {
@@ -53,7 +66,6 @@ namespace TennisCrmApiEndpoints
         {
             // PROPERLY HANDLE OVERWRITES AND P KEY EXEMPTION
             var existingCustomer = await db.Customers
-                .Where(x => !x.IsDeleted)
                 .FirstOrDefaultAsync(x => x.CustomerId == id);
             
             if (existingCustomer is null) return Results.NotFound("Could not locate customer entry");
