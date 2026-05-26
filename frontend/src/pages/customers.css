@@ -1,0 +1,16 @@
+.customerlookup{
+    display: flex;
+    align-items: center;
+
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
+    background-color: #f7f7f8;
+
+    position: relative;
+    margin: 24px 48px;
+    padding: 32px;
+
+    border: solid 2px #e9e9e9;
+    border-radius: 15px;
+}

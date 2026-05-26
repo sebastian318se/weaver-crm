@@ -1,5 +1,4 @@
 import InfoBox from "./../components/infobox";
-import LookupTable from "../components/lookuptable";
 import { DollarSign, PackageIcon, TrendingUp, UserIcon } from "lucide-react";
 import './dashboard.css';
 
@@ -10,9 +9,6 @@ export default function Dashboard() {
                 <h2>Financial Dashboard</h2>
                 <a>Buiness Performance Overview</a>
                 <hr />
-            </div>
-            <div>
-                <LookupTable/>
             </div>
             <div className="dashboardGrid">
                 <InfoBox
