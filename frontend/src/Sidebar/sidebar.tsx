@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FileText, LayoutDashboard, Package2Icon, PackageIcon, Settings, ShoppingCart, UserIcon } from "lucide-react";
+import { FileText, Info, LayoutDashboard, PackageIcon, Settings, ShoppingCart, UserIcon } from "lucide-react";
 import './sidebar.css';
 
 export default function Sidebar() {
@@ -28,6 +28,10 @@ export default function Sidebar() {
             name: "Settings",
             path: "/settings",
             icon: Settings
+        }, {
+            name: "Support",
+            path: "support",
+            icon: Info
         }
     ];
     return (

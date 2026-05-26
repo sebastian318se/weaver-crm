@@ -1,0 +1,8 @@
+.dashboardGrid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    
+    margin-right: 48px;
+    margin-left: 48px;
+    gap: 30px;
+}
