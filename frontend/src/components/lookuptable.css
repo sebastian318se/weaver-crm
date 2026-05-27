@@ -15,9 +15,14 @@
     width: 100%;
 }
 
+.lookuptable input:hover{
+    border: solid 2px #7c3aed;
+}
+
 .lookupicon{
     position: absolute;
     left: 48px;
+    top: 41.5px;
     
     pointer-events: none;
     color: #5b4b71;

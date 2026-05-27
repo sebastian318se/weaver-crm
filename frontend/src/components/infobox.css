@@ -7,6 +7,10 @@
     border-radius: 15px;
 }
 
+.infoBox:hover{
+    border: solid 2px #7c3aed;
+}
+
 .topSection{
     display: flex;
     justify-content: space-between;
