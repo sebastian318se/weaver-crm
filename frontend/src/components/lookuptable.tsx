@@ -8,10 +8,13 @@ export default function LookupTable(){
             <div className='lookupicon'>
                 <Search size={20}/>
             </div>
-            <input
-                type="text"
-                placeholder="        Search entries by name, email or phone..."
-            />
+            <div className='inputs'>
+                <input
+                    type="text"
+                    placeholder="        Search entries by name, email or phone..."
+                />
+                <a>Add New +   </a>
+            </div>
         </div>
     );
 }

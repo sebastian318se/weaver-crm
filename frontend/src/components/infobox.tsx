@@ -10,17 +10,16 @@ type InfoBoxProps = {
 
 export default function InfoBox({icon: Icon, metric, info, value} : InfoBoxProps) {
     return (
-        <div className='infoBox'>
+        <a className='infoBox'>
             <div className='topSection'>
                 <Icon size={22}/> <span>{metric}</span>
             </div>
-
             <div className='mainText'>
                 <span>{value}</span>
             </div>
             <div className='underText'>
                 <span>{info}</span>
             </div>
-        </div>
+        </a>
     );
 }

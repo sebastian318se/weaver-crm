@@ -9,6 +9,7 @@
 
 .customerBox:hover{
     border: solid 2px #7c3aed;
+    transition: 0.3s;
 }
 
 .upperSection{
