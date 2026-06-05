@@ -6,20 +6,23 @@ type InfoBoxProps = {
     metric: string;
     info: string;
     value: string;
+    classname: string;
 };
 
-export default function InfoBox({icon: Icon, metric, info, value} : InfoBoxProps) {
+export default function InfoBox({icon: Icon, metric, info, value, classname = ""} : InfoBoxProps) {
     return (
-        <a className='infoBox'>
+        <button className='infoBox'>
             <div className='topSection'>
                 <Icon size={22}/> <span>{metric}</span>
             </div>
             <div className='mainText'>
-                <span>{value}</span>
+                <div className={classname}>
+                    <span>{value}</span>
+                </div>
             </div>
             <div className='underText'>
                 <span>{info}</span>
             </div>
-        </a>
+        </button>
     );
 }

@@ -1,5 +1,5 @@
-import LookupTable from "../components/lookuptable";
-import CustomerBox from "../components/customerbox";
+import LookupTable from "../../components/lookuptable";
+import CustomerBox from "../../components/customerbox";
 import './customers.css'
 
 export default function Customers() {
@@ -7,12 +7,12 @@ export default function Customers() {
         <div>
             <div className="pageHeader">
                 <h2>Customer Management</h2>
-                <a>Track all customer history and relationships</a>
+                <span>Track all customer history and relationships</span>
                 <hr />
             </div>
             <div className="customerlookup">
                 <LookupTable/>
-                <span className="spanTag">Most Recent Customers:</span>
+                <span className="spanTag">Most Recent Customer Purchases:</span>
                 <CustomerBox
                     name="Sebastian Ferrari"
                     email="sebastianbferrari@gmail.com"

@@ -20,7 +20,7 @@ export default function CustomerBox({name, email, phone, lastvisit, metric, rack
                 <div className='lowerLeftSection'>
                     <div className='center'><Mail size={16}/> <span>{email}</span></div>
                     <div className='center'><Phone size={16}/> <span>{phone}</span></div>
-                    <div className='center'><Calendar size={16}/> <span>Last visit: {lastvisit}</span></div>
+                    <div className='center'><Calendar size={16}/> <span>Date: {lastvisit}</span></div>
                 </div>
                 <div>
                     <span>{racketsstrung} rackets strung</span>

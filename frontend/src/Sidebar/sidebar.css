@@ -7,7 +7,7 @@
 
   border-right: 2px solid #e9e9e9;
 
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
 }
@@ -45,7 +45,7 @@
 
 .sidebar-link:hover{
   background-color: #e9e9e9;
-  transition: 0.2s;
+  transition: 0.3s;
 }
 
 /* :active when pressed and .active for active page*/

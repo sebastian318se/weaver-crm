@@ -1,12 +1,13 @@
 import Sidebar from "./Sidebar/sidebar";
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/Dashboard/dashboard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Inventory from "./pages/inventory";
-import Customers from "./pages/customers";
-import Orders from "./pages/orders";
-import Invoices from "./pages/invoices";
-import Settings from "./pages/settings";
-import Support from "./pages/appsupport";
+import Inventory from "./pages/Inventory/inventory";
+import Customers from "./pages/Customers/customers";
+import Orders from "./pages/Orders/orders";
+import Invoices from "./pages/Invoices/invoices";
+import Settings from "./pages/Settings/settings";
+import Support from "./pages/AppSupport/appsupport";
+import Expenses from "./pages/Expenses/expenses";
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                         <Route path="/invoices" element={<Invoices />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/support" element={<Support />} />
+                        <Route path="/expenses" element={<Expenses />} />
                     </Routes>
                 </main>
 

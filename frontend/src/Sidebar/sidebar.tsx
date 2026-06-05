@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FileText, Info, LayoutDashboard, PackageIcon, Settings, ShoppingCart, UserIcon } from "lucide-react";
+import { FileText, Info, LayoutDashboard, PackageIcon, Settings, ShoppingCart, TrendingDown, UserIcon } from "lucide-react";
 import './sidebar.css';
 
 export default function Sidebar() {
@@ -8,6 +8,10 @@ export default function Sidebar() {
             name: "Dashboard",
             path: "/dashboard",
             icon: LayoutDashboard
+        }, {
+            name: "Expenses",
+            path: "/expenses",
+            icon: TrendingDown
         }, {
             name: "Inventory",
             path: "/inventory",
