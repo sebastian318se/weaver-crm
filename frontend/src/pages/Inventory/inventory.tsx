@@ -1,39 +1,11 @@
 import { useState } from "react";
 import InventoryTable from "./inventoryTable";
 import './inventory.css'
-
+import { balls, clothing, grips, rackets, shoes, strings, other } from "./InventoryProps";
 
 export default function Inventory() {
 
-        const products = [
-        {
-            id: 1,
-            name: "Babolat Pure Aero 98",
-            brand: "Babolat",
-            price: 305.00,
-            stock: 2,
-            capacity: 20
-        },
-        {
-            id: 2,
-            name: "Wilson Pro Staff 97",
-            brand: "Wilson",
-            price: 295,
-            stock: 15,
-            capacity: 20
-        },
-        {
-            id: 3,
-            name: "Head Speed Pro 98",
-            brand: "Head",
-            price: 305,
-            stock: 1,
-            capacity: 15
-        }
-    ];
-
-
-    const [activeTab, setActiveTab] = useState("rackets");
+    const [activeTab, setActiveTab] = useState("Rackets");
     const tabs = [
         "Rackets",
         "Strings",
@@ -66,11 +38,37 @@ export default function Inventory() {
 
                 {activeTab === "Rackets" && (
                     <InventoryTable
-                    products={products}/>
+                    products={rackets}/>
                 )}
 
                 {activeTab === "Strings" && (
-                    <h2>Orders</h2>
+                   <InventoryTable
+                    products={strings}/>
+                )}
+
+                {activeTab === "Grips" && (
+                   <InventoryTable
+                    products={grips}/>
+                )}
+
+                {activeTab === "Clothing" && (
+                   <InventoryTable
+                    products={clothing}/>
+                )}
+
+                {activeTab === "Shoes" && (
+                   <InventoryTable
+                    products={shoes}/>
+                )}
+
+                {activeTab === "Balls" && (
+                   <InventoryTable
+                    products={balls}/>
+                )}
+
+                {activeTab === "Other" && (
+                   <InventoryTable
+                    products={other}/>
                 )}
             </div>
         </div>

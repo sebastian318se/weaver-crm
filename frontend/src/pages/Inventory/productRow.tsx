@@ -20,7 +20,7 @@ export default function ProductRow({
     const stockPercent = (stock / capacity) * 100;
 
     const status =
-        stockPercent <= 20
+        stockPercent <= 30
             ? "Low"
             : "In";
 
@@ -30,11 +30,17 @@ export default function ProductRow({
             <span className='brand'>{brand}</span>
             <span className='price'>${price}</span>
 
-            <div className="progressBar">
-                <div
-                    className="progressFill"
-                    style={{ width: `${stockPercent}%` }}
-                />
+            <div className='progressBarContainer'>                
+                <div className="progressBar">
+                    <div
+                        className={status === "Low" ? "progressLow" : "progressIn"}
+                        style={{ width: `${stockPercent}%` }}
+                    />
+                </div>
+                
+                <div className='progressOverlay'>
+                    <span>{stock} / {capacity} in stock</span>
+                </div>
             </div>
 
             <span className={status}>{status} Stock</span>

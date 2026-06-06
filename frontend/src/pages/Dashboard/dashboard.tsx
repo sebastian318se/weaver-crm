@@ -33,7 +33,7 @@ export default function Dashboard() {
                     icon={PackageIcon}
                     metric="4 due"
                     info="Pending String Jobs"
-                    value="$23"
+                    value="23"
                 />
             </div>
         </div>

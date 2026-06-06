@@ -22,7 +22,7 @@
 .Low{
     padding: 5px 8px;
     background-color: rgb(247, 217, 217);
-    color: rgb(227, 8, 8);
+    color: #cd3e33;
     border-radius: 10px;
     justify-self: start;
 }
@@ -33,4 +33,60 @@
     color: #7c3aed;
     border-radius: 10px;
     justify-self: start;
+}
+
+.progressBarContainer{
+    position: relative;
+}
+
+.progressBar{
+    width: 75%;
+    height: 15px;
+    background-color: #e0e0de;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.progressOverlay{
+    position: absolute;
+    top: -20px;
+    left: 10%;
+    width: 45%;
+    height: 200%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(30, 41, 59, 0.9);
+    color: #e2c1dd;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 6px;
+
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+    min-height: min-content;
+    padding: 2px 2px;
+}
+
+.progressBarContainer:hover .progressOverlay{
+    opacity: 1;
+}
+
+.progressLow{
+    height: 100%;
+    background-color: #cd3e33;
+    border-radius: inherit;
+    transition: width 0.3s ease-in-out;
+}
+
+.progressIn{
+    height: 100%;
+    background-color: #7c3aed;
+    border-radius: inherit;
+    transition: width 0.3s ease-in-out;
 }
