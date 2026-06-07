@@ -13,7 +13,6 @@ namespace TennisCrmApi
         public bool IsDeleted { get; set; } = false;
     }
 
-
     public class Racket : Product
     {
         public string StringPattern { get; set; } = string.Empty;

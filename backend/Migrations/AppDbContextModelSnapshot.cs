@@ -85,7 +85,7 @@ namespace tenniscrm.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Order");
 
@@ -145,6 +145,42 @@ namespace tenniscrm.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("TennisCrmApi.Transaction", b =>
+                {
+                    b.Property<int>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TransactionId"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TransactionCategory")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("TransactionCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("TransactionValue")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("TransactionId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Transactions");
+                });
+
             modelBuilder.Entity("TennisCrmApi.Sale", b =>
                 {
                     b.HasBaseType("TennisCrmApi.Order");
@@ -174,12 +210,12 @@ namespace tenniscrm.Migrations
                     b.Property<int>("StringId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TenisStringProductId")
+                    b.Property<int?>("TennisStringProductId")
                         .HasColumnType("integer");
 
                     b.HasIndex("RacketId");
 
-                    b.HasIndex("TenisStringProductId");
+                    b.HasIndex("TennisStringProductId");
 
                     b.HasDiscriminator().HasValue("StringJob");
                 });
@@ -319,6 +355,17 @@ namespace tenniscrm.Migrations
                         .HasForeignKey("SaleOrderId");
                 });
 
+            modelBuilder.Entity("TennisCrmApi.Transaction", b =>
+                {
+                    b.HasOne("TennisCrmApi.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("TennisCrmApi.StringJob", b =>
                 {
                     b.HasOne("TennisCrmApi.Racket", "Racket")
@@ -327,15 +374,13 @@ namespace tenniscrm.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TennisCrmApi.TennisString", "TenisString")
+                    b.HasOne("TennisCrmApi.TennisString", "TennisString")
                         .WithMany()
-                        .HasForeignKey("TenisStringProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TennisStringProductId");
 
                     b.Navigation("Racket");
 
-                    b.Navigation("TenisString");
+                    b.Navigation("TennisString");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Customer", b =>

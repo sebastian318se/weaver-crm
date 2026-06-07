@@ -26,5 +26,6 @@ app.MapSJEndpoints();
 app.MapSalesEndpoints();
 app.MapInventoryEndpoints();
 app.MapCustomerEndpoints();
+app.MapTransactionEndpoints();
 
 app.Run();

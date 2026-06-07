@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Customer> Customers { get; set; }
 
+    public DbSet<Transaction> Transactions { get; set; }
+
     // Products
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Racket> Rackets => Set<Racket>();
@@ -22,6 +24,7 @@ public class AppDbContext : DbContext
     public DbSet<MiscGear> Miscellaneous => Set<MiscGear>();
 
     // Orders
+    public DbSet<Order> Orders => Set<Order>();
     public DbSet<Sale> Sales => Set<Sale>();
     public DbSet<StringJob> StringJobs => Set<StringJob>();
 }
