@@ -42,3 +42,19 @@
 .tabactive:active{
     transform: scale(0.97);
 }
+
+.salescontainer{
+    background-color: #f7f7f8;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e9e9e9;
+}
+
+.salescontainer input{
+    width: 50%;
+}
+.salesgrid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 20px;
+}

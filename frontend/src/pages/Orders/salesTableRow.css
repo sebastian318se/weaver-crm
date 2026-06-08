@@ -1,0 +1,14 @@
+.salesrow{
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    background-color: #f1f1f1;
+
+    margin-top: 7px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.price{
+    color: #5b4b71;
+}
