@@ -10,7 +10,7 @@
 }
 
 .customerBox:hover{
-    border: solid 2px #7c3aed;
+    border: solid 1px #7c3aed;
     transition: 0.3s;
 }
 
@@ -81,7 +81,7 @@
     overflow: hidden;
     
     word-break: break-all;     
-    overflow-wrap: break-word; 
+    word-wrap: break-word; 
     
     line-height: 1.2;
 }

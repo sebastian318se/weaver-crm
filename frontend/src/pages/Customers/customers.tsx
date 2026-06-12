@@ -10,8 +10,8 @@ interface Customer {
     customerPhone: string;
     customerEmail: string;
     lastModified: string;
-    totalSpent: number;
-    racketsStrung: number
+    totalSpent?: number;
+    racketsStrung?: number;
 }
 
 export default function Customers() {
@@ -19,14 +19,15 @@ export default function Customers() {
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [showNewCustomer, setShowNewCustomer] = useState(false);
 
+    const fetchCustomers = async () => {
+        const response = await fetch("http://localhost:5000/api/customers");
+        const data: Customer[] = await response.json();
+
+        setCustomers(data);
+    };
+
+
     useEffect(() => {
-        const fetchCustomers = async () => {
-            const response = await fetch("http://localhost:5000/api/customers");
-            const data: Customer[] = await response.json();
-
-            setCustomers(data);
-        };
-
         fetchCustomers();
     }, []);
 
@@ -44,11 +45,13 @@ export default function Customers() {
                 <hr />
             </div>
 
-            {showNewCustomer && (
-                <div>
-                    <NewCustomerBox/>
+
+                <div className={`newcustomerdiv ${showNewCustomer ? "open" : ""}`}>
+                    <NewCustomerBox
+                        action={()=>setShowNewCustomer(false)}
+                        onCustomerCreated={fetchCustomers}
+                    />
                 </div>
-            )}
 
             <div className="customerlookup">
 
@@ -71,7 +74,7 @@ export default function Customers() {
                             name={customer.customerName}
                             email={customer.customerEmail}
                             phone={customer.customerPhone}
-                            metric={`$${customer.totalSpent}`}
+                            totalSpent={customer.totalSpent}
                             racketsstrung={customer.racketsStrung}
                             lastvisit={formatDate(customer.lastModified)}
                         />

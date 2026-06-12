@@ -9,8 +9,8 @@ namespace TennisCrmApi
         public string? CustomerNotes { get; set; }
         public bool IsDeleted { get; set; } = false;
         public DateTime LastModified { get; set; } = DateTime.UtcNow;
-        public int TotalSpent { get; set; }
-        public int RacketsStrung { get; set; } 
+        public int? TotalSpent { get; set; }
+        public int? RacketsStrung { get; set; } 
         // One-to-many relationship between customer and order.
         public List<Order>? Orders { get; set; }
     }

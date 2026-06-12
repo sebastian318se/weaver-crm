@@ -36,6 +36,9 @@ namespace tenniscrm.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("CustomerNotes")
+                        .HasColumnType("text");
+
                     b.Property<string>("CustomerPhone")
                         .HasColumnType("text");
 
@@ -45,10 +48,10 @@ namespace tenniscrm.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("RacketsStrung")
+                    b.Property<int?>("RacketsStrung")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TotalSpent")
+                    b.Property<int?>("TotalSpent")
                         .HasColumnType("integer");
 
                     b.HasKey("CustomerId");

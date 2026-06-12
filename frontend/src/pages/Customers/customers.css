@@ -19,3 +19,21 @@
 
     width: 100%;
 }
+
+.newcustomerdiv {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 
+        max-height 0.3s ease,
+        opacity 0.3s ease,
+        transform 0.3s ease; {/* Sliding down from top */}
+}
+
+
+.newcustomerdiv.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+}
