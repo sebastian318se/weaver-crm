@@ -26,11 +26,11 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
             <div className='lowerSection'>
                 <div className='lowerLeftSection'>
 
-                    {email != null &&
+                    {(email != null && email != "") &&
                         (<div className='center'><Mail size={16}/> <span>{email}</span></div>)
                     }
 
-                    {phone != null &&
+                    {(phone != null && phone != "") &&
                         (<div className='center'><Phone size={16}/> <span>{phone}</span></div>)
                     }
                     <div className='center'><Calendar size={16}/> <span>Last visit: {lastvisit}</span></div>
