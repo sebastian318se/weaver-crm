@@ -1,0 +1,64 @@
+.sjtablecontainer{
+    border-radius: 10px;
+    padding: 20px;
+
+    background-color: #fbfbfb;
+    border-radius: 10px;
+    border: 1px solid #e9e9e9;
+}
+
+.sjtablecontainer:hover{
+    transition: 0.2s;
+    border: 1px solid #7c3aed;
+}
+.topRow{
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.status{
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.status span{
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.Late{
+    background-color: rgb(247, 217, 217);
+    color: #cd3e33;
+}
+
+.Pending{
+    background-color: #e9e9e9;
+    color:#5b4b71;
+}
+
+.InProgress{
+    background-color: #e1d5f5;
+    color: #7c3aed;
+}
+
+.Completed{
+    background-color: rgb(218, 247, 217);
+    color: #0ba35a;
+}
+
+.middleSection{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    margin: 15px 0;
+    gap: 10px;
+
+    font-size: 18px;
+    color: #5b4b71;
+}
+
+.sjprice{
+    color: #7c3aed;
+}

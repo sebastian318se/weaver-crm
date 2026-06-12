@@ -8,6 +8,7 @@ namespace TennisCrmApi
         public string? ProductModel { get; set; }
         public int ProductId { get; set; }
         public int ProductStockAmount { get; set; }
+        public int ProductStockCapacity { get; set; }
         public decimal ProductPrice { get; set; }
         public DateTime LastModified { get; set; }  = DateTime.UtcNow; 
         public bool IsDeleted { get; set; } = false;

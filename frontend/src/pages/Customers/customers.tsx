@@ -1,8 +1,41 @@
 import LookupTable from "../../components/lookuptable";
 import CustomerBox from "../../components/customerbox";
+import { useEffect, useState } from "react";
 import './customers.css'
+import NewCustomerBox from "./newcustomerform";
+
+interface Customer {
+    customerId: number;
+    customerName: string;
+    customerPhone: string;
+    customerEmail: string;
+    lastModified: string;
+    totalSpent: number;
+    racketsStrung: number
+}
 
 export default function Customers() {
+
+    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [showNewCustomer, setShowNewCustomer] = useState(false);
+
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            const response = await fetch("http://localhost:5000/api/customers");
+            const data: Customer[] = await response.json();
+
+            setCustomers(data);
+        };
+
+        fetchCustomers();
+    }, []);
+
+    const formatDate = (dateString: string) => {
+        return new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo"
+        }).format(new Date(dateString));
+        };
+
     return (
         <div>
             <div className="pageHeader">
@@ -10,25 +43,41 @@ export default function Customers() {
                 <span>Track all customer history and relationships</span>
                 <hr />
             </div>
+
+            {showNewCustomer && (
+                <div>
+                    <NewCustomerBox/>
+                </div>
+            )}
+
             <div className="customerlookup">
-                <LookupTable/>
-                <span className="spanTag">Most Recent Customer Purchases:</span>
-                <CustomerBox
-                    name="Sebastian Ferrari"
-                    email="sebastianbferrari@gmail.com"
-                    phone="(51)12345-1234"
-                    metric="$1240"
-                    racketsstrung="8"
-                    lastvisit="05-25-2026"
+
+                <LookupTable 
+                    action={()=>setShowNewCustomer(prev => ! prev)} // Toggle whenever pressed
                 />
-                <CustomerBox
-                    name="Marcelo Ferrari"
-                    email="marcelofavaferrari@gmail.com"
-                    phone="(51)12345-1234"
-                    metric="$2480"
-                    racketsstrung="16"
-                    lastvisit="05-26-2026"
-                />
+                
+                <div className="customerboxes">
+                    {customers
+                        .slice() // Make copy
+                        .sort((a, b) => 
+                            new Date(b.lastModified).getTime() - 
+                            new Date(a.lastModified).getTime()) // Sort by date a to be where
+                        .slice(0, 8) // Keep only most recent entries
+                        .map(customer => (
+
+                        <CustomerBox
+                            key={customer.customerId}
+                            customerid={customer.customerId}
+                            name={customer.customerName}
+                            email={customer.customerEmail}
+                            phone={customer.customerPhone}
+                            metric={`$${customer.totalSpent}`}
+                            racketsstrung={customer.racketsStrung}
+                            lastvisit={formatDate(customer.lastModified)}
+                        />
+
+                    ))}
+                </div>
             </div>
         </div>
     );

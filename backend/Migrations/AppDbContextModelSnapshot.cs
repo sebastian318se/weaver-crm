@@ -45,6 +45,12 @@ namespace tenniscrm.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("RacketsStrung")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalSpent")
+                        .HasColumnType("integer");
+
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
@@ -129,6 +135,9 @@ namespace tenniscrm.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<int>("ProductStockAmount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductStockCapacity")
                         .HasColumnType("integer");
 
                     b.Property<int?>("SaleOrderId")

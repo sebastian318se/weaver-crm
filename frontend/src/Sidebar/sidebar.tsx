@@ -24,11 +24,13 @@ export default function Sidebar() {
             name: "Orders",
             path: "/orders",
             icon: ShoppingCart
-        }, {
-            name: "Invoices",
-            path: "/invoices",
-            icon: FileText
-        }, {
+        },
+        // {
+            // name: "Invoices",
+            // path: "/invoices",
+            // icon: FileText
+        // },
+        {
             name: "Settings",
             path: "/settings",
             icon: Settings

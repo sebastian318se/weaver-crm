@@ -10,6 +10,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -17,6 +27,8 @@ if (app.Environment.IsDevelopment())
     Console.Write($"Environment = Development");
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors("ReactApp");
 }
 
 else Console.Write("Environment is Production");

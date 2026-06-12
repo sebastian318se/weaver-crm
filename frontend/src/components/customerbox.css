@@ -1,10 +1,12 @@
 .customerBox{
-    background-color: #f7f7f8;
+    background-color: white;
 
     padding: 10px 40px;
 
-    border: solid 2px #e9e9e9;
+    border: solid 1px #e9e9e9;
     border-radius: 12px;
+
+    box-sizing: border-box;
 }
 
 .customerBox:hover{
@@ -14,7 +16,7 @@
 
 .customerBox:active{
     transform: scale(0.98);
-    background-color: #e9e9e9;
+    background-color: #f7f7f8;
 }
 
 .upperSection{
@@ -27,10 +29,22 @@
 
     color: #222;
     font-size: 25px;
+
+    gap: 16px;
+}
+
+/* Handles long names */
+.upperSection > span:first-child {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
 }
 
 .metric{
     color: #7c3aed;
+    flex-shrink: 0;
 }
 
 .lowerSection{
@@ -44,16 +58,30 @@
     font-size: 20px;
     color: #5b4b71;
 }
+
 .lowerLeftSection{
     display: flex;
     align-items: center;
-
     gap: 16px;
+    min-width: 0;
+    flex-wrap: wrap;
 }
 
 .center{
     display: flex;
-    align-items: center;
-
+    align-items: center;    
     gap: 6px;
+}
+
+/* Handles super long emails */
+.center span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    word-break: break-all;     
+    overflow-wrap: break-word; 
+    
+    line-height: 1.2;
 }
