@@ -56,9 +56,9 @@ namespace TennisCrmApi
     }
 
     // Class for all miscellaneous gear and products of low store volume
-    public class MiscGear : Product
+    public class Other : Product
     {
-        public string MiscInfo { get; set; } = string.Empty;
+        public string OtherInfo { get; set; } = string.Empty;
     }
 
     public enum ClothingType

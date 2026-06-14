@@ -271,15 +271,15 @@ namespace tenniscrm.Migrations
                     b.HasDiscriminator().HasValue("Grip");
                 });
 
-            modelBuilder.Entity("TennisCrmApi.MiscGear", b =>
+            modelBuilder.Entity("TennisCrmApi.Other", b =>
                 {
                     b.HasBaseType("TennisCrmApi.Product");
 
-                    b.Property<string>("MiscInfo")
+                    b.Property<string>("OtherInfo")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasDiscriminator().HasValue("MiscGear");
+                    b.HasDiscriminator().HasValue("Other");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Racket", b =>

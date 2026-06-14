@@ -21,7 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<Clothing> Clothes => Set<Clothing>();
     public DbSet<Shoe> Shoes => Set<Shoe>();
     public DbSet<Ball> Balls => Set<Ball>();
-    public DbSet<MiscGear> Miscellaneous => Set<MiscGear>();
+    public DbSet<Other> Miscellaneous => Set<Other>();
 
     // Orders
     public DbSet<Order> Orders => Set<Order>();

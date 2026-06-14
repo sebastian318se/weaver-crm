@@ -28,9 +28,8 @@
     transition: 
         max-height 0.3s ease,
         opacity 0.3s ease,
-        transform 0.3s ease; {/* Sliding down from top */}
+        transform 0.3s ease;
 }
-
 
 .newcustomerdiv.open {
     max-height: 500px;

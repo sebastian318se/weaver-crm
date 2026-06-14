@@ -13,21 +13,21 @@ namespace TennisCrmApiEndpoints
             app.MapGet("/api/inventory/{id}", GetItemById);
             app.MapGet("api/inventory/deleted", GetDeleted);
 
-            app.MapGet("/api/inventory/rackets", GetAll<Racket>);
-            app.MapGet("/api/inventory/strings", GetAll<TennisString>);
-            app.MapGet("/api/inventory/grips", GetAll<Grip>);
+            app.MapGet("/api/inventory/racket", GetAll<Racket>);
+            app.MapGet("/api/inventory/string", GetAll<TennisString>);
+            app.MapGet("/api/inventory/grip", GetAll<Grip>);
             app.MapGet("/api/inventory/clothing", GetAll<Clothing>);
-            app.MapGet("/api/inventory/shoes", GetAll<Shoe>);
-            app.MapGet("/api/inventory/balls", GetAll<Ball>);
-            app.MapGet("/api/inventory/misc", GetAll<MiscGear>);
+            app.MapGet("/api/inventory/shoe", GetAll<Shoe>);
+            app.MapGet("/api/inventory/ball", GetAll<Ball>);
+            app.MapGet("/api/inventory/other", GetAll<Other>);
 
-            app.MapPost("/api/inventory/rackets", PostItem<Racket>);
-            app.MapPost("/api/inventory/strings", PostItem<TennisString>);
-            app.MapPost("/api/inventory/grips", PostItem<Grip>);
+            app.MapPost("/api/inventory/racket", PostItem<Racket>);
+            app.MapPost("/api/inventory/string", PostItem<TennisString>);
+            app.MapPost("/api/inventory/grip", PostItem<Grip>);
             app.MapPost("/api/inventory/clothing", PostItem<Clothing>);
-            app.MapPost("/api/inventory/shoes", PostItem<Shoe>);
-            app.MapPost("/api/inventory/balls", PostItem<Ball>);
-            app.MapPost("/api/inventory/misc", PostItem<MiscGear>);
+            app.MapPost("/api/inventory/shoe", PostItem<Shoe>);
+            app.MapPost("/api/inventory/ball", PostItem<Ball>);
+            app.MapPost("/api/inventory/other", PostItem<Other>);
 
             app.MapPut("/api/inventory/{id}", PutItem);
 
