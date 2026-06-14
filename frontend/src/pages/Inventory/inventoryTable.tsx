@@ -3,12 +3,13 @@ import ProductRow from "./productRow";
 import './inventoryTable.css'
 
 type Product = {
-    id: number;
-    name: string;
-    brand: string;
-    price: number;
-    stock: number;
-    capacity: number;
+    productId: number;
+    productName: string;
+    productBrand: string;
+    productPrice: number;
+
+    productStockAmount: number;
+    productStockCapacity: number;
 };
 
 type Props = {
@@ -33,13 +34,13 @@ export default function InventoryTable({ products }: Props) {
 
             {products.map(product => (
                 <ProductRow
-                    key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    brand={product.brand}
-                    price={product.price}
-                    stock={product.stock}
-                    capacity={product.capacity}
+                    key={product.productId}
+                    id={product.productId}
+                    name={product.productName}
+                    brand={product.productBrand}
+                    price={product.productPrice}
+                    stock={product.productStockAmount}
+                    capacity={product.productStockCapacity}
                 />
             ))}
         </div>
