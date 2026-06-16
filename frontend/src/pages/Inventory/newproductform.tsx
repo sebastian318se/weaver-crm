@@ -8,23 +8,25 @@ type customerBoxProps = {
 
 export default function NewProductBox({action, onCustomerCreated} : customerBoxProps){
 
-    const [name, setName] = useState<string | null>(null);
-    const [brand, setBrand] = useState<string | null>(null);
-    const [price, setPrice] = useState<string | null>(null);
+    const[formData, setFormData] = useState({
+        name: null,
+        brand: null,
+        price: null,
+        stockAmount: null,
+        stockCapacity: null,
+        notes: null
+    }) 
     
-    const [stockAmount, setStockAmount] = useState<string | null>(null);
-    const [stockCapacity, setStockCapacity] = useState<string | null>(null);
-
-    const [discriminator, setDiscriminator] = useState("Racket")
+    const [discriminator, setDiscriminator] = useState("")
 
     async function handleSubmit() {
         const product = {
-            productName: name,
-            productBrand: brand,
-            productPrice: Number(price),
+            productName: formData.name,
+            productBrand: formData.brand,
+            productPrice: Number(formData.price),
 
-            productStockAmount: Number(stockAmount),
-            productStockCapacity: Number(stockCapacity),
+            productStockAmount: Number(formData.stockAmount),
+            productStockCapacity: Number(formData.stockCapacity),
 
             discriminator: discriminator
         };
@@ -42,42 +44,60 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
         }
 
         onCustomerCreated();
-        setName(null); setBrand(null); setPrice(null); setStockAmount(null); setStockCapacity(null); 
+        setFormData(null); 
         action();
     }
 
     const inputMappers = [
         {
             title: "Product Name",
-            inputinfo: "Yonex Ezone 98 2026",
-            setter: setName,
-            value: name
+            placeholder: "Enter product name...",
+            key: "name"
         },
         {
             title: "Brand",
-            inputinfo: "Yonex",
-            setter: setBrand,
-            value: brand
+            placeholder: "Enter product brand...",
+            key: "brand"
         },
         {
             title: "Price",
-            inputinfo: "305.00",
-            setter: setPrice,
-            value: price
+            placeholder: "e.g. 200",
+            key: "price"
         },
         {
             title: "Stock Owned",
-            inputinfo: "15",
-            setter: setStockAmount,
-            value: stockAmount
+            placeholder: "Number of items owned",
+            key: "stockAmount"
         },
         {
             title: "In-Store Stock Capacity",
-            inputinfo: "20",
-            setter: setStockCapacity,
-            value: stockCapacity
+            placeholder: "Highest possible in-stock count of the item",
+            key: "stockCapacity"
+        },
+        {
+            title: "Notes",
+            placeholder: "Notes about this product",
+            key: "notes"
         }
     ]
+
+    const fields = {
+        racket: [
+            {title: "Weight", placeholder: "e.g. 305g", key: "weight"},
+            {title: "String Pattern", placeholder: "e.g. 16x19", key: "stringPattern"},
+            {title: "Grip Size", placeholder: "e.g. L3, 4 3/8, etc.", key: "gripSize"},
+            {title: "Head Size", placeholder: "e.g. 98 sq. in.", key: "headSize"},
+            {title: "Swing Weight", placeholder: "e.g. 320g", key:"swingWeight"},
+            {title: "Beam Thickness", placeholder: "e.g. 23.8mm", key: "beamThickness"},
+            {title: "Stiffness", placeholder: "e.g. 63RA", key: "flex"},
+            {title: "Length", placeholder: "e.g. 27in", key:"length"}
+        ],
+        string: [
+            {title: "Material", placeholder: "Polyester", key: "material"},
+            {title: "Gauge", placeholder: "e.g. 17L", key: "gauge"},
+            {title: "ADD CHECKBOX FOR REEL"}
+        ],
+    }
 
     return (
         <div>
@@ -88,11 +108,13 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
                     <span className='addnewspan'>Create New Product</span>
                     
                     <div className="forminputs">
-                        
+
+                    {/* GENERAL UN-NULLABLE PARAMETERS */}
                         <div className='forminput'>
                             <span>Product Type</span>
                             <select
                                 onChange={(e) => setDiscriminator(e.target.value)}
+                                defaultValue="other"
                             >
                                 <option value="racket">Racket</option>
                                 <option value="string">String</option>
@@ -108,15 +130,47 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
                             <div className="forminput">
                                 <span>{inputMapper.title}</span>
                                 <input 
-                                    value={inputMapper.value ?? ""}
-                                    placeholder={inputMapper.inputinfo}
-                                    onChange={(e) => inputMapper.setter(e.target.value)}
+                                    // Get values for that specific item.
+                                    value={formData[inputMapper.key] ?? ""}
+                                    placeholder={inputMapper.placeholder}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        // Set the key to desired (current) value
+                                        [inputMapper.key]: e.target.value
+                                    }))}
+                                />
+                            </div>
+                        ))}
+
+                    {/* FIELD SPECIFIC PARAMETERS */}
+                        {fields[discriminator] && (
+                            // Sorry for the cheap trick for anyone reading this lol!
+                            <> <div></div><div></div><div></div>
+                            <div className='forminput'>
+                                <span>Optional Additional Fields:</span>
+                            </div>
+                             <div></div> </>
+                        )}
+
+                        {fields[discriminator]?.map(field => (
+                            <div className="forminput">
+                                <span>{field.title}</span>
+                                <input 
+                                    // Get values for that specific item.
+                                    value={formData[field.key] ?? ""}
+                                    placeholder={field.placeholder}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        // Set the key to desired (current) value
+                                        [field.key]: e.target.value
+                                    }))}
                                 />
                             </div>
                         ))}
 
                     </div>
-
+                
+                {/* CHECKOUT BUTTONS */}
                     <div className="formbuttons">
                         <button 
                             className='addproduct'

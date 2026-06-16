@@ -60,7 +60,7 @@
 }
 
 .newproductdiv.open {
-    max-height: 1000px;
+    max-height: 1200px;
     opacity: 1;
     transform: translateY(0);
 }

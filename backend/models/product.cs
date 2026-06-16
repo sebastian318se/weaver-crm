@@ -7,6 +7,7 @@ namespace TennisCrmApi
         public string? ProductImageUrl { get; set; }
         public string? ProductModel { get; set; }
         public int ProductId { get; set; }
+        public string? Notes { get; set; }
         public int ProductStockAmount { get; set; }
         public int ProductStockCapacity { get; set; }
         public decimal ProductPrice { get; set; }
