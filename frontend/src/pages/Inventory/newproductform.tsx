@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from 'react';
 import './newproductform.css'
 
@@ -152,22 +153,31 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
                              <div></div> </>
                         )}
 
-                        {fields[discriminator]?.map(field => (
-                            <div className="forminput">
-                                <span>{field.title}</span>
-                                <input 
-                                    // Get values for that specific item.
-                                    value={formData[field.key] ?? ""}
-                                    placeholder={field.placeholder}
-                                    onChange={(e) => setFormData(prev => ({
-                                        ...prev,
-                                        // Set the key to desired (current) value
-                                        [field.key]: e.target.value
-                                    }))}
-                                />
-                            </div>
-                        ))}
+                        <AnimatePresence mode="wait">
+                            {fields[discriminator]?.map(field => (
+                                <motion.div
+                                    className="forminput"
+                                    key={field.key}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.25 }}
+                                >
+                                    <span>{field.title}</span>
 
+                                    <input
+                                        value={formData[field.key] ?? ""}
+                                        placeholder={field.placeholder}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            [field.key]: e.target.value
+                                        }))}
+                                    />
+
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                        
                     </div>
                 
                 {/* CHECKOUT BUTTONS */}
