@@ -9,26 +9,57 @@ type customerBoxProps = {
 
 export default function NewProductBox({action, onCustomerCreated} : customerBoxProps){
 
-    const[formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
         name: null,
         brand: null,
         price: null,
         stockAmount: null,
         stockCapacity: null,
         notes: null
-    }) 
+    })
+
+    const [racketFormData, setRacketFormData] = useState({
+        weight: null,
+        stringPattern: null,
+        gripSize: null,
+        headSize: null,
+        swingWeight: null,
+        beamThickness: null,
+        flex: null,
+        length: null
+    })
+
+    const [stringForm, setStringForm] = useState({
+        material: null,
+        gauge: null
+    })
+
+    const [clothingForm, setClothingForm] = useState({
+        clothingType: null,
+        clothingSize: null
+    })
+
+    const [gripType, setGripType] = useState("Overgrip")
+
+    const [shoeData, setShoeData] = useState({
+        shoeSurface: null,
+        size: null
+    })
     
+    const [ballSurface, setBallSurface] = useState("Hard")
+
     const [discriminator, setDiscriminator] = useState("")
 
     async function handleSubmit() {
         const product = {
             productName: formData.name,
             productBrand: formData.brand,
+            notes: formData.notes,
             productPrice: Number(formData.price),
 
             productStockAmount: Number(formData.stockAmount),
             productStockCapacity: Number(formData.stockCapacity),
-
+            
             discriminator: discriminator
         };
 

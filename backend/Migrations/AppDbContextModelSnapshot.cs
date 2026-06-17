@@ -120,6 +120,9 @@ namespace tenniscrm.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
                     b.Property<string>("ProductBrand")
                         .IsRequired()
                         .HasColumnType("text");
@@ -274,10 +277,6 @@ namespace tenniscrm.Migrations
             modelBuilder.Entity("TennisCrmApi.Other", b =>
                 {
                     b.HasBaseType("TennisCrmApi.Product");
-
-                    b.Property<string>("OtherInfo")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasDiscriminator().HasValue("Other");
                 });

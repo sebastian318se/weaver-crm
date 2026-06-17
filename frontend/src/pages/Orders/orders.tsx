@@ -1,17 +1,48 @@
-import { sale1, sale2, sale3, sale4, sale5, sj1, sj2, sj3, sj4, sj5 } from "./OrderProps";
 import SalesTable from "./salesTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import './orders.css'
 import LookupTable from "../../components/lookuptable";
 import SjTable from "./sjTable";
 
+interface Sale{
 
+}
+
+interface StringJob{
+
+}
 
 export default function Orders() {
 
     const [activeTab, setActiveTab] = useState("orderstab");
-    const stringjobs = [ sj1,sj2, sj3, sj4, sj5 ];
-    const sales = [ sale1, sale2, sale3, sale4, sale5 ];
+    
+
+
+    const [sales, setSales] = useState<Sale[]>([]);
+    const fetchSales = async () => {
+        const response = await fetch("http://localhost:5000/api/sales");
+        const data = await response.json();
+
+        setSales(data);
+    }
+    useEffect(() => {
+        fetchSales();
+    }, [setSales]);
+
+
+
+    const [stringjobs, setStringjobs] = useState<StringJob[]>([]);
+    const fetchStringJob = async () => {
+        const response = await fetch("http://localhost:5000/api/strung");
+        const data = await response.json();
+
+        setStringjobs(data);
+    }
+    useEffect(() => {
+        fetchStringJob();
+    }, [setStringjobs]);
+
+
 
     return (
         <div>
