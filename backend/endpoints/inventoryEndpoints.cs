@@ -12,6 +12,7 @@ namespace TennisCrmApiEndpoints
             app.MapGet("/api/inventory", GetItems);
             app.MapGet("/api/inventory/{id}", GetItemById);
             app.MapGet("api/inventory/deleted", GetDeleted);
+            app.MapGet("api/inventory/search", GetItemByQuery);
 
             app.MapGet("/api/inventory/racket", GetAll<Racket>);
             app.MapGet("/api/inventory/string", GetAll<TennisString>);
@@ -71,6 +72,21 @@ namespace TennisCrmApiEndpoints
             return items is not null
                 ? Results.Ok(items)
                 : Results.NotFound("Could not locate deleted inventory entries");
+        }
+
+        // Get products on query match
+        public static async Task<IResult> GetItemByQuery(AppDbContext db, string query)
+        {
+            var items = await db.Products
+                .Where(x =>
+                    x.ProductName.Contains(query) ||
+                    x.ProductBrand.Contains(query) ||
+                    x.ProductModel != null && x.ProductModel.Contains(query)
+                ).ToListAsync();
+
+            return items is not null
+                ? Results.Ok(items)
+                : Results.NotFound("Could not locate such a product in the database.");
         }
 
         // Get all items per category

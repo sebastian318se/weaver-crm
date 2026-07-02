@@ -2,10 +2,11 @@ import './lookuptable.css';
 import { Search } from 'lucide-react';
 
 type LookUpProp = {
-    action: () => void; // Receives void function from customers.tsx call
+    action: () => void; // Receives void function from .tsx call
+    onEntryCreated: () => void;
 }
 
-export default function LookupTable({action}: LookUpProp){
+export default function LookupTable({action, onEntryCreated}: LookUpProp){
     return (
         <div className="lookuptable">
             {/* USE STATE to check if its active and hide icon */}

@@ -1,4 +1,4 @@
-.orders{
+.ordersmargin{
     margin: 0 48px;
 }
 
@@ -70,4 +70,21 @@
 
     font-size: 18px;
     color: #5b4b71;
+}
+
+.newsalediv {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 
+        max-height 0.3s ease,
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+.newsalediv.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
 }

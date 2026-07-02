@@ -1,8 +1,8 @@
 import LookupTable from "../../components/lookuptable";
 import CustomerBox from "../../components/customerbox";
+import NewCustomerBox from "./newcustomerform";
 import { useEffect, useState } from "react";
 import './customers.css'
-import NewCustomerBox from "./newcustomerform";
 
 interface Customer {
     customerId: number;
@@ -57,6 +57,7 @@ export default function Customers() {
 
                 <LookupTable 
                     action={()=>setShowNewCustomer(prev => ! prev)} // Toggle whenever pressed
+                    onEntryCreated={() => fetchCustomers()}
                 />
                 
                 <div className="customerboxes">

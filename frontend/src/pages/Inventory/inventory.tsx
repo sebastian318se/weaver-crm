@@ -139,6 +139,7 @@ export default function Inventory() {
                             <div>
                                 <LookupTable
                                     action={() => setNewProductForm(prev => !prev)}
+                                    onEntryCreated={(fetchProducts)}
                                 />
                                 <InventoryTable
                                     key={fetchMapper.tab}

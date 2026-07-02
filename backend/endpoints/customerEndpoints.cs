@@ -10,6 +10,7 @@ namespace TennisCrmApiEndpoints
             app.MapGet("/api/customers", GetCustomers);
             app.MapGet("/api/customers/{id}", GetCustomersById);
             app.MapGet("api/customers/deleted", GetDeleted);
+            app.MapGet("api/customers/search", GetCustomersByQuery);
 
             app.MapPost("/api/customers", PostCustomer);
 
@@ -50,6 +51,27 @@ namespace TennisCrmApiEndpoints
             return customer is not null
                 ? Results.Ok(customer)
                 : Results.NotFound("Could not locate deleted customer entries.");
+        }
+
+        // Get customers on string match for any parameter. 
+        // Query is inferred from method declaration.
+        public static async Task<IResult> GetCustomersByQuery(AppDbContext db, string query)
+        {   
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return Results.BadRequest("Can not query empty entry.");
+            }
+
+            var customer = await db.Customers
+                .Where( c =>
+                    c.CustomerName.Contains(query) ||
+                    c.CustomerEmail != null && c.CustomerEmail.Contains(query) ||
+                    c.CustomerPhone != null && c.CustomerPhone.Contains(query)
+                ).ToListAsync();
+
+            return customer is not null
+                ? Results.Ok(customer)
+                : Results.NotFound("No customer entry match.");
         }
 
         // Post customer entry

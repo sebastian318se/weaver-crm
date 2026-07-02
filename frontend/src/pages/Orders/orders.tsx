@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import './orders.css'
 import LookupTable from "../../components/lookuptable";
 import SjTable from "./sjTable";
+import NewSaleBox from "./newsaleform";
 
 interface Sale{
 
@@ -15,10 +16,10 @@ interface StringJob{
 export default function Orders() {
 
     const [activeTab, setActiveTab] = useState("orderstab");
-    
-
 
     const [sales, setSales] = useState<Sale[]>([]);
+
+    const [showNewSaleBox, setShowNewSaleBox] = useState(false);
     const fetchSales = async () => {
         const response = await fetch("http://localhost:5000/api/sales");
         const data = await response.json();
@@ -52,56 +53,78 @@ export default function Orders() {
                 <hr />
             </div>
             
-            <div className="orders">
-                <div className="tabButtons">
-                    <button
-                        className={activeTab === "orderstab" ? "tabactive" : "tab"}
-                        onClick={() => setActiveTab("orderstab")}>
-                            String Jobs
-                    </button>
+            <div>
+                <div className="ordersmargin">
+                    <div className="tabButtons">
+                        <button
+                            className={activeTab === "orderstab" ? "tabactive" : "tab"}
+                            onClick={() => setActiveTab("orderstab")}>
+                                Orders
+                        </button>
 
-                    <button 
-                        className={activeTab === "salestab" ? "tabactive" : "tab"}
-                        onClick={() => setActiveTab("salestab")}>
-                            Sales
-                    </button>
+                        <button 
+                            className={activeTab === "salestab" ? "tabactive" : "tab"}
+                            onClick={() => setActiveTab("salestab")}>
+                                Sales
+                        </button>
 
+                    </div>
+
+                    <br />
                 </div>
-
-                <br />
-                
                 {activeTab === "orderstab" && (
 
-                    <div className="salescontainer">
+                    <div className="ordersmargin">
+                        <div className="salescontainer">
+                            
+                            <LookupTable
+                                onEntryCreated={fetchSales}
+                                action={() => setShowNewSaleBox(prev => !prev)}/>
 
-                        <LookupTable/>
+                            <div className="sjgrid">
 
-                        <div className="sjgrid">
+                                {stringjobs.map((job) => (
+                                    <SjTable
+                                    key={job.orderId}
+                                    {...job}/>
+                                ))}
 
-                            {stringjobs.map((job) => (
-                                <SjTable
-                                key={job.orderId}
-                                {...job}/>
-                            ))}
-
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {activeTab === "salestab" && (
-                    
-                    <div className="salescontainer">
+                    <div>
+                        <div className={`newsalediv ${showNewSaleBox ? "open" : ""}`}>
+                            <NewSaleBox
+                                action={() => setShowNewSaleBox(prev => !prev)}
+                                onSaleCreated={fetchSales}
+                            />
+                        </div>
+                        <div className="ordersmargin">
+                            <div className="salescontainer">
 
-                        <LookupTable/>
-                    
-                        <div className="salesgrid">
+                                    <LookupTable
+                                        action={()=> setShowNewSaleBox(prev => !prev)}
+                                        onEntryCreated={(fetchSales)}/>
+        
+                            
+                                <div className="salesgrid">
 
-                            {sales.map((sale) => (
-                                <SalesTable
-                                    key={sale.orderId}
-                                    {...sale}/>
-                            ))}
+                                    {/* POPULATE THIS */}
+                                    <div>
+                                        {sales.length <= 0 && (<p>Nothing</p>)}
+                                    </div>
 
+                                    {sales.map((sale) => (
+                                        <SalesTable
+                                            key={sale.orderId}
+                                            {...sale}/>
+                                    ))}
+                
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
