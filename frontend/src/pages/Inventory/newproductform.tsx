@@ -2,82 +2,104 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from 'react';
 import './newproductform.css'
 
-type customerBoxProps = {
+type NewProductBoxProps = {
     action: () => void;
     onCustomerCreated: () => void;
 }
 
-export default function NewProductBox({action, onCustomerCreated} : customerBoxProps){
+export default function NewProductBox({action, onCustomerCreated} : NewProductBoxProps){
 
     const [formData, setFormData] = useState({
-        name: null,
-        brand: null,
-        price: null,
-        stockAmount: null,
-        stockCapacity: null,
-        notes: null
+        name: "",
+        brand: "",
+        price: "",
+        stockAmount: "",
+        stockCapacity: "",
+        notes: ""
     })
 
-    const [racketFormData, setRacketFormData] = useState({
-        weight: null,
-        stringPattern: null,
-        gripSize: null,
-        headSize: null,
-        swingWeight: null,
-        beamThickness: null,
-        flex: null,
-        length: null
-    })
-
-    const [stringForm, setStringForm] = useState({
-        material: null,
-        gauge: null
-    })
-
-    const [clothingForm, setClothingForm] = useState({
-        clothingType: null,
-        clothingSize: null
-    })
-
-    const [gripType, setGripType] = useState("Overgrip")
-
-    const [shoeData, setShoeData] = useState({
-        shoeSurface: null,
-        size: null
-    })
-    
-    const [ballSurface, setBallSurface] = useState("Hard")
+    const [gripType, setGripType] = useState("")
 
     const [discriminator, setDiscriminator] = useState("")
 
+    // Validation function
+    function validateForm(): { isValid: boolean; errors: string[] } {
+        const errors: string[] = [];
+
+        if (!formData.name.trim()) errors.push("Product name is required");
+        if (!formData.brand.trim()) errors.push("Brand is required");
+        if (!formData.price.trim()) errors.push("Price is required");
+        if (formData.price && isNaN(Number(formData.price))) errors.push("Price must be a valid number");
+        if (!formData.stockAmount.trim()) errors.push("Stock amount is required");
+        if (formData.stockAmount && isNaN(Number(formData.stockAmount))) errors.push("Stock amount must be a valid number");
+        if (!formData.stockCapacity.trim()) errors.push("Stock capacity is required");
+        if (formData.stockCapacity && isNaN(Number(formData.stockCapacity))) errors.push("Stock capacity must be a valid number");
+        if (!discriminator || discriminator === "") errors.push("Product type is required");
+
+        return { isValid: errors.length === 0, errors };
+    }
+
     async function handleSubmit() {
-        const product = {
-            productName: formData.name,
-            productBrand: formData.brand,
-            notes: formData.notes,
-            productPrice: Number(formData.price),
+        try {
+            // Validate form
+            const validation = validateForm();
+            if (!validation.isValid) {
+                console.warn("Form validation failed:", validation.errors);
+                alert("Please fill in all required fields:\n" + validation.errors.join("\n"));
+                return;
+            }
 
-            productStockAmount: Number(formData.stockAmount),
-            productStockCapacity: Number(formData.stockCapacity),
-            
-            discriminator: discriminator
-        };
+            // Build base product object with required fields
+            const product: Record<string, any> = {
+                productName: formData.name.trim(),
+                productBrand: formData.brand.trim(),
+                productPrice: Number(formData.price),
+                productStockAmount: Number(formData.stockAmount),
+                productStockCapacity: Number(formData.stockCapacity),
+                notes: formData.notes.trim() || null,
+                discriminator: discriminator
+            };
 
-        const response = await fetch(`http://localhost:5000/api/inventory/${discriminator}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(product)
-        });
+            // Add discriminator-specific fields if they exist and aren't empty
+            if (fields[discriminator]) {
+                fields[discriminator].forEach(field => {
+                    const value = formData[field.key];
+                    // Convert empty strings to null, keep other values as-is
+                    product[field.key] = (value === "" || value === null) ? null : value;
+                });
+            }
 
-        if (response.ok) {
+            const response = await fetch(`http://localhost:5000/api/inventory/${discriminator}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(product)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+
             console.log("Product added to db.");
-        }
+            onCustomerCreated();
+            
+            // Reset form with empty strings
+            setFormData({
+                name: "",
+                brand: "",
+                price: "",
+                stockAmount: "",
+                stockCapacity: "",
+                notes: ""
+            });
+            setDiscriminator("");
+            action();
 
-        onCustomerCreated();
-        setFormData(null); 
-        action();
+        } catch (error) {
+            console.error("Error adding product:", error);
+            alert("Failed to add product. Please try again.");
+        }
     }
 
     const inputMappers = [
@@ -127,7 +149,6 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
         string: [
             {title: "Material", placeholder: "Polyester", key: "material"},
             {title: "Gauge", placeholder: "e.g. 17L", key: "gauge"},
-            {title: "ADD CHECKBOX FOR REEL"}
         ],
     }
 
@@ -146,8 +167,9 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
                             <span>Product Type</span>
                             <select
                                 onChange={(e) => setDiscriminator(e.target.value)}
-                                defaultValue="other"
+                                value={discriminator}
                             >
+                                <option value="">Select a product type...</option>
                                 <option value="racket">Racket</option>
                                 <option value="string">String</option>
                                 <option value="grip">Grip</option>
@@ -159,31 +181,30 @@ export default function NewProductBox({action, onCustomerCreated} : customerBoxP
                         </div>
 
                         {inputMappers.map(inputMapper => (
-                            <div className="forminput">
+                            <div className="forminput" key={inputMapper.key}>
                                 <span>{inputMapper.title}</span>
                                 <input 
-                                    // Get values for that specific item.
-                                    value={formData[inputMapper.key] ?? ""}
+                                    value={formData[inputMapper.key]}
                                     placeholder={inputMapper.placeholder}
                                     onChange={(e) => setFormData(prev => ({
                                         ...prev,
-                                        // Set the key to desired (current) value
                                         [inputMapper.key]: e.target.value
                                     }))}
                                 />
                             </div>
                         ))}
+                    </div>
 
+                    <div>
                     {/* FIELD SPECIFIC PARAMETERS */}
                         {fields[discriminator] && (
-                            // Sorry for the cheap trick for anyone reading this lol!
-                            <> <div></div><div></div><div></div>
-                            <div className='forminput'>
+                            <div className='forminput forminput--optional-header'>
                                 <span>Optional Additional Fields:</span>
                             </div>
-                             <div></div> </>
                         )}
+                    </div>
 
+                    <div className="forminputs">
                         <AnimatePresence mode="wait">
                             {fields[discriminator]?.map(field => (
                                 <motion.div

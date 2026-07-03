@@ -9,6 +9,47 @@
     margin: 0 48px 16px 48px; /* top right bottom left*/
 }
 
+.newOrderTopRow{
+    display: flex;
+    justify-content: space-between;
+}
+
+.newOrderTopRow button{
+    font-size: 18px;
+    background-color: #7c3aed;
+    color: white;
+
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: solid 0px;
+}
+
+.newOrderTopRow button:hover{
+    background-color: #9254fc;
+    transition: 0.3s;
+}
+
+.newOrderTopRow button:active{
+    background-color: #601dd5;
+    transform: scale(0.98);
+}
+
+.addedProducts{
+    display: grid;
+    grid-template-columns: repeat();
+    gap: 30px;
+}
+
+.addedProducts span{
+    font-size: 20px;
+    background-color: #e9e9e9;
+    color: #5b4b71;
+    padding: 10px;
+
+    border: solid 0px;
+    border-radius: 5px;
+}
+
 .addnewspan{
     font-size: 22px;
 }
@@ -21,7 +62,7 @@
 .forminputs{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px 30px;
+    gap: 20px 50px;
 }
 
 .forminput{

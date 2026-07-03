@@ -18,6 +18,12 @@ interface Product {
     productName: string;
 }
 
+type ProductProps = {
+    productName: string;
+    productId: number;
+    quantity: number;
+}
+
 export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
     const [customerSearch, setCustomerSearch] = useState("");
@@ -27,7 +33,10 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
     const [productSearch, setProductSearch] = useState("");
     const [products, setProducts] = useState<Product[]>([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
-
+    
+    const [productCount, setProductCount] = useState(1);
+    
+    const [finalProducts, setFinalProducts] = useState<ProductProps[]>([]);
 
     // Normalize names and id's
     const customerEntries = customers.map(customer => ({
@@ -82,7 +91,25 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
             setProducts(uniqueProductEntries)
             })
     }, [productSearch, selectedProduct])
-    
+
+    const handleAddProduct = () => {
+
+        if (!selectedProduct || productCount === 0) return;
+
+        setFinalProducts(prev => [
+            ...prev,
+            {
+                productName: selectedProduct.label,
+                productId: selectedProduct!.id,
+                quantity: productCount
+            }
+        ]);
+
+        setProductCount(1);
+        setProductSearch(""); setProducts([]); setSelectedProduct(null);
+    }
+
+
     async function handleSubmit() {
         const sale = {
             customerId: selectedCustomer.customerId,
@@ -111,25 +138,48 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
                 <div className="formcontents">
 
-                    <span className='addnewspan'>Add New Sale</span>
+                    <div className="newOrderTopRow">
+                        <span className='addnewspan'>Add New Sale</span>
+                        <button onClick={() => {handleAddProduct()}}>
+                            Add Another Product
+                        </button>
+                    </div>
                     
                     <div className="forminputs">
-                        <InputDropdown
-                            inputPlaceholder="Search customer..."
-                            list="customers"
-                            search={customerSearch}
-                            setSearch={setCustomerSearch}
-                            entries={customerEntries}
-                            setSelected={setSelectedCustomer}
-                        />
-                         <InputDropdown
-                            inputPlaceholder="Search product..."
-                            list="products"
-                            search={productSearch}
-                            setSearch={setProductSearch}
-                            entries={productEntries}
-                            setSelected={setSelectedProduct}
-                        />
+                        <div className="forminput">
+                            <span>Customer:</span>
+                            <InputDropdown
+                                inputPlaceholder="Search customer..."
+                                list="customers"
+                                search={customerSearch}
+                                setSearch={setCustomerSearch}
+                                entries={customerEntries}
+                                setSelected={setSelectedCustomer}
+                                counter={false}
+                            />
+                        </div>
+                        <div className="forminput">
+                                <span>Add Product:</span>
+                                <InputDropdown
+                                    inputPlaceholder="Search product..."
+                                    list="products"
+                                    search={productSearch}
+                                    setSearch={setProductSearch}
+                                    entries={productEntries}
+                                    setSelected={setSelectedProduct}
+                                    counter={true}
+                                    count={productCount}
+                                    setCount={setProductCount}
+                                />
+                        </div>
+                    </div>
+
+                    <div className="addedProducts">
+                    {finalProducts.map((finalProduct) => (
+                        <div key={finalProduct.productId}>
+                            <span>{finalProduct.productName} × {finalProduct.quantity}</span>
+                        </div>
+                    ))}
                     </div>
 
                     <div className="formbuttons">

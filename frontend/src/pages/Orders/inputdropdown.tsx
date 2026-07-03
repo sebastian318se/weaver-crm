@@ -1,3 +1,6 @@
+import './inputdropdown.css';
+import { useState } from 'react';
+
 interface Customer {
     customerName: string;
     customerId: number;
@@ -23,12 +26,17 @@ type dropdownProps = {
 
     entries: dropdownEntry[];
     setSelected: (selected: dropdownEntry | null) => void;
+
+    count?: number;
+    setCount?: (count: number) => void;
+
+    counter: boolean;
 }
 
-export default function InputDropdown({inputPlaceholder, list, search, setSearch, setSelected, entries} : dropdownProps){
-        
+export default function InputDropdown({inputPlaceholder, list, search, setSearch, setSelected, entries, counter, count, setCount} : dropdownProps){
+    
     return (
-        <div>
+        <div className='dropdowninput'>
             <input
                 autoComplete="off"
                 
@@ -40,7 +48,14 @@ export default function InputDropdown({inputPlaceholder, list, search, setSearch
                 onChange={(e) => {
                     const value = e.target.value;
                     setSearch(value);
-                    setSelected(null);
+
+                    // Check whether input exactly matches one of the fields
+                    const match = entries.find(entry => entry.label === value);
+                        if (match) {
+                            setSelected(match);
+                        } else {
+                            setSelected(null);
+                        }                
                 }}
             />
 
@@ -53,6 +68,23 @@ export default function InputDropdown({inputPlaceholder, list, search, setSearch
                     </option>
                 )}
             </datalist>
+
+            {counter === true && (
+                <div>
+                    <input 
+                        type="number"
+                        min={0}
+                        inputMode="numeric"
+                        placeholder="amount"
+                        onChange={(e) => 
+                            {
+                                const value = Number(e.target.value);
+                                setCount(value);
+                            }}
+                        value={count}
+                    />
+                </div>
+            )}
         </div>
     );
 }
