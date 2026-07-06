@@ -61,64 +61,96 @@ namespace TennisCrmApiEndpoints
         // Post new sale entry
         public static async Task<IResult> PostSale(AppDbContext db, Sale newSale)
         {
+            // Make sure that the whole request succeeds or fails uniformly
+            await using var dbTransaction = await db.Database.BeginTransactionAsync();
 
-            // Fetch customer (handle whether exists or not)
-            var customerExists = await db.Customers
-                .AnyAsync(c => c.CustomerId == newSale.CustomerId);
-
-            if (!customerExists)
-                return Results.BadRequest("Invalid customer.");
-
-            // Fetch products (more W validation)
-            if (newSale.SaleItems == null || newSale.SaleItems.Count == 0)
+            try
             {
-                return Results.BadRequest("No items provided.");
-            }
+                // Fetch customer (handle whether exists or not)
+                var customerExists = await db.Customers
+                    .AnyAsync(c => c.CustomerId == newSale.CustomerId);
 
-            // Merge duplicate products (on id)
-            var groupedItems = newSale.SaleItems
-                .GroupBy(i => i.ProductId)
-                .Select(g => new OrderItems
+                if (!customerExists)
+                    return Results.BadRequest("Invalid customer.");
+
+                // Fetch products (more W validation)
+                if (newSale.SaleItems == null || newSale.SaleItems.Count == 0)
                 {
-                    ProductId = g.Key,
-                    ProductQuantity = g.Sum(x => x.ProductQuantity)
-                })
-                .ToList();
+                    return Results.BadRequest("No items provided.");
+                }
 
-            // Crteate sale obj
-            var sale = new Sale
-            {
-                CustomerId = newSale.CustomerId,
-                OrderPrice = newSale.OrderPrice,
-                Status = newSale.Status,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false,
-                SaleItems = new List<OrderItems>()
-            };
+                // Merge duplicate products (on id)
+                var groupedItems = newSale.SaleItems
+                    .GroupBy(i => i.ProductId)
+                    .Select(g => new OrderItems
+                    {
+                        ProductId = g.Key,
+                        ProductQuantity = g.Sum(x => x.ProductQuantity)
+                    })
+                    .ToList();
 
-            // Attaching sale items w/ proper handling1
-            foreach (var item in newSale.SaleItems)
-            {
-                var productExists = await db.Products
-                    .AnyAsync(p => p.ProductId == item.ProductId);
-
-                if (!productExists)
-                    return Results.BadRequest($"Invalid product ID: {item.ProductId}");
-
-                sale.SaleItems.Add(new OrderItems
+                // Crteate sale obj
+                var sale = new Sale
                 {
-                    ProductId = item.ProductId,
-                    ProductQuantity = item.ProductQuantity
-                });
+                    CustomerId = newSale.CustomerId,
+                    OrderPrice = newSale.OrderPrice,
+                    Status = newSale.Status,
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false,
+                    SaleItems = new List<OrderItems>()
+                };
+
+
+                decimal total = 0;
+                // Attaching sale items w/ proper handling
+                foreach (var item in groupedItems)
+                {
+                    var existingProduct = await db.Products
+                        .FindAsync(item.ProductId);
+
+                    if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
+                    
+                    // Deducting quantity from product entry
+                    existingProduct.LastModified = DateTime.UtcNow;
+                    
+                    if ((existingProduct.ProductStockAmount - item.ProductId) < 0) 
+                        return Results.BadRequest($"Insufficient stock of id #{item.ProductId} to execute sale.");
+
+                    existingProduct.ProductStockAmount -= item.ProductQuantity;
+                    // Recalculating sale price on run
+                    total += existingProduct.ProductPrice * item.ProductQuantity;
+
+                    sale.SaleItems.Add(new OrderItems
+                        {
+                            ProductId = item.ProductId,
+                            ProductQuantity = item.ProductQuantity
+                        });
+
+                }
+
+                sale.OrderPrice = total;
+                db.Sales.Add(sale);
+
+                // Add transaction to db
+                var newTransaction = new Transaction
+                {
+                    TransactionValue = sale.OrderPrice,
+                    TransactionCategory = TransactionCategory.Sale,
+                    Description = "API sale post transaction.",
+                    CustomerId = sale.CustomerId,
+                };
+                db.Transactions.Add(newTransaction);
+
+                // Save
+                await db.SaveChangesAsync();
+                await dbTransaction.CommitAsync();
+                return Results.Created($"/api/sales/{sale.OrderId}", sale);
             }
-
-            // Save sale
-            db.Sales.Add(sale);
-            await db.SaveChangesAsync();
-
-            await db.SaveChangesAsync();
-
-            return Results.Created($"/api/sales/{sale.OrderId}", sale);
+            catch
+            {
+                await dbTransaction.RollbackAsync();
+                throw;
+            }
         }
 
         // Edit sale entry on ID match

@@ -154,6 +154,7 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
         if (response.ok) {
             console.log("Sale added to db.");
+            console.log(response);
         }
 
         onSaleCreated();

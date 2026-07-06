@@ -48,14 +48,14 @@ export default function NewCustomerBox({action, onCustomerCreated} : customerBox
         {
             title: "Email",
             inputinfo: "john@email.com",
-            setter: setPhone,
-            value: phone
+            setter: setEmail,
+            value: email
         },
         {
             title: "Phone",
             inputinfo: "(123) 1234-5678",
-            setter: setEmail,
-            value: email
+            setter: setPhone,
+            value: phone
         },
         {
             title: "Notes (Optional)",

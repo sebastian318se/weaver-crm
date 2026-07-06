@@ -16,12 +16,8 @@ namespace TennisCrmApi
     public enum TransactionCategory
     {
         OperationalCost,
-        Racket,
-        String,
-        Grip,
-        Clothing,
-        Shoe,
-        Ball,
+        Sale,
+        Stringjob,
         Other
     }
 }

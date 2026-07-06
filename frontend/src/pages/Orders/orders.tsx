@@ -137,11 +137,9 @@ export default function Orders() {
                             
                                 <div className="salesgrid">
 
-                                    {/* POPULATE THIS */}
-                                    <div>
+                                        {/* POPULATE THIS */}
                                         {sales.length <= 0 && (<p>Nothing</p>)}
-                                    </div>
-
+                                  
                                     {sales.map((sale) => (
                                         <SalesTable
                                             key={sale.orderId}
