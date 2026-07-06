@@ -5,8 +5,33 @@ import LookupTable from "../../components/lookuptable";
 import SjTable from "./sjTable";
 import NewSaleBox from "./newsaleform";
 
-interface Sale{
+type ProductProps = {
+    productId: number,
+    productName: string,
+    productQuantity: number,
+    productPrice: number
+}
 
+interface SaleItem {
+    productId: number;
+    productQuantity: number;
+}
+
+interface Customer {
+    customerId: number;
+    customerName: string;
+}
+
+interface Sale {
+    orderId: number;
+    customerId: number;
+    customer: Customer | null;
+    orderPrice: number;
+    status: number;
+    createdAt: string;
+    completedAt: string | null;
+    isDeleted: boolean;
+    saleItems: SaleItem[];
 }
 
 interface StringJob{
@@ -28,7 +53,7 @@ export default function Orders() {
     }
     useEffect(() => {
         fetchSales();
-    }, [setSales]);
+    }, []);
 
 
 
@@ -41,7 +66,7 @@ export default function Orders() {
     }
     useEffect(() => {
         fetchStringJob();
-    }, [setStringjobs]);
+    }, []);
 
 
 
@@ -107,7 +132,7 @@ export default function Orders() {
 
                                     <LookupTable
                                         action={()=> setShowNewSaleBox(prev => !prev)}
-                                        onEntryCreated={(fetchSales)}/>
+                                        onEntryCreated={fetchSales}/>
         
                             
                                 <div className="salesgrid">
@@ -120,7 +145,8 @@ export default function Orders() {
                                     {sales.map((sale) => (
                                         <SalesTable
                                             key={sale.orderId}
-                                            {...sale}/>
+                                            {...sale}
+                                        />
                                     ))}
                 
                                 </div>

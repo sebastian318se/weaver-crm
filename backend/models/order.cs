@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TennisCrmApi
 {
     public abstract class Order
@@ -6,7 +8,7 @@ namespace TennisCrmApi
 
         // Define foreign key and respective object to retrieve data from
         public int CustomerId { get; set; }
-        public required Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
 
         public decimal OrderPrice { get; set; }
         public OrderStatus Status { get; set; }
@@ -35,8 +37,22 @@ namespace TennisCrmApi
 
     public class Sale : Order
     {
+        public List<OrderItems> SaleItems { get; set; } =new();
+    }
+
+    public class OrderItems
+    {
+        public int OrderItemsId { get; set; }
+
         public int ProductId { get; set; }
-        public required List<Product> SaleProducts { get; set; }
+        public Product? Product { get; set; }
+
+        public int ProductQuantity { get; set; }
+
+        public int OrderId { get; set; }
+
+        [JsonIgnore] // Make this not loop and break into 500 server error
+        public Sale? Sale { get; set; }
     }
 
     public enum OrderStatus

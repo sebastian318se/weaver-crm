@@ -101,6 +101,35 @@ namespace tenniscrm.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("TennisCrmApi.OrderItems", b =>
+                {
+                    b.Property<int>("OrderItemsId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderItemsId"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductQuantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("SaleOrderId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("OrderItemsId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SaleOrderId");
+
+                    b.ToTable("OrderItems");
+                });
+
             modelBuilder.Entity("TennisCrmApi.Product", b =>
                 {
                     b.Property<int>("ProductId")
@@ -146,12 +175,7 @@ namespace tenniscrm.Migrations
                     b.Property<int>("ProductStockCapacity")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SaleOrderId")
-                        .HasColumnType("integer");
-
                     b.HasKey("ProductId");
-
-                    b.HasIndex("SaleOrderId");
 
                     b.ToTable("Products");
 
@@ -199,9 +223,6 @@ namespace tenniscrm.Migrations
             modelBuilder.Entity("TennisCrmApi.Sale", b =>
                 {
                     b.HasBaseType("TennisCrmApi.Order");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
 
                     b.HasDiscriminator().HasValue("Sale");
                 });
@@ -351,7 +372,7 @@ namespace tenniscrm.Migrations
             modelBuilder.Entity("TennisCrmApi.Order", b =>
                 {
                     b.HasOne("TennisCrmApi.Customer", "Customer")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -359,11 +380,21 @@ namespace tenniscrm.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("TennisCrmApi.Product", b =>
+            modelBuilder.Entity("TennisCrmApi.OrderItems", b =>
                 {
-                    b.HasOne("TennisCrmApi.Sale", null)
-                        .WithMany("SaleProducts")
+                    b.HasOne("TennisCrmApi.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TennisCrmApi.Sale", "Sale")
+                        .WithMany("SaleItems")
                         .HasForeignKey("SaleOrderId");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Sale");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Transaction", b =>
@@ -394,14 +425,9 @@ namespace tenniscrm.Migrations
                     b.Navigation("TennisString");
                 });
 
-            modelBuilder.Entity("TennisCrmApi.Customer", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("TennisCrmApi.Sale", b =>
                 {
-                    b.Navigation("SaleProducts");
+                    b.Navigation("SaleItems");
                 });
 #pragma warning restore 612, 618
         }

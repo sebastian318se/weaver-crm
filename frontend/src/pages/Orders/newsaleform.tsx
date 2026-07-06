@@ -16,24 +16,39 @@ interface Customer {
 interface Product {
     productId: number;
     productName: string;
+    productPrice: number;
 }
 
 type ProductProps = {
     productName: string;
     productId: number;
     quantity: number;
+    price: number;
+}
+
+type CustomerEntry = {
+    id: number;
+    label: string;
+}
+
+type ProductEntry = {
+    id: number;
+    label: string;
+    price: number;
 }
 
 export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
     const [customerSearch, setCustomerSearch] = useState("");
     const [customers, setCustomers] = useState<Customer[]>([]);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] =
+        useState<CustomerEntry | null>(null);
 
     const [productSearch, setProductSearch] = useState("");
     const [products, setProducts] = useState<Product[]>([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    
+    const [selectedProduct, setSelectedProduct] =
+        useState<ProductEntry | null>(null);
+
     const [productCount, setProductCount] = useState(1);
     
     const [finalProducts, setFinalProducts] = useState<ProductProps[]>([]);
@@ -45,7 +60,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
     }));
     const productEntries = products.map(product => ({
         id: product.productId,
-        label: product.productName
+        label: product.productName,
+        price: product.productPrice
     }));
 
 
@@ -101,20 +117,32 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
             {
                 productName: selectedProduct.label,
                 productId: selectedProduct!.id,
-                quantity: productCount
+                quantity: productCount,
+                price: selectedProduct.price
             }
         ]);
-
-        setProductCount(1);
-        setProductSearch(""); setProducts([]); setSelectedProduct(null);
     }
 
 
     async function handleSubmit() {
+
+        if (!selectedCustomer || finalProducts.length === 0) return;
+
         const sale = {
-            customerId: selectedCustomer.customerId,
-            productId: selectedProduct.productId
+            customerId: selectedCustomer.id,
+            
+            status: 0, // Collected
+
+            saleItems: finalProducts.map(finalProduct => 
+                ({productId: finalProduct.productId, 
+                productQuantity: finalProduct.quantity})),
+            
+            orderPrice: finalProducts.reduce(
+                (total, product) => 
+                    total + product.price * product.quantity, 0)
         };
+
+        console.log(sale);
 
         const response = await fetch("http://localhost:5000/api/sales", {
             method: "POST",
@@ -130,6 +158,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
         onSaleCreated();
         action();
+        setProductCount(1);
+        setProductSearch(""); setProducts([]); setSelectedProduct(null);
     }
 
     return (
@@ -141,7 +171,7 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                     <div className="newOrderTopRow">
                         <span className='addnewspan'>Add New Sale</span>
                         <button onClick={() => {handleAddProduct()}}>
-                            Add Another Product
+                            Add Product to Sale
                         </button>
                     </div>
                     
@@ -152,8 +182,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                                 inputPlaceholder="Search customer..."
                                 list="customers"
                                 search={customerSearch}
-                                setSearch={setCustomerSearch}
                                 entries={customerEntries}
+                                setSearch={setCustomerSearch}
                                 setSelected={setSelectedCustomer}
                                 counter={false}
                             />
@@ -164,8 +194,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                                     inputPlaceholder="Search product..."
                                     list="products"
                                     search={productSearch}
-                                    setSearch={setProductSearch}
                                     entries={productEntries}
+                                    setSearch={setProductSearch}
                                     setSelected={setSelectedProduct}
                                     counter={true}
                                     count={productCount}
@@ -173,6 +203,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                                 />
                         </div>
                     </div>
+                  
+                    {finalProducts.length > 0 && (<hr />)}
 
                     <div className="addedProducts">
                     {finalProducts.map((finalProduct) => (
@@ -181,6 +213,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                         </div>
                     ))}
                     </div>
+
+                    {finalProducts.length > 0 && (<hr />)}
 
                     <div className="formbuttons">
                         <button 

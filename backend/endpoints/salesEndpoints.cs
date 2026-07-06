@@ -23,6 +23,9 @@ namespace TennisCrmApiEndpoints
         {
             var sales = await db.Sales
                 .Where(x => !x.IsDeleted)
+                .Include(s => s.Customer)
+                .Include(s => s.SaleItems)
+                    .ThenInclude(i => i.Product)
                 .ToListAsync();
 
             return Results.Ok(sales); 
@@ -32,8 +35,10 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> GetSalesById(int id, AppDbContext db)
         {
             var sale = await db.Sales
-                .Where(x => !x.IsDeleted)
-                .FirstOrDefaultAsync(x => x.OrderId == id);
+                .Include(s => s.Customer)
+                 .Include(s => s.SaleItems)
+                    .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(x => x.OrderId == id && !x.IsDeleted);
             
             return sale is not null
                 ? Results.Ok(sale)
@@ -56,17 +61,71 @@ namespace TennisCrmApiEndpoints
         // Post new sale entry
         public static async Task<IResult> PostSale(AppDbContext db, Sale newSale)
         {
-            db.Sales.Add(newSale);
+
+            // Fetch customer (handle whether exists or not)
+            var customerExists = await db.Customers
+                .AnyAsync(c => c.CustomerId == newSale.CustomerId);
+
+            if (!customerExists)
+                return Results.BadRequest("Invalid customer.");
+
+            // Fetch products (more W validation)
+            if (newSale.SaleItems == null || newSale.SaleItems.Count == 0)
+            {
+                return Results.BadRequest("No items provided.");
+            }
+
+            // Merge duplicate products (on id)
+            var groupedItems = newSale.SaleItems
+                .GroupBy(i => i.ProductId)
+                .Select(g => new OrderItems
+                {
+                    ProductId = g.Key,
+                    ProductQuantity = g.Sum(x => x.ProductQuantity)
+                })
+                .ToList();
+
+            // Crteate sale obj
+            var sale = new Sale
+            {
+                CustomerId = newSale.CustomerId,
+                OrderPrice = newSale.OrderPrice,
+                Status = newSale.Status,
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false,
+                SaleItems = new List<OrderItems>()
+            };
+
+            // Attaching sale items w/ proper handling1
+            foreach (var item in newSale.SaleItems)
+            {
+                var productExists = await db.Products
+                    .AnyAsync(p => p.ProductId == item.ProductId);
+
+                if (!productExists)
+                    return Results.BadRequest($"Invalid product ID: {item.ProductId}");
+
+                sale.SaleItems.Add(new OrderItems
+                {
+                    ProductId = item.ProductId,
+                    ProductQuantity = item.ProductQuantity
+                });
+            }
+
+            // Save sale
+            db.Sales.Add(sale);
             await db.SaveChangesAsync();
-            
-            return Results.Created($"Successfully added {newSale} to database.", newSale);
+
+            await db.SaveChangesAsync();
+
+            return Results.Created($"/api/sales/{sale.OrderId}", sale);
         }
 
         // Edit sale entry on ID match
         public static async Task<IResult> PutSale(AppDbContext db, Sale updatedSale, int id)
         {
             var existingSale = await db.Sales
-                .FirstOrDefaultAsync(x => x.ProductId == id);
+                .FirstOrDefaultAsync(x => x.OrderId == id);
 
             if (existingSale is null) return Results.NotFound("Could not locate sale entry.");
 
@@ -79,7 +138,7 @@ namespace TennisCrmApiEndpoints
             });
 
             // SetValues does not supports List<T> Ts properties
-            existingSale.SaleProducts = updatedSale.SaleProducts;
+            existingSale.SaleItems = updatedSale.SaleItems;
             
             await db.SaveChangesAsync();
             return Results.Ok("Successfully updated sale entry.");

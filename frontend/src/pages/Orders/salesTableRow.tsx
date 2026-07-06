@@ -1,17 +1,21 @@
 import './salesTableRow.css'
 
-type EntryProps = {
+type ProductProps = {
     productId: number,
     productName: string,
-    productQuantity: number,
     productPrice: number
 }
 
-export default function SalesRow({productId, productName, productQuantity, productPrice}: EntryProps) {
+type EntryProps = {
+    product: ProductProps,
+    productQuantity: number
+}
+
+export default function SalesRow({product, productQuantity}: EntryProps) {
     return (
         <div className="salesrow">
-            <span> {productName} × {productQuantity} </span>
-            <span className='price'> ${productPrice * productQuantity} </span>
+            <span> {product.productName} × {productQuantity} </span>
+            <span className='price'> ${product.productPrice * productQuantity} </span>
         </div>
     );
 }

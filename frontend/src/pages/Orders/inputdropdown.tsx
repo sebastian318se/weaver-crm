@@ -1,19 +1,9 @@
 import './inputdropdown.css';
-import { useState } from 'react';
-
-interface Customer {
-    customerName: string;
-    customerId: number;
-}
-
-interface Product {
-    productName: string;
-    productId: number;
-}
 
 type dropdownEntry = {
     id: number;
     label: string;
+    price: number;
 }
 
 type dropdownProps = {
@@ -53,6 +43,7 @@ export default function InputDropdown({inputPlaceholder, list, search, setSearch
                     const match = entries.find(entry => entry.label === value);
                         if (match) {
                             setSelected(match);
+                            console.log("when selected:", match)
                         } else {
                             setSelected(null);
                         }                

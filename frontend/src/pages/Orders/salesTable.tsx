@@ -5,46 +5,50 @@ import { Calendar } from "lucide-react";
 type ProductProps = {
     productId: number,
     productName: string,
-    productQuantity: number,
     productPrice: number
 }
 
-type SaleProps = {
-    products: ProductProps[]
-    customerId: number,
-    customerName: string
-    saleDate: string
+type SaleItemProps = {
+    product: ProductProps,
+    productQuantity: number
 }
 
-export default function SalesTable({products, customerId, customerName, saleDate } : SaleProps) {
+type CustomerProps = {
+    customerId: number,
+    customerName: string
+}
 
-    const totalPrice = products.reduce(
-        (total, product) => total + product.productPrice * product.productQuantity, 0 
-        // Init total at 0 and then add every product's value
-    );
+type SaleProps = {
+    saleItems: SaleItemProps[],
+    customer: CustomerProps | null,
+    orderPrice: number,
+    createdAt: string
+}
+
+export default function SalesTable({saleItems, customer, orderPrice, createdAt } : SaleProps) {
+
+    if (!saleItems) return;
 
     return (
         <div className="salestablecontainer">
 
             <div className="containerheader">
                 <div className="top">
-                    <span>{customerName}</span>
-                    <span className="totalprice">${totalPrice}</span>
+                    <span>{customer?.customerName ?? "Unknown Customer"}</span>
+                    <span className="totalprice">${orderPrice}</span>
                 </div>
                 <div className="date">
                     <Calendar size={18}/>
-                    <span className="date"> {saleDate}</span>
+                    <span className="date"> {new Date(createdAt).toLocaleDateString()}</span>
                 </div>
             </div>
 
             <div className="tablerow">
-                 {products.map(product =>(
+                 {saleItems.map(item =>(
                     <SalesRow
-                        key={product.productId}
-                        productId={product.productId}
-                        productName={product.productName}
-                        productQuantity={product.productQuantity}
-                        productPrice={product.productPrice}/>
+                        key={item.product.productId}
+                        product={item.product}
+                        productQuantity={item.productQuantity}/>
                  ))}
             </div>
 
