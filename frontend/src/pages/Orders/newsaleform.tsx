@@ -209,8 +209,10 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
                     <div className="addedProducts">
                     {finalProducts.map((finalProduct) => (
-                        <div key={finalProduct.productId}>
+                        <div key={finalProduct.productId} className="addedProductRow">
                             <span>{finalProduct.productName} × {finalProduct.quantity}</span>
+                            <span className="addedProductDivider">|</span>
+                            <span className="addedProductPrice">${finalProduct.price * finalProduct.quantity}</span>
                         </div>
                     ))}
                     </div>

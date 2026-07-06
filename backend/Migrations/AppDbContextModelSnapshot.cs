@@ -51,8 +51,8 @@ namespace tenniscrm.Migrations
                     b.Property<int?>("RacketsStrung")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TotalSpent")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("TotalSpent")
+                        .HasColumnType("numeric");
 
                     b.HasKey("CustomerId");
 

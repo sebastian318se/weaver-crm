@@ -67,10 +67,10 @@ namespace TennisCrmApiEndpoints
             try
             {
                 // Fetch customer (handle whether exists or not)
-                var customerExists = await db.Customers
-                    .AnyAsync(c => c.CustomerId == newSale.CustomerId);
+                var existingCustomer = await db.Customers
+                    .FindAsync(newSale.CustomerId);
 
-                if (!customerExists)
+                if (existingCustomer is null)
                     return Results.BadRequest("Invalid customer.");
 
                 // Fetch products (more W validation)
@@ -128,6 +128,7 @@ namespace TennisCrmApiEndpoints
 
                 }
 
+                existingCustomer.TotalSpent += total;
                 sale.OrderPrice = total;
                 db.Sales.Add(sale);
 
