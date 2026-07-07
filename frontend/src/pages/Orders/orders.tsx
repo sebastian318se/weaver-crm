@@ -4,6 +4,7 @@ import './orders.css'
 import LookupTable from "../../components/lookuptable";
 import SjTable from "./sjTable";
 import NewSaleBox from "./newsaleform";
+import NewSjBox from "./neworderform";
 
 type ProductProps = {
     productId: number,
@@ -98,22 +99,30 @@ export default function Orders() {
                     <br />
                 </div>
                 {activeTab === "orderstab" && (
+                    <div>
+                        <div className={`newsalediv ${showNewSaleBox ? "open" : ""}`}>
+                            <NewSjBox
+                                action={() => setShowNewSaleBox(prev => !prev)}
+                                onSaleCreated={fetchSales}
+                            />
+                        </div>
 
-                    <div className="ordersmargin">
-                        <div className="salescontainer">
-                            
-                            <LookupTable
-                                onEntryCreated={fetchSales}
-                                action={() => setShowNewSaleBox(prev => !prev)}/>
+                        <div className="ordersmargin">
+                            <div className="salescontainer">
+                                
+                                <LookupTable
+                                    onEntryCreated={fetchSales}
+                                    action={() => setShowNewSaleBox(prev => !prev)}/>
 
-                            <div className="sjgrid">
+                                <div className="sjgrid">
 
-                                {stringjobs.map((job) => (
-                                    <SjTable
-                                    key={job.orderId}
-                                    {...job}/>
-                                ))}
+                                    {stringjobs.map((job) => (
+                                        <SjTable
+                                        key={job.orderId}
+                                        {...job}/>
+                                    ))}
 
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -137,8 +146,8 @@ export default function Orders() {
                             
                                 <div className="salesgrid">
 
-                                        {/* POPULATE THIS */}
-                                        {sales.length <= 0 && (<p>Nothing</p>)}
+                                    {/* POPULATE THIS (throughout project)*/}
+                                    {sales.length <= 0 && (<p>Nothing</p>)}
                                   
                                     {sales.map((sale) => (
                                         <SalesTable

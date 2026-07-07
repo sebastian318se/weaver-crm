@@ -33,6 +33,9 @@ namespace TennisCrmApi
         public int StringId { get; set; }
         // Navigator prop
         public TennisString? TennisString { get; set; }
+
+        // Check whether or not string is store owned
+        public bool IsStoreOwned { get; set; }
     }
 
     public class Sale : Order

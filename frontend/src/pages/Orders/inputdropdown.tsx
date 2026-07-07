@@ -3,7 +3,7 @@ import './inputdropdown.css';
 type dropdownEntry = {
     id: number;
     label: string;
-    price: number;
+    price?: number;
 }
 
 type dropdownProps = {

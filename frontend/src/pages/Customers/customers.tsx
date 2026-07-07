@@ -1,5 +1,5 @@
 import LookupTable from "../../components/lookuptable";
-import CustomerBox from "../../components/customerbox";
+import CustomerBox from "./customerbox";
 import NewCustomerBox from "./newcustomerform";
 import { useEffect, useState } from "react";
 import './customers.css'

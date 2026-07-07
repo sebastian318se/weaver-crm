@@ -237,6 +237,9 @@ namespace tenniscrm.Migrations
                     b.Property<DateTime?>("ExpectedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsStoreOwned")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("MainTension")
                         .HasColumnType("integer");
 
@@ -360,7 +363,7 @@ namespace tenniscrm.Migrations
                     b.Property<decimal>("Gauge")
                         .HasColumnType("numeric");
 
-                    b.Property<bool>("IsReel")
+                    b.Property<bool>("IsStoreOwned")
                         .HasColumnType("boolean");
 
                     b.Property<int?>("Material")

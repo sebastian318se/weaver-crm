@@ -8,11 +8,13 @@ namespace TennisCrmApiEndpoints
     {
         public static IEndpointRouteBuilder MapInventoryEndpoints(this IEndpointRouteBuilder app)
         {
-            // Name all endpoint paths .WithName()
             app.MapGet("/api/inventory", GetItems);
             app.MapGet("/api/inventory/{id}", GetItemById);
-            app.MapGet("api/inventory/deleted", GetDeleted);
-            app.MapGet("api/inventory/search", GetItemByQuery);
+            app.MapGet("/api/inventory/deleted", GetDeleted);
+
+            app.MapGet("/api/inventory/search", GetItemByQuery);
+            app.MapGet("/api/inventory/racket/search", GetRacketByQuery);
+            app.MapGet("/api/inventory/string/search", GetStringByQuery);
 
             app.MapGet("/api/inventory/racket", GetAll<Racket>);
             app.MapGet("/api/inventory/string", GetAll<TennisString>);
@@ -87,6 +89,40 @@ namespace TennisCrmApiEndpoints
             return items is not null
                 ? Results.Ok(items)
                 : Results.NotFound("Could not locate such a product in the database.");
+        }
+
+        // Get rackets on query match 
+        public static async Task<IResult> GetRacketByQuery(AppDbContext db, string query)
+        {
+            var rackets = await db.Products
+                .OfType<Racket>()
+                .Where(x =>
+                    x.ProductName.Contains(query) ||
+                    x.ProductBrand.Contains(query) ||
+                    x.ProductModel != null && x.ProductModel.Contains(query))
+                .ToListAsync();
+                
+            Console.Write(query);
+
+            return rackets is not null
+                ? Results.Ok(rackets)
+                : Results.NotFound("Could not locate such a racket in the database.");
+        }
+
+        // Get strings on query match
+        public static async Task<IResult> GetStringByQuery(AppDbContext db, string query)
+        {
+            var strings = await db.Products
+                .OfType<TennisString>()
+                .Where(x =>
+                    x.ProductName.Contains(query) ||
+                    x.ProductBrand.Contains(query) ||
+                    x.ProductModel != null && x.ProductModel.Contains(query))
+                .ToListAsync();
+
+            return strings is not null
+                ? Results.Ok(strings)
+                : Results.NotFound("Could not locate such a string in the database.");
         }
 
         // Get all items per category

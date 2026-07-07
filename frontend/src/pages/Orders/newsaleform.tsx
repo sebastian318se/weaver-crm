@@ -131,7 +131,7 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
         const sale = {
             customerId: selectedCustomer.id,
             
-            status: 0, // Collected
+            status: 4, // Delivered
 
             saleItems: finalProducts.map(finalProduct => 
                 ({productId: finalProduct.productId, 

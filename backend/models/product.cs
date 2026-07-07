@@ -30,7 +30,7 @@ namespace TennisCrmApi
     public class TennisString : Product
     {
         public StringMaterial? Material { get; set; }
-        public bool IsReel { get; set; }
+        public bool IsStoreOwned { get; set; } = true;
         public decimal Gauge { get; set; }
     }
 
