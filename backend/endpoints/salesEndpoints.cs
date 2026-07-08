@@ -36,7 +36,7 @@ namespace TennisCrmApiEndpoints
         {
             var sale = await db.Sales
                 .Include(s => s.Customer)
-                 .Include(s => s.SaleItems)
+                .Include(s => s.SaleItems)
                     .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(x => x.OrderId == id && !x.IsDeleted);
             
@@ -129,6 +129,7 @@ namespace TennisCrmApiEndpoints
                 }
 
                 existingCustomer.TotalSpent += total;
+                existingCustomer.LastModified = DateTime.UtcNow;
                 sale.OrderPrice = total;
                 db.Sales.Add(sale);
 
@@ -137,7 +138,7 @@ namespace TennisCrmApiEndpoints
                 {
                     TransactionValue = sale.OrderPrice,
                     TransactionCategory = TransactionCategory.Sale,
-                    Description = "API sale post transaction.",
+                    Description = "Origin: API sale post transaction.",
                     CustomerId = sale.CustomerId,
                 };
                 db.Transactions.Add(newTransaction);
@@ -145,7 +146,7 @@ namespace TennisCrmApiEndpoints
                 // Save
                 await db.SaveChangesAsync();
                 await dbTransaction.CommitAsync();
-                return Results.Created($"/api/sales/{sale.OrderId}", sale);
+                return Results.Created($"Successfully added {sale} to database.", sale);
             }
             catch
             {

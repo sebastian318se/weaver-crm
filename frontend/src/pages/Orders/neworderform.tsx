@@ -152,7 +152,7 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
                 const uniqueStringEntries = data.filter(
                     (string, index, self) =>
                         index === self.findIndex(
-                            s => s.stringId === string.stringId
+                            s => s.tennisStringId === string.tennisStringId
                     )
                 );
 
@@ -170,13 +170,13 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
         const stringJob = {
             customerId: selectedCustomer.id,
             racketId: selectedRacket.id,
-            stringId: selectedString.id,
+            tennisStringId: selectedString.id,
             mainTension: mainTension,
             crossTension: crossTension,
             expectedAt: expectedAt.toISOString(),
-            isStoreOwned: isStoreOwned,
+            isStoreOwned: true,
             
-            status: 0, // Collected
+            status: "Collected", // Collected
             orderPrice: selectedString.price + laborCost
         };
 

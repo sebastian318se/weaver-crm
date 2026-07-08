@@ -23,6 +23,9 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> GetSJ(AppDbContext db)
         {
             var sj = await db.StringJobs
+                .Include(s => s.Customer)
+                .Include(s => s.Racket)
+                .Include(s => s.TennisString)
                 .Where(x => !x.IsDeleted)
                 .ToListAsync();
                 
@@ -34,8 +37,10 @@ namespace TennisCrmApiEndpoints
         {
             // Return only valid non-null results else "NotFound".
             var sj = await db.StringJobs
-                .Where(x => !x.IsDeleted)
-                .FirstOrDefaultAsync(x => x.OrderId == id);
+                .Include(s => s.Customer)
+                .Include(s => s.Racket)
+                .Include(s => s.TennisString)
+                .FirstOrDefaultAsync(x => x.OrderId == id && !x.IsDeleted);
 
             return sj is not null
                 ? Results.Ok(sj)
@@ -57,10 +62,60 @@ namespace TennisCrmApiEndpoints
         // Post new SJ entry
         public static async Task<IResult> PostSJ(AppDbContext db, StringJob newSJ)
         {
-            db.StringJobs.Add(newSJ);
-            await db.SaveChangesAsync();
 
-            return Results.Created($"Successfully added {newSJ} to database.", newSJ);
+            // Make sure that the whole request succeeds or fails uniformly
+            await using var dbTransaction = await db.Database.BeginTransactionAsync();
+
+            try
+            {
+                db.StringJobs.Add(newSJ);
+
+                // Fetch customer (handle whether exists or not)
+                var existingCustomer = await db.Customers
+                    .FindAsync(newSJ.CustomerId);
+
+                if (existingCustomer is null)
+                    return Results.BadRequest("Invalid customer.");
+
+
+                // Deduct quantity from string db entry
+                var existingProduct = await db.Products
+                    .FindAsync(newSJ.TennisStringId);
+                
+                if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
+                
+                existingProduct.LastModified = DateTime.UtcNow;
+
+                if ((existingProduct.ProductStockAmount - 1) < 0) 
+                    return Results.BadRequest($"Insufficient stock of id #{existingProduct.ProductId} to execute sale.");
+
+                existingProduct.ProductStockAmount -= 1;
+
+                // Add SJ to transaction db
+                var newTransaction = new Transaction
+                    {
+                        TransactionValue = newSJ.OrderPrice,
+                        TransactionCategory = TransactionCategory.Sale,
+                        Description = "Origin: API stringjob post transaction.",
+                        CustomerId = newSJ.CustomerId,
+                    };
+                db.Transactions.Add(newTransaction);
+
+                existingCustomer.TotalSpent += newSJ.OrderPrice;
+                existingCustomer.RacketsStrung += 1;
+                existingCustomer.LastModified = DateTime.UtcNow;
+                await db.SaveChangesAsync();
+
+                 // Save
+                await db.SaveChangesAsync();
+                await dbTransaction.CommitAsync();
+                return Results.Created($"Successfully added {newSJ} to database.", newSJ);
+            }
+            catch 
+            {
+                await dbTransaction.RollbackAsync();
+                throw;
+            }
         }
 
         // Edit SJ on ID match
@@ -81,7 +136,7 @@ namespace TennisCrmApiEndpoints
                 updatedSJ.CrossTension,
                 updatedSJ.ExpectedAt,
                 updatedSJ.RacketId,
-                updatedSJ.StringId
+                updatedSJ.TennisStringId
             });
 
             sj.Racket = null;

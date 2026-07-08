@@ -10,6 +10,6 @@ namespace TennisCrmApi
         public bool IsDeleted { get; set; } = false;
         public DateTime LastModified { get; set; } = DateTime.UtcNow;
         public decimal TotalSpent { get; set; } = 0;
-        public int? RacketsStrung { get; set; } 
+        public int? RacketsStrung { get; set; } = 0;
     }
 }

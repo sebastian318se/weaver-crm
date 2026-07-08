@@ -246,15 +246,12 @@ namespace tenniscrm.Migrations
                     b.Property<int>("RacketId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("StringId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TennisStringProductId")
+                    b.Property<int>("TennisStringId")
                         .HasColumnType("integer");
 
                     b.HasIndex("RacketId");
 
-                    b.HasIndex("TennisStringProductId");
+                    b.HasIndex("TennisStringId");
 
                     b.HasDiscriminator().HasValue("StringJob");
                 });
@@ -421,7 +418,9 @@ namespace tenniscrm.Migrations
 
                     b.HasOne("TennisCrmApi.TennisString", "TennisString")
                         .WithMany()
-                        .HasForeignKey("TennisStringProductId");
+                        .HasForeignKey("TennisStringId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Racket");
 

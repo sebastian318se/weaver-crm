@@ -36,9 +36,9 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
                     <div className='center'><Calendar size={16}/> <span>Last visit: {lastvisit}</span></div>
                 </div>
                 <div>
-                    {racketsstrung === null ?
-                    (<span>0 rackets strung</span>) :
-                    (<span>{racketsstrung} rackets strung</span>)}
+                    {racketsstrung === 1 
+                    ? (<span>1 racket strung</span>)
+                    : (<span>{racketsstrung} rackets strung </span>)}
                 </div>
             </div>
         </div>

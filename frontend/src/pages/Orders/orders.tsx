@@ -23,6 +23,20 @@ interface Customer {
     customerName: string;
 }
 
+interface Racket {
+    productId: number;
+    productName: string;
+    headSize: number;
+    stringPattern: string;
+}
+
+interface TennisString {
+    productId: number;
+    productName: string;
+    gauge: number;
+    productPrice: number;
+}
+
 interface Sale {
     orderId: number;
     customerId: number;
@@ -36,7 +50,20 @@ interface Sale {
 }
 
 interface StringJob{
-
+    orderId: number;
+    customerId: number;
+    customer: Customer | null;
+    racketId: number;
+    racket: Racket | null;
+    tennisStringId: number;
+    tennisString: TennisString | null;
+    orderPrice: number;
+    status: string;
+    createdAt: string;
+    completedAt: string | null;
+    expectedAt: string | null;
+    mainTension: number;
+    crossTension: number;
 }
 
 export default function Orders() {
@@ -46,6 +73,7 @@ export default function Orders() {
     const [sales, setSales] = useState<Sale[]>([]);
 
     const [showNewSaleBox, setShowNewSaleBox] = useState(false);
+
     const fetchSales = async () => {
         const response = await fetch("http://localhost:5000/api/sales");
         const data = await response.json();
@@ -63,6 +91,7 @@ export default function Orders() {
         const response = await fetch("http://localhost:5000/api/strung");
         const data = await response.json();
 
+        console.log("DATA", data);
         setStringjobs(data);
     }
     useEffect(() => {
@@ -103,7 +132,7 @@ export default function Orders() {
                         <div className={`newsalediv ${showNewSaleBox ? "open" : ""}`}>
                             <NewSjBox
                                 action={() => setShowNewSaleBox(prev => !prev)}
-                                onSaleCreated={fetchSales}
+                                onSjCreated={fetchStringJob}
                             />
                         </div>
 

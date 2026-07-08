@@ -30,7 +30,7 @@ namespace TennisCrmApi
         public Racket? Racket { get; set; }
 
         // Foreign key to reference string used
-        public int StringId { get; set; }
+        public int TennisStringId { get; set; }
         // Navigator prop
         public TennisString? TennisString { get; set; }
 
