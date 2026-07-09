@@ -241,7 +241,7 @@ export default function Expenses() {
         <div className="expensesPageContainer">
             <div className="pageHeader">
                 <h2>Financial Overview</h2>
-                <span>Revenue, expenses and profitability</span>
+                <span>Revenue, expenses and profitability at a glance</span>
                 <hr />
             </div>
 

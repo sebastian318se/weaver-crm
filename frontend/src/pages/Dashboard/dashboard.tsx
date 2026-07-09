@@ -77,7 +77,7 @@ const CHART_COLORS = ['#7c3aed', '#5b4b71', '#06b6d4', '#c4b5fd', '#f472b6', '#f
 
 const PRODUCT_TYPE_LABELS: Record<string, string> = {
     racket: 'Rackets',
-    tennisstring: 'Tennis Strings',
+    tennisstring: 'Strings',
     grip: 'Grips',
     shoe: 'Shoes',
     ball: 'Balls',
@@ -239,7 +239,7 @@ function buildPieData(sales: Sale[], stringJobs: StringJob[], period: TimePeriod
     const startDate = getPeriodStartDate(period);
     const grouped: { [key: string]: number } = {
         'Rackets': 0,
-        'Tennis Strings': 0,
+        'Strings': 0,
         'Grips': 0,
         'Shoes': 0,
         'Balls': 0,
@@ -406,35 +406,12 @@ const todayRevenue = useMemo(() => {
 
         return revenue / validSales.length;
     }, [sales]);
-    const totalRevenue = useMemo(
-        () => chartData.reduce((sum, d) => sum + d.totalRevenue, 0),
-        [chartData]
-    );
-
-    const totalExpenses = useMemo(() => {
-        const startDate = getPeriodStartDate(timePeriod);
-        return transactions
-            .filter(
-                (t) =>
-                    !t.isDeleted &&
-                    t.transactionCategory === 'OperationalCost' &&
-                    new Date(t.transactionCreated) >= startDate
-            )
-            .reduce((sum, t) => sum + Math.abs(t.transactionValue), 0);
-    }, [transactions, timePeriod]);
-
-    const netProfit = useMemo(() => totalRevenue - totalExpenses, [totalRevenue, totalExpenses]);
-
-    const profitMargin = useMemo(
-        () => (totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0),
-        [netProfit, totalRevenue]
-    );
-
+    
     return (
         <div className="dashboard">
             <div className="pageHeader">
                 <h2>Financial Dashboard</h2>
-                <span>Business Performance Overview</span>
+                <span>Business Performance Overview at a Glance</span>
                 <hr />
             </div>
 
@@ -525,7 +502,7 @@ const todayRevenue = useMemo(() => {
                                 <Line
                                     type="monotone"
                                     dataKey="stringjobRevenue"
-                                    stroke={CHART_COLORS[4]}
+                                    stroke={CHART_COLORS[1]}
                                     name="Stringjob Revenue"
                                     strokeWidth={2}
                                     dot={false}
