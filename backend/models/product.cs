@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace TennisCrmApi
 {
     public abstract class Product
@@ -13,6 +15,8 @@ namespace TennisCrmApi
         public decimal ProductPrice { get; set; }
         public DateTime LastModified { get; set; }  = DateTime.UtcNow; 
         public bool IsDeleted { get; set; } = false;
+        [NotMapped]
+        public string Discriminator => GetType().Name;
     }
 
     public class Racket : Product

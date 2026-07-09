@@ -1,7 +1,16 @@
 import { DollarSign, TrendingUp, TrendingDown, ChartColumnIncreasing } from "lucide-react";
 import InfoBox from "../../components/infobox";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useState, useEffect } from "react";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+} from "recharts";
+import { useState, useEffect, useMemo } from "react";
 import "./expenses.css";
 
 interface Transaction {
@@ -13,7 +22,6 @@ interface Transaction {
     description: string | null;
     isDeleted: boolean;
     customerId: number | null;
-    customer: null;
 }
 
 interface ChartDataPoint {
@@ -24,122 +32,219 @@ interface ChartDataPoint {
 
 type TimePeriod = "weeks" | "months";
 
+const round = (n: number) => Math.round(n * 100) / 100;
+
+function startOfWeek(date: Date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+
+    d.setDate(d.getDate() + diff);
+
+    return d;
+}
+
+function startOfMonth(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function buildBuckets(period: TimePeriod) {
+    const buckets: {
+        key: number;
+        label: string;
+        revenue: number;
+        expenses: number;
+    }[] = [];
+
+    const now = new Date();
+
+    if (period === "weeks") {
+        let current = startOfWeek(now);
+
+        current.setDate(current.getDate() - 28);
+
+        for (let i = 0; i < 5; i++) {
+            buckets.push({
+                key: current.getTime(),
+                label: current.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                }),
+                revenue: 0,
+                expenses: 0,
+            });
+
+            current = new Date(current);
+            current.setDate(current.getDate() + 7);
+        }
+    } else {
+        let current = startOfMonth(now);
+
+        current.setMonth(current.getMonth() - 4);
+
+        for (let i = 0; i < 5; i++) {
+            buckets.push({
+                key: current.getTime(),
+                label: current.toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "2-digit",
+                }),
+                revenue: 0,
+                expenses: 0,
+            });
+
+            current = new Date(current);
+            current.setMonth(current.getMonth() + 1);
+        }
+    }
+
+    return buckets;
+}
+
+function aggregateTransactions(
+    transactions: Transaction[],
+    period: TimePeriod
+): ChartDataPoint[] {
+
+    const buckets = buildBuckets(period);
+
+    const lookup = new Map<number, typeof buckets[number]>();
+
+    buckets.forEach(bucket => lookup.set(bucket.key, bucket));
+
+    transactions
+        .filter(t => !t.isDeleted)
+        .forEach(transaction => {
+
+            const date = new Date(transaction.transactionCreated);
+
+            let key: number;
+
+            if (period === "weeks") {
+                key = startOfWeek(date).getTime();
+            } else {
+                key = startOfMonth(date).getTime();
+            }
+
+            const bucket = lookup.get(key);
+
+            if (!bucket) return;
+
+            switch (transaction.transactionCategory) {
+
+                case "Sale":
+                case "Stringjob":
+                    bucket.revenue += transaction.transactionValue;
+                    break;
+
+                case "OperationalCost":
+                    bucket.expenses += Math.abs(transaction.transactionValue);
+                    break;
+            }
+
+        });
+
+    return buckets.map(bucket => ({
+        period: bucket.label,
+        revenue: round(bucket.revenue),
+        expenses: round(bucket.expenses),
+    }));
+}
+
 export default function Expenses() {
+
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
     const [timePeriod, setTimePeriod] = useState<TimePeriod>("weeks");
     const [loading, setLoading] = useState(true);
 
-    const fetchTransactions = async () => {
+    async function fetchTransactions() {
+
         try {
+
             setLoading(true);
-            const response = await fetch("http://localhost:5000/api/transactions");
+
+            const response = await fetch(
+                "http://localhost:5000/api/transactions"
+            );
+
             const data: Transaction[] = await response.json();
+
             setTransactions(data);
-        } catch (error) {
-            console.error("Error fetching transactions:", error);
+
+        } catch (err) {
+
+            console.error(err);
+
         } finally {
+
             setLoading(false);
+
         }
-    };
+
+    }
 
     useEffect(() => {
+
         fetchTransactions();
+
     }, []);
 
-    useEffect(() => {
-        if (transactions.length > 0) {
-            const aggregatedData = aggregateTransactions(transactions, timePeriod);
-            setChartData(aggregatedData);
-        }
+    const chartData = useMemo(() => {
+
+        return aggregateTransactions(transactions, timePeriod);
+
     }, [transactions, timePeriod]);
 
-    const aggregateTransactions = (transactions: Transaction[], period: TimePeriod): ChartDataPoint[] => {
-        const grouped: { [key: string]: { revenue: number; expenses: number } } = {};
-        const now = new Date();
-
-        transactions.forEach((transaction) => {
-            const date = new Date(transaction.transactionCreated);
-            
-            // Only include transactions from the last 5 periods
-            const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-            
-            if (period === "weeks" && daysDiff > 35) return;
-            if (period === "months" && daysDiff > 150) return;
-
-            let periodKey: string;
-
-            if (period === "weeks") {
-                const weekStart = new Date(date);
-                weekStart.setDate(date.getDate() - date.getDay());
-                periodKey = `Week ${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
-            } else {
-                periodKey = date.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
-            }
-
-            if (!grouped[periodKey]) {
-                grouped[periodKey] = { revenue: 0, expenses: 0 };
-            }
-
-            // Categorize based on transactionCategory
-            if (transaction.transactionCategory === "Sale" || 
-                transaction.transactionCategory === "Stringjob") {
-                grouped[periodKey].revenue += transaction.transactionValue;
-
-            } else if (transaction.transactionCategory === "OperationalCost") {
-                grouped[periodKey].expenses += Math.abs(transaction.transactionValue);
-            }
-        });
-
-        // Convert to array and sort chronologically
-        return Object.entries(grouped)
-            .map(([period, values]) => ({
-                period,
-                revenue: Math.round(values.revenue * 100) / 100,
-                expenses: Math.round(values.expenses * 100) / 100,
-            }))
-            .sort((a, b) => new Date(a.period).getTime() - new Date(b.period).getTime())
-            .slice(-5); // Get last 5 periods
-    };
-
-    // InfoBox value calculations
     const now = new Date();
 
-    const currentMonthTransactions = transactions.filter((transaction) => {
-        const date = new Date(transaction.transactionCreated);
+    const currentMonthTransactions = useMemo(() => {
 
-        return (
-            date.getMonth() === now.getMonth() &&
-            date.getFullYear() === now.getFullYear()
-        );
-    });
+        return transactions.filter(t => {
 
-    const monthlyRevenue = currentMonthTransactions
-        .filter(
-            (t) =>
-                t.transactionCategory === "Sale" ||
-                t.transactionCategory === "Stringjob"
-        )
-        .reduce((sum, t) => sum + t.transactionValue, 0);
+            const d = new Date(t.transactionCreated);
 
-    const monthlyExpenses = currentMonthTransactions
-        .filter((t) => t.transactionCategory === "OperationalCost")
-        .reduce((sum, t) => sum + Math.abs(t.transactionValue), 0);
+            return (
+                !t.isDeleted &&
+                d.getMonth() === now.getMonth() &&
+                d.getFullYear() === now.getFullYear()
+            );
+
+        });
+
+    }, [transactions]);
+        const monthlyRevenue = useMemo(() => {
+        return currentMonthTransactions
+            .filter(
+                (t) =>
+                    t.transactionCategory === "Sale" ||
+                    t.transactionCategory === "Stringjob"
+            )
+            .reduce((sum, t) => sum + t.transactionValue, 0);
+    }, [currentMonthTransactions]);
+
+    const monthlyExpenses = useMemo(() => {
+        return currentMonthTransactions
+            .filter((t) => t.transactionCategory === "OperationalCost")
+            .reduce((sum, t) => sum + Math.abs(t.transactionValue), 0);
+    }, [currentMonthTransactions]);
 
     const monthlyProfit = monthlyRevenue - monthlyExpenses;
 
     const monthlyProfitMargin =
-        monthlyRevenue > 0
-            ? (monthlyProfit / monthlyRevenue) * 100
-            : 0;
+        monthlyRevenue === 0
+            ? 0
+            : (monthlyProfit / monthlyRevenue) * 100;
 
     return (
         <div className="expensesPageContainer">
             <div className="pageHeader">
-                <h2>Customer Management</h2>
-                <span>Track all customer history and relationships</span>
+                <h2>Financial Overview</h2>
+                <span>Revenue, expenses and profitability</span>
                 <hr />
             </div>
+
             <div className="expensesPageDashboardGrid">
                 <InfoBox
                     icon={TrendingUp}
@@ -147,6 +252,7 @@ export default function Expenses() {
                     info="Monthly Revenue"
                     value={`$${monthlyRevenue.toFixed(2)}`}
                 />
+
                 <InfoBox
                     icon={TrendingDown}
                     metric=""
@@ -160,7 +266,11 @@ export default function Expenses() {
                     metric=""
                     info="Monthly Net Profit"
                     value={`$${monthlyProfit.toFixed(2)}`}
-                    classname={monthlyProfit >= 0 ? "text-green" : "text-red"}
+                    classname={
+                        monthlyProfit >= 0
+                            ? "text-green"
+                            : "text-red"
+                    }
                 />
 
                 <InfoBox
@@ -168,61 +278,96 @@ export default function Expenses() {
                     metric=""
                     info="Monthly Profit Margin"
                     value={`${monthlyProfitMargin.toFixed(2)}%`}
-                    classname={monthlyProfitMargin >= 0 ? "text-green" : "text-red"}
+                    classname={
+                        monthlyProfitMargin >= 0
+                            ? "text-green"
+                            : "text-red"
+                    }
                 />
             </div>
+
             <div className="expensesGraphWrapper">
                 <div className="expensesGraphHeader">
-                    <h3 className="expensesGraphTitle">Revenue vs Expenses</h3>
+                    <h3 className="expensesGraphTitle">
+                        Revenue vs Expenses
+                    </h3>
+
                     <div className="expensesGraphTimePeriodToggle">
                         <button
-                            className={`expensesGraphToggleButton ${timePeriod === "weeks" ? "expensesGraphToggleButtonActive" : ""}`}
+                            className={
+                                timePeriod === "weeks"
+                                    ? "expensesGraphToggleButton expensesGraphToggleButtonActive"
+                                    : "expensesGraphToggleButton"
+                            }
                             onClick={() => setTimePeriod("weeks")}
                         >
                             5 Weeks
                         </button>
+
                         <button
-                            className={`expensesGraphToggleButton ${timePeriod === "months" ? "expensesGraphToggleButtonActive" : ""}`}
+                            className={
+                                timePeriod === "months"
+                                    ? "expensesGraphToggleButton expensesGraphToggleButtonActive"
+                                    : "expensesGraphToggleButton"
+                            }
                             onClick={() => setTimePeriod("months")}
                         >
                             5 Months
                         </button>
                     </div>
                 </div>
+
                 {loading ? (
-                    <div className="expensesGraphLoadingState">Loading transactions...</div>
-                ) : chartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={400}>
+                    <div className="expensesGraphLoadingState">
+                        Loading transactions...
+                    </div>
+                ) : (
+                    <ResponsiveContainer
+                        width="100%"
+                        height={400}
+                    >
                         <BarChart
                             data={chartData}
                             margin={{
                                 top: 20,
                                 right: 30,
-                                left: 0,
+                                left: 10,
                                 bottom: 5,
                             }}
                         >
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="period" />
-                            <YAxis width={60} />
-                            <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+
+                            <XAxis
+                                dataKey="period"
+                            />
+
+                            <YAxis
+                                width={70}
+                            />
+
+                            <Tooltip
+                                formatter={(value: number) =>
+                                    `$${value.toFixed(2)}`
+                                }
+                            />
+
                             <Legend />
+
                             <Bar
                                 dataKey="revenue"
-                                fill="#7c3aed"
                                 name="Revenue"
+                                fill="#7c3aed"
                                 radius={[10, 10, 0, 0]}
                             />
+
                             <Bar
                                 dataKey="expenses"
-                                fill="#cd3e33"
                                 name="Expenses"
+                                fill="#cd3e33"
                                 radius={[10, 10, 0, 0]}
                             />
                         </BarChart>
                     </ResponsiveContainer>
-                ) : (
-                    <div className="expensesGraphEmptyState">No transactions found</div>
                 )}
             </div>
         </div>

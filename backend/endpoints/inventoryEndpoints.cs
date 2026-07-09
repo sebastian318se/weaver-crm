@@ -43,13 +43,14 @@ namespace TennisCrmApiEndpoints
             // Order by class name then product name
             var items = await db.Products
                 .Where(x => !x.IsDeleted)
+                .Select(x => new
+                {
+                    Product = x,
+                    Discriminator = EF.Property<string>(x, "Discriminator")
+                })
                 .ToListAsync();
 
-            var sortedItems = items
-                .OrderBy(p => p.GetType().Name) // Linq name property
-                .ThenBy(p => p.ProductName); // Database name property
-
-            return Results.Ok(sortedItems);
+            return Results.Ok(items);
         }
 
         // Get inventory on ID match, including discriminator for dashboard graphing

@@ -141,11 +141,6 @@ namespace tenniscrm.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("character varying(13)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -182,9 +177,7 @@ namespace tenniscrm.Migrations
 
                     b.ToTable("Products");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Product");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("TennisCrmApi.Transaction", b =>
@@ -266,7 +259,7 @@ namespace tenniscrm.Migrations
                     b.Property<int>("BallSurface")
                         .HasColumnType("integer");
 
-                    b.HasDiscriminator().HasValue("Ball");
+                    b.ToTable("Balls");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Clothing", b =>
@@ -279,13 +272,7 @@ namespace tenniscrm.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.ToTable("Products", t =>
-                        {
-                            t.Property("Type")
-                                .HasColumnName("Clothing_Type");
-                        });
-
-                    b.HasDiscriminator().HasValue("Clothing");
+                    b.ToTable("Clothes");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Grip", b =>
@@ -295,14 +282,14 @@ namespace tenniscrm.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.HasDiscriminator().HasValue("Grip");
+                    b.ToTable("Grips");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Other", b =>
                 {
                     b.HasBaseType("TennisCrmApi.Product");
 
-                    b.HasDiscriminator().HasValue("Other");
+                    b.ToTable("Miscellaneous");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Racket", b =>
@@ -334,7 +321,7 @@ namespace tenniscrm.Migrations
                     b.Property<int>("Weight")
                         .HasColumnType("integer");
 
-                    b.HasDiscriminator().HasValue("Racket");
+                    b.ToTable("Rackets");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Shoe", b =>
@@ -347,13 +334,7 @@ namespace tenniscrm.Migrations
                     b.Property<decimal>("Size")
                         .HasColumnType("numeric");
 
-                    b.ToTable("Products", t =>
-                        {
-                            t.Property("Size")
-                                .HasColumnName("Shoe_Size");
-                        });
-
-                    b.HasDiscriminator().HasValue("Shoe");
+                    b.ToTable("Shoes");
                 });
 
             modelBuilder.Entity("TennisCrmApi.TennisString", b =>
@@ -369,7 +350,7 @@ namespace tenniscrm.Migrations
                     b.Property<int?>("Material")
                         .HasColumnType("integer");
 
-                    b.HasDiscriminator().HasValue("TennisString");
+                    b.ToTable("TennisStrings");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Order", b =>
@@ -426,6 +407,69 @@ namespace tenniscrm.Migrations
                     b.Navigation("Racket");
 
                     b.Navigation("TennisString");
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Ball", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.Ball", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Clothing", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.Clothing", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Grip", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.Grip", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Other", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.Other", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Racket", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.Racket", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Shoe", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.Shoe", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.TennisString", b =>
+                {
+                    b.HasOne("TennisCrmApi.Product", null)
+                        .WithOne()
+                        .HasForeignKey("TennisCrmApi.TennisString", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TennisCrmApi.Sale", b =>

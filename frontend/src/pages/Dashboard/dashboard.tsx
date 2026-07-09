@@ -22,12 +22,38 @@ interface Transaction {
     transactionId: number;
     transactionValue: number;
     transactionCategory: string;
-    transactionDiscriminator?: string;
     transactionCreated: string;
     isDeleted: boolean;
 }
 
+interface Sale {
+    orderId: number;
+    createdAt: string;
+    orderPrice: number;
+    saleItems: SaleItem[];
+    customer: {
+        customerId: number;
+    };
+    isDeleted: boolean;
+}
+
+interface SaleItem {
+    productPrice: number;
+    productQuantity: number;
+    product: {
+        productType: string;
+    };
+}
+
+interface StringJob {
+    orderId: number;
+    createdAt: string;
+    orderPrice: number;
+    isDeleted: boolean;
+}
+
 interface ChartDataPoint {
+    date: Date;
     period: string;
     totalRevenue: number;
     salesRevenue: number;
@@ -47,30 +73,29 @@ const TIME_PERIODS: { value: TimePeriod; label: string }[] = [
     { value: 'ytd', label: 'YTD' },
 ];
 
-const CHART_COLORS = ['#7c3aed', '#cd3e33', '#06b6d4', '#c4b5fd', '#f472b6', '#fbbf24', '#f87171', '#94a3b8'];
+const CHART_COLORS = ['#7c3aed', '#5b4b71', '#06b6d4', '#c4b5fd', '#f472b6', '#fbbf24', '#f87171', '#94a3b8'];
 
-const SALE_DISCRIMINATORS = ['shoe', 'ball', 'clothing', 'tennisString', 'racket', 'grip', 'other'];
-
-const DISCRIMINATOR_LABELS: Record<string, string> = {
-    shoe: 'Shoe',
-    ball: 'Ball',
+const PRODUCT_TYPE_LABELS: Record<string, string> = {
+    racket: 'Rackets',
+    tennisstring: 'Tennis Strings',
+    grip: 'Grips',
+    shoe: 'Shoes',
+    ball: 'Balls',
     clothing: 'Clothing',
-    tennisString: 'Tennis String',
-    racket: 'Racket',
-    grip: 'Grip',
     other: 'Other',
 };
 
 function getPeriodStartDate(period: TimePeriod): Date {
     const now = new Date();
     const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
 
     switch (period) {
         case '7d':
-            start.setDate(now.getDate() - 7);
+            start.setDate(now.getDate() - 6);
             return start;
         case '30d':
-            start.setDate(now.getDate() - 30);
+            start.setDate(now.getDate() - 29);
             return start;
         case '3m':
             start.setMonth(now.getMonth() - 3);
@@ -83,82 +108,166 @@ function getPeriodStartDate(period: TimePeriod): Date {
     }
 }
 
-function getBucketKey(date: Date, period: TimePeriod): string {
+function getStartOfDay(date: Date): Date {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+function getStartOfWeek(date: Date): Date {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+}
+
+function getStartOfMonth(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function formatBucketLabel(date: Date, period: TimePeriod): string {
     if (period === '7d' || period === '30d') {
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     if (period === '3m' || period === '6m') {
-        const weekStart = new Date(date);
-        weekStart.setDate(date.getDate() - date.getDay());
-        return `Week ${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        return `Week ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
     }
 
     return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
 }
 
-function aggregateRevenueLines(transactions: Transaction[], period: TimePeriod): ChartDataPoint[] {
+function generateBuckets(period: TimePeriod): Date[] {
+    const buckets: Date[] = [];
+    const start = getPeriodStartDate(period);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    if (period === '7d' || period === '30d') {
+        let current = new Date(start);
+        while (current <= now) {
+            buckets.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+    } else if (period === '3m' || period === '6m') {
+        let current = getStartOfWeek(start);
+        const endOfWeek = getStartOfWeek(now);
+        while (current <= endOfWeek) {
+            buckets.push(new Date(current));
+            current.setDate(current.getDate() + 7);
+        }
+    } else {
+        let current = getStartOfMonth(start);
+        const endMonth = getStartOfMonth(now);
+        while (current <= endMonth) {
+            buckets.push(new Date(current));
+            current.setMonth(current.getMonth() + 1);
+        }
+    }
+
+    return buckets;
+}
+
+function getBucketDate(date: Date, period: TimePeriod): Date {
+    if (period === '7d' || period === '30d') {
+        return getStartOfDay(date);
+    }
+
+    if (period === '3m' || period === '6m') {
+        return getStartOfWeek(date);
+    }
+
+    return getStartOfMonth(date);
+}
+
+function aggregateRevenueLines(
+    sales: Sale[],
+    stringJobs: StringJob[],
+    period: TimePeriod
+): ChartDataPoint[] {
     const startDate = getPeriodStartDate(period);
-    const grouped: {
-        [key: string]: { salesRevenue: number; stringjobRevenue: number };
-    } = {};
+    const buckets = generateBuckets(period);
+    const bucketMap = new Map<number, { salesRevenue: number; stringjobRevenue: number }>();
 
-    transactions
-        .filter((t) => !t.isDeleted && new Date(t.transactionCreated) >= startDate)
-        .forEach((t) => {
-            const date = new Date(t.transactionCreated);
-            const key = getBucketKey(date, period);
+    buckets.forEach((bucket) => {
+        bucketMap.set(bucket.getTime(), { salesRevenue: 0, stringjobRevenue: 0 });
+    });
 
-            if (!grouped[key]) {
-                grouped[key] = { salesRevenue: 0, stringjobRevenue: 0 };
-            }
+    sales
+        .filter((s) => !s.isDeleted && new Date(s.createdAt) >= startDate)
+        .forEach((sale) => {
+            const saleDate = new Date(sale.createdAt);
+            const bucketDate = getBucketDate(saleDate, period);
+            const bucketKey = bucketDate.getTime();
 
-            if (t.transactionCategory === 'Sale') {
-                grouped[key].salesRevenue += t.transactionValue;
-            } else if (t.transactionCategory === 'Stringjob') {
-                grouped[key].stringjobRevenue += t.transactionValue;
+            if (bucketMap.has(bucketKey)) {
+                const revenue = sale.saleItems.reduce(
+                    (sum, item) => sum + item.productPrice * item.productQuantity,
+                    0
+                );
+                bucketMap.get(bucketKey)!.salesRevenue += revenue;
             }
         });
 
-    return Object.entries(grouped).map(([period, values]) => {
+    stringJobs
+        .filter((sj) => !sj.isDeleted && new Date(sj.createdAt) >= startDate)
+        .forEach((stringJob) => {
+            const jobDate = new Date(stringJob.createdAt);
+            const bucketDate = getBucketDate(jobDate, period);
+            const bucketKey = bucketDate.getTime();
+
+            if (bucketMap.has(bucketKey)) {
+                bucketMap.get(bucketKey)!.stringjobRevenue += stringJob.orderPrice;
+            }
+        });
+
+    return buckets.map((bucket) => {
+        const values = bucketMap.get(bucket.getTime())!;
         const salesRevenue = Math.round(values.salesRevenue * 100) / 100;
         const stringjobRevenue = Math.round(values.stringjobRevenue * 100) / 100;
+
         return {
-            period,
+            date: bucket,
+            period: formatBucketLabel(bucket, period),
             salesRevenue,
             stringjobRevenue,
             totalRevenue: Math.round((salesRevenue + stringjobRevenue) * 100) / 100,
         };
     });
 }
-
-// Pie: break Sale into discriminator subcategories, plus Stringjob as its own slice.
-function buildPieData(transactions: Transaction[], period: TimePeriod): PieSlice[] {
+function buildPieData(sales: Sale[], stringJobs: StringJob[], period: TimePeriod): PieSlice[] {
     const startDate = getPeriodStartDate(period);
-    const grouped: { [key: string]: number } = {};
+    const grouped: { [key: string]: number } = {
+        'Rackets': 0,
+        'Tennis Strings': 0,
+        'Grips': 0,
+        'Shoes': 0,
+        'Balls': 0,
+        'Clothing': 0,
+        'Other': 0,
+        'Stringjobs': 0,
+    };
 
-    transactions
-        .filter(
-            (t) =>
-                !t.isDeleted &&
-                new Date(t.transactionCreated) >= startDate &&
-                (t.transactionCategory === 'Sale' || t.transactionCategory === 'Stringjob')
-        )
-        .forEach((t) => {
-            let label: string;
-
-            if (t.transactionCategory === 'Stringjob') {
-                label = 'Stringjob';
-            } else {
-                // Sale break down by discriminator
-                const disc = t.transactionDiscriminator ?? 'other';
-                const normalized = SALE_DISCRIMINATORS.includes(disc) ? disc : 'other';
-                label = DISCRIMINATOR_LABELS[normalized] ?? 'Other';
-            }
-
-            grouped[label] = (grouped[label] ?? 0) + t.transactionValue;
+    // Aggregate sales revenue by product type
+    sales
+        .filter((s) => !s.isDeleted && new Date(s.createdAt) >= startDate)
+        .forEach((sale) => {
+            sale.saleItems.forEach((item) => {
+                const discriminator = item.product.discriminator?.toLowerCase() || "other";
+                const label = PRODUCT_TYPE_LABELS[discriminator] || 'Other';
+                const revenue = item.productPrice * item.productQuantity;
+                grouped[label] += revenue;
+            });
         });
 
+    // Aggregate stringjob revenue
+    stringJobs
+        .filter((sj) => !sj.isDeleted && new Date(sj.createdAt) >= startDate)
+        .forEach((stringJob) => {
+            grouped['Stringjobs'] += stringJob.orderPrice;
+        });
+
+    // Return only non-zero slices
     return Object.entries(grouped)
         .filter(([, value]) => value > 0)
         .map(([name, value]) => ({
@@ -171,21 +280,33 @@ function formatCurrency(value: number): string {
     return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
-// ---------- Component ----------
-
 export default function Dashboard() {
     const [timePeriod, setTimePeriod] = useState<TimePeriod>('30d');
     const [pieTimePeriod, setPieTimePeriod] = useState<TimePeriod>('30d');
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [sales, setSales] = useState<Sale[]>([]);
+    const [stringJobs, setStringJobs] = useState<StringJob[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function fetchDashboardData() {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:5000/api/transactions');
-                const transactionsData: Transaction[] = await response.json();
+                const [transactionsRes, salesRes, stringJobsRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/transactions'),
+                    fetch('http://localhost:5000/api/sales'),
+                    fetch('http://localhost:5000/api/strung'),
+                ]);
+
+                const [transactionsData, salesData, stringJobsData] = await Promise.all([
+                    transactionsRes.json(),
+                    salesRes.json(),
+                    stringJobsRes.json(),
+                ]);
+
                 setTransactions(transactionsData);
+                setSales(salesData);
+                setStringJobs(stringJobsData);
             } catch (err) {
                 console.error('Failed to load dashboard data', err);
             } finally {
@@ -197,16 +318,99 @@ export default function Dashboard() {
     }, []);
 
     const chartData = useMemo(
-        () => aggregateRevenueLines(transactions, timePeriod),
-        [transactions, timePeriod]
+        () => aggregateRevenueLines(sales, stringJobs, timePeriod),
+        [sales, stringJobs, timePeriod]
     );
 
     const pieData = useMemo(
-        () => buildPieData(transactions, pieTimePeriod),
-        [transactions, pieTimePeriod]
+        () => buildPieData(sales, stringJobs, pieTimePeriod),
+        [sales, stringJobs, pieTimePeriod]
+    );
+const todayRevenue = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const salesRevenue = sales
+        .filter(s => !s.isDeleted && new Date(s.createdAt) >= today)
+        .reduce(
+            (sum, sale) =>
+                sum +
+                sale.saleItems.reduce(
+                    (itemSum, item) => itemSum + item.productPrice * item.productQuantity,
+                    0
+                ),
+            0
+        );
+
+    const stringRevenue = stringJobs
+        .filter(sj => !sj.isDeleted && new Date(sj.createdAt) >= today)
+        .reduce((sum, sj) => sum + sj.orderPrice, 0);
+
+    return salesRevenue + stringRevenue;
+}, [sales, stringJobs]);
+
+    const monthlyRevenue = useMemo(() => {
+        const start = new Date();
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+
+        const salesRevenue = sales
+            .filter(s => !s.isDeleted && new Date(s.createdAt) >= start)
+            .reduce(
+                (sum, sale) =>
+                    sum +
+                    sale.saleItems.reduce(
+                        (itemSum, item) => itemSum + item.productPrice * item.productQuantity,
+                        0
+                    ),
+                0
+            );
+
+        const stringRevenue = stringJobs
+            .filter(sj => !sj.isDeleted && new Date(sj.createdAt) >= start)
+            .reduce((sum, sj) => sum + sj.orderPrice, 0);
+
+        return salesRevenue + stringRevenue;
+    }, [sales, stringJobs]);
+
+    const activeCustomers = useMemo(() => {
+        const start = new Date();
+        start.setDate(start.getDate() - 30);
+
+        return new Set(
+            sales
+                .filter(
+                    s =>
+                        !s.isDeleted &&
+                        new Date(s.createdAt) >= start &&
+                        s.customer
+                )
+                .map(s => s.customer.customerId)
+        ).size;
+    }, [sales]);
+
+    const averageOrderValue = useMemo(() => {
+        const validSales = sales.filter(s => !s.isDeleted);
+
+        if (validSales.length === 0) return 0;
+
+        const revenue = validSales.reduce(
+            (sum, sale) =>
+                sum +
+                sale.saleItems.reduce(
+                    (itemSum, item) => itemSum + item.productPrice * item.productQuantity,
+                    0
+                ),
+            0
+        );
+
+        return revenue / validSales.length;
+    }, [sales]);
+    const totalRevenue = useMemo(
+        () => chartData.reduce((sum, d) => sum + d.totalRevenue, 0),
+        [chartData]
     );
 
-    const totalRevenue = chartData.reduce((sum, d) => sum + d.totalRevenue, 0);
     const totalExpenses = useMemo(() => {
         const startDate = getPeriodStartDate(timePeriod);
         return transactions
@@ -219,8 +423,12 @@ export default function Dashboard() {
             .reduce((sum, t) => sum + Math.abs(t.transactionValue), 0);
     }, [transactions, timePeriod]);
 
-    const netProfit = totalRevenue - totalExpenses;
-    const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+    const netProfit = useMemo(() => totalRevenue - totalExpenses, [totalRevenue, totalExpenses]);
+
+    const profitMargin = useMemo(
+        () => (totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0),
+        [netProfit, totalRevenue]
+    );
 
     return (
         <div className="dashboard">
@@ -232,35 +440,37 @@ export default function Dashboard() {
 
             <div className="dashboardGrid">
                 <InfoBox
+                    icon={DollarSign}
+                    metric=""
+                    info="Today's Revenue"
+                    classname="text-green"
+                    value={`$${todayRevenue.toFixed(2)}`}
+                />
+
+                <InfoBox
                     icon={TrendingUp}
                     metric=""
                     info="Monthly Revenue"
-                    value={totalRevenue.toFixed(2)}
-                />
-                <InfoBox
-                    icon={TrendingDown}
-                    metric=""
-                    info="Monthly Expenses"
-                    value={totalExpenses.toFixed(2)}
-                    classname="text-red"
-                />
-                <InfoBox
-                    icon={DollarSign}
-                    metric=""
-                    info="Monthly Net Profit"
-                    value={netProfit.toFixed(2)}
                     classname="text-green"
+                    value={`$${monthlyRevenue.toFixed(2)}`}
                 />
+
                 <InfoBox
                     icon={ChartColumnIncreasing}
                     metric=""
-                    info="Monthly Profit Margin"
-                    value={`${profitMargin.toFixed(2)}%`}
+                    info="Active Customers (30 Days)"
+                    value={activeCustomers.toString()}
+                />
+
+                <InfoBox
+                    icon={TrendingUp}
+                    metric=""
+                    info="Average Order Value"
+                    value={`$${averageOrderValue.toFixed(2)}`}
                 />
             </div>
 
             <div className="dashboardChartsGrid">
-                {/* Line Chart — Revenue over time */}
                 <div className="dashboardGraphWrapper">
                     <div className="dashboardGraphHeader">
                         <h3 className="dashboardGraphTitle">Revenue Over Time</h3>
@@ -325,7 +535,6 @@ export default function Dashboard() {
                     )}
                 </div>
 
-                {/* Pie Chart — Revenue type breakdown */}
                 <div className="dashboardGraphWrapper">
                     <div className="dashboardGraphHeader">
                         <h3 className="dashboardGraphTitle">Revenue Breakdown</h3>
