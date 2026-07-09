@@ -115,6 +115,9 @@ namespace tenniscrm.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("ProductPrice")
+                        .HasColumnType("numeric");
+
                     b.Property<int>("ProductQuantity")
                         .HasColumnType("integer");
 
@@ -192,7 +195,7 @@ namespace tenniscrm.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TransactionId"));
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -401,9 +404,7 @@ namespace tenniscrm.Migrations
                 {
                     b.HasOne("TennisCrmApi.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.Navigation("Customer");
                 });

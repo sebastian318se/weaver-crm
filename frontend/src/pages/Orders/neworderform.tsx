@@ -3,23 +3,6 @@ import { useEffect } from "react";
 import InputDropdown from "./inputdropdown";
 import "./neworderform.css";
 
-
-// Add racket and string SEARCH endpoints on productendpoints
-// Add IsStoreOwned bool defaulted to true in String:Product model
-// Add placeholders for whenever a map field is empty
-// Order sales and sj's on most recent order
-
-// Add expense and dashboard graphing + support data
-
-// Set keys for navigation in maps -> switch sale from customer to orderid
-// Come back and set up PUT requests for editing entries etc.
-
-// Refactor project css -> font-size, grid sizes, colors etc. for better consistency and smaller components
-
-// AUTH wahhhhh
-// Set up servers!
-
-
 type sjBoxProps = {
     action: () => void;
     onSjCreated: () => void;

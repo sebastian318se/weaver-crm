@@ -113,7 +113,7 @@ namespace TennisCrmApiEndpoints
                     // Deducting quantity from product entry
                     existingProduct.LastModified = DateTime.UtcNow;
                     
-                    if ((existingProduct.ProductStockAmount - item.ProductId) < 0) 
+                    if ((existingProduct.ProductStockAmount - item.ProductQuantity) < 0) 
                         return Results.BadRequest($"Insufficient stock of id #{item.ProductId} to execute sale.");
 
                     existingProduct.ProductStockAmount -= item.ProductQuantity;
@@ -123,7 +123,8 @@ namespace TennisCrmApiEndpoints
                     sale.SaleItems.Add(new OrderItems
                         {
                             ProductId = item.ProductId,
-                            ProductQuantity = item.ProductQuantity
+                            ProductQuantity = item.ProductQuantity,
+                            ProductPrice = existingProduct.ProductPrice
                         });
 
                 }

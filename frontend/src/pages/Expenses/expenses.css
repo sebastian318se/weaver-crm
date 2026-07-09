@@ -1,0 +1,120 @@
+.expensesPageContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.expensesPageHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 32px 48px;
+}
+
+.expensesPageDashboardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin: 0 48px;
+}
+
+.expensesGraphWrapper {
+    background-color: #f7f7f8;
+    border: solid 1px #e9e9e9;
+    border-radius: 15px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 32px 48px;
+}
+
+.expensesGraphHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 0 20px;
+}
+
+.expensesGraphTitle {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0;
+    color: #5b4b71;
+}
+
+.expensesGraphTimePeriodToggle {
+    display: flex;
+    gap: 15px;
+}
+
+.expensesGraphToggleButton {
+    padding: 12px 20px;
+    border: 0px solid;
+    background-color: #e1d5f5;
+    border-radius: 8px;
+    font-size: 19px;
+    color: #7c3aed;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.expensesGraphToggleButton:hover {
+    background-color: #d6bdfa;
+    transition: 0.3s;
+}
+
+.expensesGraphToggleButton:active {
+    background-color: rgb(195, 182, 218);
+    transform: scale(0.98);
+}
+
+.expensesGraphToggleButtonActive {
+    background-color: #7c3aed;
+    color: white;
+}
+
+.expensesGraphToggleButtonActive:hover {
+    background-color: #9254fc;
+}
+
+.expensesGraphToggleButtonActive:active {
+    background-color: #601dd5;
+    transform: scale(0.98);
+}
+
+.expensesGraphLoadingState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    font-size: 18px;
+    color: #5b5b5b;
+}
+
+.expensesGraphEmptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    font-size: 18px;
+    color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+    .expensesGraphHeader {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .expensesGraphWrapper {
+        padding: 24px;
+        margin: 24px 24px;
+    }
+
+    .expensesPageDashboardGrid {
+        margin: 0 24px;
+        grid-template-columns: 1fr;
+    }
+}

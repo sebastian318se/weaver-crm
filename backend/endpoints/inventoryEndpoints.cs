@@ -52,13 +52,18 @@ namespace TennisCrmApiEndpoints
             return Results.Ok(sortedItems);
         }
 
-        // Get inventory on ID match
+        // Get inventory on ID match, including discriminator for dashboard graphing
         public static async Task<IResult> GetItemById(int id, AppDbContext db)
         {
             var item = await db.Products
-                .Where(x => !x.IsDeleted)
-                .FirstOrDefaultAsync(x => x.ProductId == id);
-                
+                .Where(x => !x.IsDeleted && x.ProductId == id)
+                .Select(x => new
+                {
+                    Product = x,
+                    Discriminator = EF.Property<string>(x, "Discriminator")
+                })
+                .FirstOrDefaultAsync();
+
             return item is not null
                 ? Results.Ok(item)
                 : Results.NotFound("Could not locate item");

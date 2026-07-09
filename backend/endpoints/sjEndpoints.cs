@@ -69,6 +69,7 @@ namespace TennisCrmApiEndpoints
             try
             {
                 db.StringJobs.Add(newSJ);
+                
 
                 // Fetch customer (handle whether exists or not)
                 var existingCustomer = await db.Customers
@@ -77,25 +78,27 @@ namespace TennisCrmApiEndpoints
                 if (existingCustomer is null)
                     return Results.BadRequest("Invalid customer.");
 
+                if (newSJ.IsStoreOwned != false)
+                {
+                    // Deduct quantity from string db entry
+                    var existingProduct = await db.Products
+                        .FindAsync(newSJ.TennisStringId);
+                    
+                    if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
+                    
+                    existingProduct.LastModified = DateTime.UtcNow;
 
-                // Deduct quantity from string db entry
-                var existingProduct = await db.Products
-                    .FindAsync(newSJ.TennisStringId);
-                
-                if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
-                
-                existingProduct.LastModified = DateTime.UtcNow;
+                    if ((existingProduct.ProductStockAmount - 1) < 0) 
+                        return Results.BadRequest($"Insufficient stock of id #{existingProduct.ProductId} to execute sale.");
 
-                if ((existingProduct.ProductStockAmount - 1) < 0) 
-                    return Results.BadRequest($"Insufficient stock of id #{existingProduct.ProductId} to execute sale.");
-
-                existingProduct.ProductStockAmount -= 1;
+                    existingProduct.ProductStockAmount -= 1;
+                }
 
                 // Add SJ to transaction db
                 var newTransaction = new Transaction
                     {
                         TransactionValue = newSJ.OrderPrice,
-                        TransactionCategory = TransactionCategory.Sale,
+                        TransactionCategory = TransactionCategory.Stringjob,
                         Description = "Origin: API stringjob post transaction.",
                         CustomerId = newSJ.CustomerId,
                     };
