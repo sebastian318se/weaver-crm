@@ -311,22 +311,6 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
                         </div>
                     </div>
 
-                    {selectedRacket && selectedString && (<hr />)}
-
-                    <div className="jobSummary">
-                        {selectedRacket && selectedString && (
-                            <div>
-                                <span>Racket: {selectedRacket.label}</span>
-                                <span className="addedProductDivider">|</span>
-                                <span>String: {selectedString.label}</span>
-                                <span className="addedProductDivider">|</span>
-                                <span>Tension: {mainTension}/{crossTension}</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {selectedRacket && selectedString && (<hr />)}
-
                     <div className="formbuttons">
                         <button 
                             className='addsale'

@@ -1,17 +1,24 @@
 .stringownerinput{
     display: flex;
     gap: 20px;
-    width: 97.5%;
-    height: 30px;
+    width: 96.5%;
+    height: 20px;
     cursor: pointer;
     accent-color: #7c3aed;
     margin-right: 8px;
-
 
     background-color: #e9e9e9;
     padding: 10px;
     border: solid 1px #dadada;
     border-radius: 5px;
+}
+
+.stringownerinput label{
+    font-size: 13px !important;
+}
+
+.stringownerinput input{
+    font-size: 13px;
 }
 
 .forminput label {

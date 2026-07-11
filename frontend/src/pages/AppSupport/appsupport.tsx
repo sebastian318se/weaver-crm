@@ -17,7 +17,7 @@ export default function Support() {
                 <SupportBox
                     icon={Phone}
                     title="Support Line"
-                    value="(555) 123-4567"
+                    value="+55 (051) 995161556"
                     emptyMessage="No support line provided at this time."
                     additionalInfo="Mon–Fri, 9:00 AM – 5:00 PM"
                 />

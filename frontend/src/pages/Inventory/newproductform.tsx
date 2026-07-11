@@ -156,14 +156,14 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
         <div>
             <div className="formcontainer">
 
-                <div className="formcontents">
+                <div className="productformcontents">
 
-                    <span className='addnewspan'>Create New Product</span>
+                    <span className='addnewproductspan'>Create New Product</span>
                     
-                    <div className="forminputs">
+                    <div className="productforminputs">
 
                     {/* GENERAL UN-NULLABLE PARAMETERS */}
-                        <div className='forminput'>
+                        <div className='productforminput'>
                             <span>Product Type</span>
                             <select
                                 onChange={(e) => setDiscriminator(e.target.value)}
@@ -181,7 +181,7 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
                         </div>
 
                         {inputMappers.map(inputMapper => (
-                            <div className="forminput" key={inputMapper.key}>
+                            <div className="productforminput" key={inputMapper.key}>
                                 <span>{inputMapper.title}</span>
                                 <input 
                                     value={formData[inputMapper.key]}
@@ -208,7 +208,7 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
                         <AnimatePresence mode="wait">
                             {fields[discriminator]?.map(field => (
                                 <motion.div
-                                    className="forminput"
+                                    className="productforminput"
                                     key={field.key}
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -233,14 +233,14 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
                     </div>
                 
                 {/* CHECKOUT BUTTONS */}
-                    <div className="formbuttons">
+                    <div className="productformbuttons">
                         <button 
                             className='addproduct'
                             onClick={handleSubmit}>
                                 Add Product
                             </button>
                         <button 
-                            className='cancel'
+                            className='cancelproduct'
                             onClick={action}>
                                 Cancel
                             </button>

@@ -6,36 +6,36 @@
 
     position: relative;
     padding: 32px;
-    margin: 32px 48px;    
+    margin: 0 48px;    
 }
 
-.addnewspan{
-    font-size: 22px;
+.addnewproductspan{
+    font-size: 16px;
 }
 
-.formcontents{
+.productformcontents{
     display: grid;
-    gap: 20px;
+    gap: 10px;
 }
 
-.forminputs{
+.productforminputs{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px 30px;
+    gap: 15px 20px;
 }
 
-.forminput{
+.productforminput{
     display: grid;
     grid-template-columns: repeat();
     gap: 8px;
 }
 
-.forminput span{
+.productforminput span{
     color: #5b4b71;
-    font-size: 20px;
+    font-size: 13px;
 }
 
-.forminput input{
+.productforminput input{
     border: solid 1px #d5d5d5;
     border-radius: 5px;
 
@@ -43,20 +43,20 @@
     padding-left: 10px;
 
     background-color: #e9e9e9;
-    font-size: 18px;    
+    font-size: 13px;    
 }
 
-.forminputs select{
+.productforminputs select{
     border: solid 1px #d5d5d5;
     border-radius: 5px;
 
     color: #5b5b5b;
-    font-size: 18px;
+    font-size: 14px;
 
     padding: 12px;
 }
 
-.formbuttons{
+.productformbuttons{
     display: flex;
     gap: 15px;
 }
@@ -65,7 +65,7 @@
     background-color: #7c3aed;
     border-radius: 8px;
     border: 0px solid;
-    font-size: 19px;
+    font-size: 13px;
 
     color: white;
     padding: 12px 20px;
@@ -81,23 +81,23 @@
     transform: scale(0.98);
 }
 
-.cancel{
+.cancelproduct{
     background-color: #e1d5f5;
     color: #7c3aed;
 
     border-radius: 8px;
     border: 0px solid;
-    font-size: 19px;
+    font-size: 13px;
 
     padding: 12px 20px;
 }
 
-.cancel:hover{
+.cancelproduct:hover{
     background-color: #d6bdfa;
     transition: 0.3s;
 }
 
-.cancel:active{
+.cancelproduct:active{
     background-color: rgb(195, 182, 218);
     transform: scale(0.98);
 }

@@ -165,9 +165,9 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
     return (
         <div>
-            <div className="formcontainer">
+            <div className="saleformcontainer">
 
-                <div className="formcontents">
+                <div className="saleformcontents">
 
                     <div className="newOrderTopRow">
                         <span className='addnewspan'>Add New Sale</span>
@@ -176,8 +176,8 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                         </button>
                     </div>
                     
-                    <div className="forminputs">
-                        <div className="forminput">
+                    <div className="saleforminputs">
+                        <div className="saleforminput">
                             <span>Customer:</span>
                             <InputDropdown
                                 inputPlaceholder="Search customer..."
@@ -189,7 +189,7 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
                                 counter={false}
                             />
                         </div>
-                        <div className="forminput">
+                        <div className="saleforminput">
                                 <span>Add Product:</span>
                                 <InputDropdown
                                     inputPlaceholder="Search product..."
@@ -219,7 +219,7 @@ export default function NewSaleBox({action, onSaleCreated}: saleBoxProps) {
 
                     {finalProducts.length > 0 && (<hr />)}
 
-                    <div className="formbuttons">
+                    <div className="saleformbuttons">
                         <button 
                             className='addsale'
                             onClick={handleSubmit}>

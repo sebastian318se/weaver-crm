@@ -125,7 +125,7 @@ export default function Inventory() {
                         {tabs.map(tab => (
                             <button
                                 key={tab}
-                                className={activeTab === tab ? "tabactive" : "tab"}
+                                className={activeTab === tab ? "inventorytabactive" : "inventorytab"}
                                 onClick={() => setActiveTab(tab)}>
                                     {tab}
                                 </button>

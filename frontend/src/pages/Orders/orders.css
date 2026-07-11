@@ -15,7 +15,7 @@
     color: #5b4b71;
     padding: 11px 16px;
 
-    font-size: 18px;
+    font-size: 12px;
 }
 
 .tab:hover{
@@ -36,7 +36,7 @@
     color: white;
     padding: 11px 16px;
 
-    font-size: 18px;
+    font-size: 12px;
 }
 
 .tabactive:active{
@@ -53,7 +53,7 @@
 .salesgrid{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px 20px;
+    gap: 10px 20px;
 }
 
 .sjgrid{
@@ -68,7 +68,7 @@
 
     gap: 5px;
 
-    font-size: 18px;
+    font-size: 12px;
     color: #5b4b71;
 }
 

@@ -281,8 +281,8 @@ function formatCurrency(value: number): string {
 }
 
 export default function Dashboard() {
-    const [timePeriod, setTimePeriod] = useState<TimePeriod>('30d');
-    const [pieTimePeriod, setPieTimePeriod] = useState<TimePeriod>('30d');
+    const [timePeriod, setTimePeriod] = useState<TimePeriod>('7d');
+    const [pieTimePeriod, setPieTimePeriod] = useState<TimePeriod>('7d');
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [sales, setSales] = useState<Sale[]>([]);
     const [stringJobs, setStringJobs] = useState<StringJob[]>([]);
@@ -411,7 +411,7 @@ const todayRevenue = useMemo(() => {
         <div className="dashboard">
             <div className="pageHeader">
                 <h2>Financial Dashboard</h2>
-                <span>Business Performance Overview at a Glance</span>
+                <span>Business Performance Overview At A Glance</span>
                 <hr />
             </div>
 
@@ -435,7 +435,7 @@ const todayRevenue = useMemo(() => {
                 <InfoBox
                     icon={ChartColumnIncreasing}
                     metric=""
-                    info="Active Customers (30 Days)"
+                    info="Active Customers this Month"
                     value={activeCustomers.toString()}
                 />
 
@@ -473,14 +473,14 @@ const todayRevenue = useMemo(() => {
                     ) : chartData.length === 0 ? (
                         <div className="dashboardGraphEmptyState">No data available for this period</div>
                     ) : (
-                        <ResponsiveContainer width="100%" height={350}>
+                        <ResponsiveContainer width="100%" height={250}>
                             <LineChart
                                 data={chartData}
                                 margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="period" />
-                                <YAxis width={70} tickFormatter={formatCurrency} />
+                                <XAxis dataKey="period" tick={{ fontSize: 14}} />
+                                <YAxis width={70} tickFormatter={formatCurrency} tick={{ fontSize: 14}}/>
                                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                                 <Legend />
                                 <Line
@@ -488,7 +488,7 @@ const todayRevenue = useMemo(() => {
                                     dataKey="totalRevenue"
                                     stroke={CHART_COLORS[0]}
                                     name="Total Revenue"
-                                    strokeWidth={2}
+                                    strokeWidth={1.5}
                                     dot={false}
                                 />
                                 <Line
@@ -496,7 +496,7 @@ const todayRevenue = useMemo(() => {
                                     dataKey="salesRevenue"
                                     stroke={CHART_COLORS[2]}
                                     name="Sales Revenue"
-                                    strokeWidth={2}
+                                    strokeWidth={1.5}
                                     dot={false}
                                 />
                                 <Line
@@ -504,7 +504,7 @@ const todayRevenue = useMemo(() => {
                                     dataKey="stringjobRevenue"
                                     stroke={CHART_COLORS[1]}
                                     name="Stringjob Revenue"
-                                    strokeWidth={2}
+                                    strokeWidth={1.5}
                                     dot={false}
                                 />
                             </LineChart>
@@ -537,7 +537,7 @@ const todayRevenue = useMemo(() => {
                     ) : pieData.length === 0 ? (
                         <div className="dashboardGraphEmptyState">No data available for this period</div>
                     ) : (
-                        <ResponsiveContainer width="100%" height={350}>
+                        <ResponsiveContainer width="100%" height={250}>
                             <PieChart>
                                 <Pie
                                     data={pieData}
@@ -545,8 +545,9 @@ const todayRevenue = useMemo(() => {
                                     nameKey="name"
                                     cx="50%"
                                     cy="50%"
-                                    outerRadius={120}
+                                    outerRadius={80}
                                     label={(entry) => `${entry.name}`}
+                                    fontSize={14}
                                 >
                                     {pieData.map((_entry, index) => (
                                         <Cell

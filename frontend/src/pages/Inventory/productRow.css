@@ -51,7 +51,7 @@
 
 .progressBar{
     width: 75%;
-    height: 15px;
+    height: 10px;
     background-color: #e0e0de;
     border-radius: 8px;
     overflow: hidden;
@@ -61,14 +61,14 @@
     position: absolute;
     top: -20px;
     left: 10%;
-    width: 45%;
+    width: 50%;
     height: 200%;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: rgba(30, 41, 59, 0.9);
     color: #e2c1dd;
-    font-size: 1rem;
+    font-size: 14px;
     font-weight: bold;
     border-radius: 6px;
 

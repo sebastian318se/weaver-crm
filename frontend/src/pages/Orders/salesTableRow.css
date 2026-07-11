@@ -1,7 +1,7 @@
 .salesrow{
     display: flex;
     justify-content: space-between;
-    font-size: 15px;
+    font-size: 12px;
     background-color: #f1f1f1;
 
     margin-top: 7px;

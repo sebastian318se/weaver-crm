@@ -1,4 +1,4 @@
-import { Calendar } from "lucide-react";
+import { Calendar, Check } from "lucide-react";
 import './sjTable.css'
 
 type Customer = {
@@ -45,7 +45,8 @@ export default function SjTable({
     status,
     mainTension,
     crossTension,
-    expectedAt
+    expectedAt,
+    createdAt
 }: SjProps) {
 
     const finalTension = mainTension === crossTension 
@@ -72,9 +73,18 @@ export default function SjTable({
                 <span>Tension: {finalTension}</span>
             </div>
 
-            <div className="date">
-                <Calendar size={18}/>
-                <span>{expectedAt ? new Date(expectedAt).toLocaleDateString("en-GB") : ""}</span>
+            <div className="datedisplay">
+
+                <div className="date">
+                    <Calendar size={18}/>
+                    <span>Order date: {expectedAt ? new Date(createdAt).toLocaleDateString("en-GB") : ""}</span>
+                </div>
+
+                <div className="date">
+                    <Check size={18}/>
+                    <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("en-GB") : ""}</span>
+                </div>
+                
             </div>
         </div>
     );

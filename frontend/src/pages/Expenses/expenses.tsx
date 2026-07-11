@@ -324,7 +324,7 @@ export default function Expenses() {
                 ) : (
                     <ResponsiveContainer
                         width="100%"
-                        height={400}
+                        height={250}
                     >
                         <BarChart
                             data={chartData}

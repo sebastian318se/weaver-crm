@@ -27,7 +27,7 @@ export default function SupportBox({
           <Icon size={35} />
         </div>
 
-        <div>
+        <div className="supportcontent">
           <span className="upline">{title}</span>
 
           {value ? (

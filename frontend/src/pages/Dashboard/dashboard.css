@@ -4,12 +4,12 @@
     
     margin-right: 48px;
     margin-left: 48px;
-    gap: 30px;
+    gap: 20px;
 }
 
 .dashboardChartsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     gap: 20px;
     margin: 32px 48px;
 }
@@ -24,6 +24,10 @@
     gap: 20px;
 }
 
+.dashboardGraphWrapper:hover {
+    border: solid 1px #7c3aed;
+}
+
 .dashboardGraphHeader {
     display: flex;
     align-items: center;
@@ -33,7 +37,7 @@
 }
 
 .dashboardGraphTitle {
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 500;
     margin: 0;
     color: #5b4b71;
@@ -41,15 +45,15 @@
 
 .dashboardGraphTimePeriodToggle {
     display: flex;
-    gap: 15px;
+    gap: 10px;
 }
 
 .dashboardGraphToggleButton {
-    padding: 12px 20px;
+    padding: 6px 12px;
     border: 0px solid;
     background-color: #e1d5f5;
-    border-radius: 8px;
-    font-size: 19px;
+    border-radius: 6px;
+    font-size: 14px;
     color: #7c3aed;
     cursor: pointer;
     transition: 0.3s;
@@ -84,7 +88,7 @@
     align-items: center;
     justify-content: center;
     min-height: 300px;
-    font-size: 18px;
+    font-size: 14px;
     color: #5b5b5b;
 }
 
@@ -93,7 +97,7 @@
     align-items: center;
     justify-content: center;
     min-height: 300px;
-    font-size: 18px;
+    font-size: 14px;
     color: #9ca3af;
 }
 

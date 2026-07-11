@@ -13,7 +13,7 @@ export default function InfoBox({icon: Icon, metric, info, value, classname = ""
     return (
         <button className='infoBox'>
             <div className='topSection'>
-                <Icon size={22}/> <span>{metric}</span>
+                <Icon size={18}/> <span>{metric}</span>
             </div>
             <div className='mainText'>
                 <div className={classname}>

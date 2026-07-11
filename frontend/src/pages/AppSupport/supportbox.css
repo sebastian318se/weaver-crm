@@ -31,15 +31,20 @@
 
 .upline {
     display: block;
-    font-size: 22px;
+    font-size: 16px;
 }
 
 .downlinecontent {
-    font-size: 19px;
+    font-size: 13px;
     color: #7d3aec;
 }
 
 .downline {
-    font-size: 17px;
+    font-size: 13px;
     color: #5b4b71;
+}
+
+.supportcontent {
+    display: grid;
+    gap: 5px;
 }

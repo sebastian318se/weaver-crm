@@ -38,7 +38,7 @@ export default function SalesTable({saleItems, customer, orderPrice, createdAt }
                     <span className="totalprice">${orderPrice}</span>
                 </div>
                 <div className="date">
-                    <Calendar size={18}/>
+                    <Calendar size={15}/>
                     <span className="date"> {new Date(createdAt).toLocaleDateString()}</span>
                 </div>
             </div>
