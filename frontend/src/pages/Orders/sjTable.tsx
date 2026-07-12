@@ -82,7 +82,7 @@ export default function SjTable({
 
                 <div className="date">
                     <Check size={18}/>
-                    <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("en-GB") : ""}</span>
+                    <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("pt-BR") : ""}</span>
                 </div>
                 
             </div>

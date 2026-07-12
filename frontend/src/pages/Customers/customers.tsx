@@ -62,7 +62,7 @@ export default function Customers() {
                 
                 <div>
 
-                    {customers.length >= 0
+                    {customers.length <= 0
                         ? (<div className="unpopulated">
                             <span>There are no customer entries yet. Click add new to get started!</span>
                         </div>)

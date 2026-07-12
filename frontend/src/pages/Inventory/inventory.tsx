@@ -12,6 +12,7 @@ interface Product {
     
     productStockAmount: number;
     productStockCapacity: number;
+    lastModified: string;
 }
 
 export default function Inventory() {
@@ -80,21 +81,21 @@ export default function Inventory() {
         }
     ]
 
-        // Get data for active tab
-        const fetchProducts = async () => {
+    // Get data for active tab
+    const fetchProducts = async () => {
 
-            // Find active tab to use parameter
-            const activeMapper = fetchMappers.find(
-                mapper => mapper.tab === activeTab
-            );
+        // Find active tab to use parameter
+        const activeMapper = fetchMappers.find(
+            mapper => mapper.tab === activeTab
+        );
 
-            if (!activeMapper) return;
+        if (!activeMapper) return;
 
-            const response = await fetch(activeMapper.apilink);
-            const data: Product[] = await response.json();
+        const response = await fetch(activeMapper.apilink);
+        const data: Product[] = await response.json();
 
-            activeMapper.setter(data);
-        };
+        activeMapper.setter(data);
+    };
 
     // Re-render component of the tab with the proper parameters
     useEffect(() => {
@@ -103,6 +104,22 @@ export default function Inventory() {
     }, [activeTab]);
 
     const [newProductForm, setNewProductForm] = useState(false);
+
+    // Fetch active tab
+    const activeMapper = fetchMappers.find(
+        mapper => mapper.tab === activeTab
+    );
+
+    // Define most recent entries (16) for active tab
+    const sortedProducts = activeMapper
+        ? [...activeMapper.data]
+            .sort(
+                (a, b) =>
+                    new Date(b.lastModified).getTime() -
+                    new Date(a.lastModified).getTime()
+            )
+            .slice(0, 16)
+        : [];
 
     return (
         <div>
@@ -134,29 +151,26 @@ export default function Inventory() {
 
                     <br />
 
-                    {fetchMappers.map((fetchMapper) => 
-                        activeTab === fetchMapper.tab ? (
-                            <div>
-                                <LookupTable
-                                    action={() => setNewProductForm(prev => !prev)}
-                                    onEntryCreated={(fetchProducts)}
-                                />
-                                {fetchMapper.data.length <= 0 
-                                    ? (<div className="unpopulated">
-                                            <span>There are no products of this category yet. Click add new to get started!</span>
-                                        </div>)
-                                    : (<div>
-                                            
-                                            <InventoryTable
-                                                key={fetchMapper.tab}
-                                                products={fetchMapper.data}
-                                            />
-                                        </div>)}
+                    {activeMapper && (
+                        <div>
+                            <LookupTable
+                                action={() => setNewProductForm(prev => !prev)}
+                                onEntryCreated={fetchProducts}
+                            />
 
-                                
-                            </div>
-                        ) : null
-                    )}
+                            {sortedProducts.length === 0 ? (
+                                <div className="unpopulated">
+                                    <span>
+                                        There are no products of this category yet. Click add new to get started!
+                                    </span>
+                                </div>
+                            ) : (
+                                <InventoryTable
+                                    products={sortedProducts}
+                                />
+                            )}
+                        </div>
+)}
 
                 </div>
             </div>

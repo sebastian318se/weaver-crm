@@ -91,7 +91,6 @@ export default function Orders() {
         const response = await fetch("http://localhost:5000/api/strung");
         const data = await response.json();
 
-        console.log("DATA", data);
         setStringjobs(data);
     }
     useEffect(() => {
@@ -150,10 +149,16 @@ export default function Orders() {
                                             <span>There are no string jobs yet. Click add new to get started!</span>
                                         </div>)
                                     : (<div className="sjgrid">
-                                            {stringjobs.map((job) => (
-                                                <SjTable
-                                                key={job.orderId}
-                                                {...job}/>
+                                            {stringjobs.slice() // Make copy
+                                                .sort((a, b) => 
+                                                    new Date(b.createdAt).getTime() - 
+                                                    new Date(a.createdAt).getTime()) // Sort by date a to be where
+                                                .slice(0, 9) // Keep only most recent entries
+                                                .map((job) => (
+
+                                                    <SjTable
+                                                    key={job.orderId}
+                                                    {...job}/>
                                             ))}
                                         </div>)}
                                 </div>
@@ -185,11 +190,17 @@ export default function Orders() {
                                             <span>There are no sales yet. Click add new to get started!</span>
                                         </div>)
                                     : (<div className="salesgrid">
-                                            {sales.map((sale) => (
-                                                <SalesTable
-                                                    key={sale.orderId}
-                                                    {...sale}
-                                                />
+                                            {sales.slice() // Make copy
+                                                .sort((a, b) => 
+                                                    new Date(b.createdAt).getTime() - 
+                                                    new Date(a.createdAt).getTime()) // Sort by date a to be where
+                                                .slice(0, 9) // Keep only most recent entries
+                                                .map((sale) => (
+
+                                                    <SalesTable
+                                                        key={sale.orderId}
+                                                        {...sale}
+                                                    />
                                             ))}
                                         </div>)}
                                 </div>
