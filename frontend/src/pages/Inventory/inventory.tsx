@@ -141,10 +141,19 @@ export default function Inventory() {
                                     action={() => setNewProductForm(prev => !prev)}
                                     onEntryCreated={(fetchProducts)}
                                 />
-                                <InventoryTable
-                                    key={fetchMapper.tab}
-                                    products={fetchMapper.data}
-                                />
+                                {fetchMapper.data.length <= 0 
+                                    ? (<div className="unpopulated">
+                                            <span>There are no products of this category yet. Click add new to get started!</span>
+                                        </div>)
+                                    : (<div>
+                                            
+                                            <InventoryTable
+                                                key={fetchMapper.tab}
+                                                products={fetchMapper.data}
+                                            />
+                                        </div>)}
+
+                                
                             </div>
                         ) : null
                     )}

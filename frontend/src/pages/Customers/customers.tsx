@@ -60,27 +60,34 @@ export default function Customers() {
                     onEntryCreated={() => fetchCustomers()}
                 />
                 
-                <div className="customerboxes">
-                    {customers
-                        .slice() // Make copy
-                        .sort((a, b) => 
-                            new Date(b.lastModified).getTime() - 
-                            new Date(a.lastModified).getTime()) // Sort by date a to be where
-                        .slice(0, 8) // Keep only most recent entries
-                        .map(customer => (
+                <div>
 
-                        <CustomerBox
-                            key={customer.customerId}
-                            customerid={customer.customerId}
-                            name={customer.customerName}
-                            email={customer.customerEmail}
-                            phone={customer.customerPhone}
-                            totalSpent={customer.totalSpent}
-                            racketsstrung={customer.racketsStrung}
-                            lastvisit={formatDate(customer.lastModified)}
-                        />
+                    {customers.length >= 0
+                        ? (<div className="unpopulated">
+                            <span>There are no customer entries yet. Click add new to get started!</span>
+                        </div>)
+                        : (<div className="customerboxes">
+                            {customers
+                                .slice() // Make copy
+                                .sort((a, b) => 
+                                    new Date(b.lastModified).getTime() - 
+                                    new Date(a.lastModified).getTime()) // Sort by date a to be where
+                                .slice(0, 8) // Keep only most recent entries
+                                .map(customer => (
 
-                    ))}
+                                <CustomerBox
+                                    key={customer.customerId}
+                                    customerid={customer.customerId}
+                                    name={customer.customerName}
+                                    email={customer.customerEmail}
+                                    phone={customer.customerPhone}
+                                    totalSpent={customer.totalSpent}
+                                    racketsstrung={customer.racketsStrung}
+                                    lastvisit={formatDate(customer.lastModified)}
+                                />
+                    ))}</div>)}
+
+                    
                 </div>
             </div>
         </div>

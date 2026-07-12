@@ -72,6 +72,15 @@
     color: #5b4b71;
 }
 
+.unpopulated {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
 .newsalediv {
     max-height: 0;
     overflow: hidden;

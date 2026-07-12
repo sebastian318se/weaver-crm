@@ -143,14 +143,19 @@ export default function Orders() {
                                     onEntryCreated={fetchSales}
                                     action={() => setShowNewSaleBox(prev => !prev)}/>
 
-                                <div className="sjgrid">
+                                <div>
 
-                                    {stringjobs.map((job) => (
-                                        <SjTable
-                                        key={job.orderId}
-                                        {...job}/>
-                                    ))}
-
+                                    {sales.length <= 0
+                                    ? (<div className="unpopulated">
+                                            <span>There are no string jobs yet. Click add new to get started!</span>
+                                        </div>)
+                                    : (<div className="sjgrid">
+                                            {stringjobs.map((job) => (
+                                                <SjTable
+                                                key={job.orderId}
+                                                {...job}/>
+                                            ))}
+                                        </div>)}
                                 </div>
                             </div>
                         </div>
@@ -173,18 +178,20 @@ export default function Orders() {
                                         onEntryCreated={fetchSales}/>
         
                             
-                                <div className="salesgrid">
+                                <div>
 
-                                    {/* POPULATE THIS (throughout project)*/}
-                                    {sales.length <= 0 && (<p>Nothing</p>)}
-                                  
-                                    {sales.map((sale) => (
-                                        <SalesTable
-                                            key={sale.orderId}
-                                            {...sale}
-                                        />
-                                    ))}
-                
+                                    {sales.length <= 0
+                                    ? (<div className="unpopulated">
+                                            <span>There are no sales yet. Click add new to get started!</span>
+                                        </div>)
+                                    : (<div className="salesgrid">
+                                            {sales.map((sale) => (
+                                                <SalesTable
+                                                    key={sale.orderId}
+                                                    {...sale}
+                                                />
+                                            ))}
+                                        </div>)}
                                 </div>
                             </div>
                         </div>
