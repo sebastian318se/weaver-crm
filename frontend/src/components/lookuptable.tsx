@@ -14,7 +14,11 @@ export default function LookupTable({action, onEntryCreated}: LookUpProp){
                     type="text"
                     placeholder="        Search entries by name, email or phone..."
                 />
-                <button onClick={action}>Add New +   </button>
+                <button
+                    className="addnewbutton"
+                    onClick={action}>
+                        Add New +   
+                </button>
             </div>
         </div>
     );

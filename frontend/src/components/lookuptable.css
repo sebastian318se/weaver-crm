@@ -28,7 +28,7 @@
     font-size: 12px;
 }
 
-.inputs button{
+.addnewbutton{
     background-color: #7c3aed;
     border-radius: 5px;
     border: 0px solid;
@@ -38,12 +38,12 @@
     padding: 7px 15px;
 }
 
-.inputs button:hover{
+.addnewbutton:hover{
     background-color: #9254fc;
     transition: 0.3s;
 }
 
-.inputs button:active{
+.addnewbutton:active{
     background-color: #601dd5;
     transform: scale(0.98);
 }

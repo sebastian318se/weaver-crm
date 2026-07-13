@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { useState, useEffect, useMemo } from "react";
 import "./expenses.css";
+import NewExpenseForm from "./newOperationalCostForm";
 
 interface Transaction {
     transactionId: number;
@@ -68,7 +69,7 @@ function buildBuckets(period: TimePeriod) {
         for (let i = 0; i < 5; i++) {
             buckets.push({
                 key: current.getTime(),
-                label: current.toLocaleDateString("en-US", {
+                label: current.toLocaleDateString("pt-BR", {
                     month: "short",
                     day: "numeric",
                 }),
@@ -87,7 +88,7 @@ function buildBuckets(period: TimePeriod) {
         for (let i = 0; i < 5; i++) {
             buckets.push({
                 key: current.getTime(),
-                label: current.toLocaleDateString("en-US", {
+                label: current.toLocaleDateString("pt-BR", {
                     month: "short",
                     year: "2-digit",
                 }),
@@ -190,9 +191,7 @@ export default function Expenses() {
     }
 
     useEffect(() => {
-
         fetchTransactions();
-
     }, []);
 
     const chartData = useMemo(() => {
@@ -245,6 +244,8 @@ export default function Expenses() {
             ? 0
             : (monthlyProfit / monthlyRevenue) * 100;
 
+    const [showNewExpense, setShowNewExpense] = useState<boolean>(false);
+
     return (
         <div className="expensesPageContainer">
             <div className="pageHeader">
@@ -259,6 +260,7 @@ export default function Expenses() {
                     metric=""
                     info="Monthly Revenue"
                     value={`$${monthlyRevenue.toFixed(2)}`}
+                    classname=""
                 />
 
                 <InfoBox
@@ -293,6 +295,13 @@ export default function Expenses() {
                     }
                 />
             </div>
+            
+            <div className={`newexpensediv ${showNewExpense ? "open" : ""}`}>
+                <NewExpenseForm
+                    onCancel={() => setShowNewExpense(prev => !prev)}
+                    onTransactionCreated={fetchTransactions}
+                />
+            </div>
 
             <div className="expensesGraphWrapper">
                 <div className="expensesGraphHeader">
@@ -321,6 +330,12 @@ export default function Expenses() {
                             onClick={() => setTimePeriod("months")}
                         >
                             5 Months
+                        </button>
+
+                        <button
+                            className="newexpensebutton"
+                            onClick={() => setShowNewExpense(prev => !prev)}>
+                            Add Expense
                         </button>
                     </div>
                 </div>

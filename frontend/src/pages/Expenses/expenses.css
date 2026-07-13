@@ -117,3 +117,40 @@
         grid-template-columns: 1fr;
     }
 }
+.newexpensebutton{
+    background-color: #7c3aed;
+    border-radius: 8px;
+    border: 0px solid;
+    font-size: 14px;
+    margin-left: 24px;
+
+    color: white;
+    padding: 7px 15px;
+}
+
+.newexpensebutton:hover{
+    background-color: #9254fc;
+    transition: 0.3s;
+}
+
+.newexpensebutton:active{
+    background-color: #601dd5;
+    transform: scale(0.98);
+}
+
+.newexpensediv {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 
+        max-height 0.3s ease,
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+.newexpensediv.open {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+}
