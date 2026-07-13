@@ -146,10 +146,46 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> PostItem<T>(AppDbContext db, T item)
             where T : Product
         {
-            db.Set<T>().Add(item);
-            await db.SaveChangesAsync();
+            var existingProduct = await db.Products
+                .Where( p => p.ProductName.ToLower() == item.ProductName.ToLower())
+                .FirstOrDefaultAsync();
 
-            return Results.Created($"/api/inventory/{item.ProductId}", item);
+            // Simply update product if entry already exists
+            // Running for loop to avoid unnecessary changes. Mismatched id's will break before defaulting again otherwise
+            if (existingProduct is not null)
+            {
+                var productEntry = db.Entry(existingProduct);
+
+                foreach (var property in productEntry.Metadata.GetProperties())
+                {
+                    if (property.Name == nameof(Product.ProductId) ||
+                        property.Name == nameof(Product.ProductStockAmount) ||
+                        property.Name == nameof(Product.LastModified))
+                    {
+                        continue;
+                    }
+
+                    property.PropertyInfo?.SetValue(
+                        existingProduct,
+                        property.PropertyInfo.GetValue(item)
+                    );
+                }
+
+                // Handle exception properties
+                existingProduct.ProductStockAmount += item.ProductStockAmount;
+                existingProduct.LastModified = DateTime.UtcNow;
+
+                await db.SaveChangesAsync();
+                return Results.Ok("Successfully updated existing product entry");
+            }
+            else
+            {
+                db.Set<T>().Add(item);
+                await db.SaveChangesAsync();
+
+                return Results.Created($"/api/inventory/{item.ProductId}", item);
+            }
+            
         }
 
         // Edit inventory entry on ID match

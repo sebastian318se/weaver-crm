@@ -4,7 +4,7 @@ namespace TennisCrmApi
     {
         public int CustomerId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
-        public string? CustomerEmail {get; set; }
+        public string CustomerEmail {get; set; } = string.Empty;
         public string? CustomerPhone { get; set; }
         public string? CustomerNotes { get; set; }
         public bool IsDeleted { get; set; } = false;

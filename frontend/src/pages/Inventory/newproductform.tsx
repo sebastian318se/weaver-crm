@@ -18,8 +18,6 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
         notes: ""
     })
 
-    const [gripType, setGripType] = useState("")
-
     const [discriminator, setDiscriminator] = useState("")
 
     // Validation function
@@ -106,32 +104,44 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
         {
             title: "Product Name",
             placeholder: "Enter product name...",
-            key: "name"
+            key: "name",
+            mode: "text"
         },
         {
             title: "Brand",
             placeholder: "Enter product brand...",
-            key: "brand"
+            key: "brand",
+            mode: "text"
         },
         {
             title: "Price",
             placeholder: "e.g. 200",
-            key: "price"
+            key: "price",
+            mode: "decimal"
         },
         {
-            title: "Stock Owned",
+            title: "Stock to Add",
             placeholder: "Number of items owned",
-            key: "stockAmount"
+            key: "stockAmount",
+            mode: "numeric"
         },
         {
             title: "In-Store Stock Capacity",
             placeholder: "Highest possible in-stock count of the item",
-            key: "stockCapacity"
+            key: "stockCapacity",
+            mode: "numeric"
         },
         {
-            title: "Notes",
+            title: "Acquisition Price",
+            placeholder: "Product expense",
+            key: "productAcquisitionCost",
+            mode: "decimal"
+        },
+        {
+            title: "Notes (Optional)",
             placeholder: "Notes about this product",
-            key: "notes"
+            key: "notes",
+            mode: "text"
         }
     ]
 
@@ -184,12 +194,32 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
                             <div className="productforminput" key={inputMapper.key}>
                                 <span>{inputMapper.title}</span>
                                 <input 
-                                    value={formData[inputMapper.key]}
+                                    type="text"
+                                    maxLength={32}
+                                    inputMode={inputMapper.mode === "numeric" || inputMapper.mode === "decimal" ? "numeric" : "text"}
+                                    value={formData[inputMapper.key] ?? ""}
                                     placeholder={inputMapper.placeholder}
-                                    onChange={(e) => setFormData(prev => ({
-                                        ...prev,
-                                        [inputMapper.key]: e.target.value
-                                    }))}
+                                    step={inputMapper.mode === "decimal" ? "0.01" : "1"}
+                                    onChange={(e) => {
+                                        let value = e.target.value;
+
+                                        if (inputMapper.mode === "numeric") {
+                                            // Only allow whole numbers
+                                            value = value.replace(/\D/g, "");
+                                        }
+
+                                        if (inputMapper.mode === "decimal") {
+                                            // Only allow numbers with one decimal point
+                                            value = value
+                                                .replace(/[^0-9.]/g, "")
+                                                .replace(/(\..*)\./g, "$1");
+                                        }
+
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            [inputMapper.key]: value
+                                        }));
+                                    }}
                                 />
                             </div>
                         ))}

@@ -30,6 +30,7 @@ namespace tenniscrm.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CustomerId"));
 
                     b.Property<string>("CustomerEmail")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("CustomerName")
@@ -149,6 +150,9 @@ namespace tenniscrm.Migrations
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
+
+                    b.Property<decimal>("ProductAcquisitionPrice")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("ProductBrand")
                         .IsRequired()

@@ -13,7 +13,8 @@ namespace TennisCrmApi
         public int ProductStockAmount { get; set; }
         public int ProductStockCapacity { get; set; }
         public decimal ProductPrice { get; set; }
-        public DateTime LastModified { get; set; }  = DateTime.UtcNow; 
+        public decimal ProductAcquisitionPrice { get; set; } = 0;
+        public DateTime LastModified { get; set; }  = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
         [NotMapped]
         public string Discriminator => GetType().Name;

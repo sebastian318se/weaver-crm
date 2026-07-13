@@ -76,7 +76,16 @@ namespace TennisCrmApiEndpoints
 
         // Post customer entry
         public static async Task<IResult> PostCustomer(AppDbContext db, Customer newCustomer)
-        {
+        {   
+            var existingCustomer = await db.Customers
+                .Where( c =>
+                    // Disallow entries with duplicate email and phone number (if available)
+                    c.CustomerEmail.Contains(newCustomer.CustomerEmail) ||
+                    c.CustomerPhone != null && newCustomer.CustomerPhone.Contains(c.CustomerPhone)
+                    ).ToListAsync();
+
+            if (existingCustomer is not null) return Results.BadRequest("Customer entry already exists.");
+
             db.Customers.Add(newCustomer);
             await db.SaveChangesAsync();
 
