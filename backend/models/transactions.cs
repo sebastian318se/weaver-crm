@@ -18,6 +18,7 @@ namespace TennisCrmApi
         OperationalCost,
         Sale,
         Stringjob,
+        ProductAcquisition,
         Other
     }
 }

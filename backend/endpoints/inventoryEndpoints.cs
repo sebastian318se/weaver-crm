@@ -150,6 +150,15 @@ namespace TennisCrmApiEndpoints
                 .Where( p => p.ProductName.ToLower() == item.ProductName.ToLower())
                 .FirstOrDefaultAsync();
 
+            // Add purchase cost to transaction db
+            var newTransaction = new Transaction{
+                TransactionValue = item.ProductAcquisitionPrice,
+                TransactionCategory = TransactionCategory.ProductAcquisition,
+                Description = "Origin: Expense via API add product"
+            };
+
+            db.Transactions.Add(newTransaction);
+
             // Simply update product if entry already exists
             // Running for loop to avoid unnecessary changes. Mismatched id's will break before defaulting again otherwise
             if (existingProduct is not null)

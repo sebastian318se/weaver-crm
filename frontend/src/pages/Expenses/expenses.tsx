@@ -142,6 +142,10 @@ function aggregateTransactions(
                 case "OperationalCost":
                     bucket.expenses += Math.abs(transaction.transactionValue);
                     break;
+
+                case "ProductAcquisition":
+                    bucket.expenses += Math.abs(transaction.transactionValue);
+                    break;
             }
 
         });
@@ -226,7 +230,11 @@ export default function Expenses() {
 
     const monthlyExpenses = useMemo(() => {
         return currentMonthTransactions
-            .filter((t) => t.transactionCategory === "OperationalCost")
+            .filter(
+                (t) => 
+                    t.transactionCategory === "OperationalCost" ||
+                    t.transactionCategory === "ProductAcquisition"
+            )
             .reduce((sum, t) => sum + Math.abs(t.transactionValue), 0);
     }, [currentMonthTransactions]);
 

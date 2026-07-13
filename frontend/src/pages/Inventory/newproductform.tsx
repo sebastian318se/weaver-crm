@@ -15,7 +15,8 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
         price: "",
         stockAmount: "",
         stockCapacity: "",
-        notes: ""
+        notes: "",
+        productAcquisitionPrice: ""
     })
 
     const [discriminator, setDiscriminator] = useState("")
@@ -23,7 +24,7 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
     // Validation function
     function validateForm(): { isValid: boolean; errors: string[] } {
         const errors: string[] = [];
-
+        
         if (!formData.name.trim()) errors.push("Product name is required");
         if (!formData.brand.trim()) errors.push("Brand is required");
         if (!formData.price.trim()) errors.push("Price is required");
@@ -33,6 +34,7 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
         if (!formData.stockCapacity.trim()) errors.push("Stock capacity is required");
         if (formData.stockCapacity && isNaN(Number(formData.stockCapacity))) errors.push("Stock capacity must be a valid number");
         if (!discriminator || discriminator === "") errors.push("Product type is required");
+        if (formData.productAcquisitionPrice && isNaN(Number(formData.productAcquisitionPrice))) errors.push("Acquisition price must be a valid number");
 
         return { isValid: errors.length === 0, errors };
     }
@@ -55,7 +57,8 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
                 productStockAmount: Number(formData.stockAmount),
                 productStockCapacity: Number(formData.stockCapacity),
                 notes: formData.notes.trim() || null,
-                discriminator: discriminator
+                discriminator: discriminator,
+                productAcquisitionPrice: Number(formData.productAcquisitionPrice)
             };
 
             // Add discriminator-specific fields if they exist and aren't empty
@@ -89,7 +92,8 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
                 price: "",
                 stockAmount: "",
                 stockCapacity: "",
-                notes: ""
+                notes: "",
+                productAcquisitionPrice: ""
             });
             setDiscriminator("");
             action();
@@ -134,7 +138,7 @@ export default function NewProductBox({action, onCustomerCreated} : NewProductBo
         {
             title: "Acquisition Price",
             placeholder: "Product expense",
-            key: "productAcquisitionCost",
+            key: "productAcquisitionPrice",
             mode: "decimal"
         },
         {
