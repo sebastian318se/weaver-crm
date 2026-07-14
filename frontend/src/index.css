@@ -1,3 +1,10 @@
+/* @font-face {
+  font-family: 'marola';
+  src: url('/fonts/MAROLA__.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} */
+
 :root{
   background-color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;}

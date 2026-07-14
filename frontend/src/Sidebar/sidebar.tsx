@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { FileText, Info, LayoutDashboard, PackageIcon, Settings, ShoppingCart, TrendingDown, UserIcon } from "lucide-react";
+import { Info, LayoutDashboard, PackageIcon, Settings, ShoppingCart, TrendingDown, UserIcon } from "lucide-react";
 import './sidebar.css';
 
 export default function Sidebar() {
@@ -42,7 +42,7 @@ export default function Sidebar() {
     ];
     return (
         <div className="sidebar">
-            <h2>Tennis CRM</h2>
+            <h2>Weaver CRM</h2>
             <hr />
 
             <nav>
