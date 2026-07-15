@@ -36,6 +36,9 @@ export default function Inventory() {
     const [balls, setBalls] = useState<Product[]>([]);
     const [other, setOther] = useState<Product[]>([]);
 
+    // Holds tab-filtered search matches; null means "no active search, show full tab list"
+    const [searchResults, setSearchResults] = useState<Product[] | null>(null);
+
     const fetchMappers = [
         {
             tab: "Rackets",
@@ -97,9 +100,38 @@ export default function Inventory() {
         activeMapper.setter(data);
     };
 
+    // Searches globally, then narrows results down to whatever belongs to the active tab
+    const searchProducts = async (query: string) => {
+        if (!query.trim()) {
+            setSearchResults(null);
+            return;
+        }
+
+        const activeMapper = fetchMappers.find(
+            mapper => mapper.tab === activeTab
+        );
+
+        if (!activeMapper) return;
+
+        const response = await fetch(`http://localhost:5000/api/inventory/search?query=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            // No match (404) or bad query (400) — treat as empty result set
+            setSearchResults([]);
+            return;
+        }
+
+        const data: Product[] = await response.json();
+
+        // Endpoint searches all categories, so keep only items also present in this tab's fetched list
+        const tabIds = new Set(activeMapper.data.map(p => p.productId));
+        setSearchResults(data.filter(p => tabIds.has(p.productId)));
+    };
+
     // Re-render component of the tab with the proper parameters
     useEffect(() => {
         fetchProducts();
+        setSearchResults(null); // Clear any active search when switching tabs
         // Re-render whenever activeTab
     }, [activeTab]);
 
@@ -110,16 +142,19 @@ export default function Inventory() {
         mapper => mapper.tab === activeTab
     );
 
+    // Use search results when a search is active, otherwise the full tab list
+    const sourceProducts = searchResults !== null
+        ? searchResults
+        : (activeMapper ? activeMapper.data : []);
+
     // Define most recent entries (16) for active tab
-    const sortedProducts = activeMapper
-        ? [...activeMapper.data]
-            .sort(
-                (a, b) =>
-                    new Date(b.lastModified).getTime() -
-                    new Date(a.lastModified).getTime()
-            )
-            .slice(0, 16)
-        : [];
+    const sortedProducts = [...sourceProducts]
+        .sort(
+            (a, b) =>
+                new Date(b.lastModified).getTime() -
+                new Date(a.lastModified).getTime()
+        )
+        .slice(0, 16);
 
     return (
         <div>
@@ -156,6 +191,7 @@ export default function Inventory() {
                             <LookupTable
                                 action={() => setNewProductForm(prev => !prev)}
                                 onEntryCreated={fetchProducts}
+                                onSearch={searchProducts}
                             />
 
                             {sortedProducts.length === 0 ? (
@@ -170,7 +206,7 @@ export default function Inventory() {
                                 />
                             )}
                         </div>
-)}
+    )}
 
                 </div>
             </div>

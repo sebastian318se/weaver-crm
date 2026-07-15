@@ -50,42 +50,41 @@ export default function SjTable({
 }: SjProps) {
 
     const finalTension = mainTension === crossTension 
-        ? `${mainTension}` 
-        : `${mainTension} × ${crossTension}`;
-        // Only diplay both tensions when they are different
+            ? `${mainTension}` 
+            : `${mainTension} × ${crossTension}`;
+    // Only diplay both tensions when they are different
     
     return (
-        <div className="sjtablecontainer">
+    
+    <div className="sjtablecontainer">
 
-            
-            <div className="topRow">
-                <span>{customer.customerName}</span>
-                <span className="sjprice">${orderPrice}</span>
+        <div className="topRow">
+            <span>{customer?.customerName ?? "Unknown customer"}</span>
+            <span className="sjprice">${orderPrice}</span>
+        </div>
+
+        <div className="status">
+            <span className={status.replaceAll(" ", "")}>{status}</span>
+        </div>
+
+        <div className="middleSection">
+            <span>Racket: {racket?.productName ?? "N/A"}</span>
+            <span>String: {tennisString ? `${tennisString.productName} - $${tennisString.productPrice}` : "N/A"}</span>
+            <span>Tension: {finalTension}</span>
+        </div>
+
+        <div className="datedisplay">
+
+            <div className="date">
+                <Calendar size={18}/>
+                <span>Order date: {expectedAt ? new Date(createdAt).toLocaleDateString("en-GB") : ""}</span>
             </div>
 
-            <div className="status">
-                <span className={status.replaceAll(" ", "")}>{status}</span>
-            </div>
-
-            <div className="middleSection">
-                <span>Racket: {racket.productName}</span>
-                <span>String: {tennisString.productName} - ${tennisString.productPrice}</span>
-                <span>Tension: {finalTension}</span>
-            </div>
-
-            <div className="datedisplay">
-
-                <div className="date">
-                    <Calendar size={18}/>
-                    <span>Order date: {expectedAt ? new Date(createdAt).toLocaleDateString("en-GB") : ""}</span>
-                </div>
-
-                <div className="date">
-                    <Check size={18}/>
-                    <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("pt-BR") : ""}</span>
-                </div>
-                
+            <div className="date">
+                <Check size={18}/>
+                <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("pt-BR") : ""}</span>
             </div>
         </div>
+    </div>
     );
 }

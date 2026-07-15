@@ -411,7 +411,7 @@ const todayRevenue = useMemo(() => {
         <div className="dashboard">
             <div className="pageHeader">
                 <h2>Financial Dashboard</h2>
-                <span>Business Performance Overview At A Glance</span>
+                <span>Business performance overview</span>
                 <hr />
             </div>
 

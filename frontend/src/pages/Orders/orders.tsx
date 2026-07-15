@@ -97,7 +97,54 @@ export default function Orders() {
         fetchStringJob();
     }, []);
 
+    // Search results per tab; null means "no active search, show full list"
+    const [saleSearchResults, setSaleSearchResults] = useState<Sale[] | null>(null);
+    const [sjSearchResults, setSjSearchResults] = useState<StringJob[] | null>(null);
 
+    const searchSales = async (query: string) => {
+        if (!query.trim()) {
+            setSaleSearchResults(null);
+            return;
+        }
+
+        const response = await fetch(`http://localhost:5000/api/sales/search?query=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            // No match (404) or bad query (400) — treat as empty result set
+            setSaleSearchResults([]);
+            return;
+        }
+
+        const data: Sale[] = await response.json();
+        setSaleSearchResults(data);
+    };
+
+    const searchStringJobs = async (query: string) => {
+        if (!query.trim()) {
+            setSjSearchResults(null);
+            return;
+        }
+
+        const response = await fetch(`http://localhost:5000/api/strung/search?query=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            // No match (404) or bad query (400) — treat as empty result set
+            setSjSearchResults([]);
+            return;
+        }
+
+        const data: StringJob[] = await response.json();
+        setSjSearchResults(data);
+    };
+
+    // Clear whichever search is active when switching tabs
+    useEffect(() => {
+        setSaleSearchResults(null);
+        setSjSearchResults(null);
+    }, [activeTab]);
+
+    const displayedStringJobs = sjSearchResults !== null ? sjSearchResults : stringjobs;
+    const displayedSales = saleSearchResults !== null ? saleSearchResults : sales;
 
     return (
         <div>
@@ -140,7 +187,8 @@ export default function Orders() {
                                 
                                 <LookupTable
                                     onEntryCreated={fetchSales}
-                                    action={() => setShowNewSaleBox(prev => !prev)}/>
+                                    action={() => setShowNewSaleBox(prev => !prev)}
+                                    onSearch={searchStringJobs}/>
 
                                 <div>
 
@@ -149,7 +197,7 @@ export default function Orders() {
                                             <span>There are no string jobs yet. Click add new to get started!</span>
                                         </div>)
                                     : (<div className="sjgrid">
-                                            {stringjobs.slice() // Make copy
+                                            {displayedStringJobs.slice() // Make copy
                                                 .sort((a, b) => 
                                                     new Date(b.createdAt).getTime() - 
                                                     new Date(a.createdAt).getTime()) // Sort by date a to be where
@@ -180,7 +228,8 @@ export default function Orders() {
 
                                     <LookupTable
                                         action={()=> setShowNewSaleBox(prev => !prev)}
-                                        onEntryCreated={fetchSales}/>
+                                        onEntryCreated={fetchSales}
+                                        onSearch={searchSales}/>
         
                             
                                 <div>
@@ -190,7 +239,7 @@ export default function Orders() {
                                             <span>There are no sales yet. Click add new to get started!</span>
                                         </div>)
                                     : (<div className="salesgrid">
-                                            {sales.slice() // Make copy
+                                            {displayedSales.slice() // Make copy
                                                 .sort((a, b) => 
                                                     new Date(b.createdAt).getTime() - 
                                                     new Date(a.createdAt).getTime()) // Sort by date a to be where

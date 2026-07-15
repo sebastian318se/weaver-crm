@@ -11,6 +11,8 @@ namespace TennisCrmApiEndpoints
             app.MapGet("/api/sales/{id}", GetSalesById);
             app.MapGet("api/sales/deleted", GetDeleted);
 
+            app.MapGet("api/sales/search", GetSaleByQuery);
+
             app.MapPost("/api/sales/", PostSale);
 
             app.MapPut("/api/sales/{id}", PutSale);
@@ -57,6 +59,23 @@ namespace TennisCrmApiEndpoints
                 : Results.NotFound("Could not locate deleted sale entries.");
         }
 
+        // Get sales on query match 
+        public static async Task<IResult> GetSaleByQuery(AppDbContext db, string query)
+        {
+            var sales = await db.Sales
+                .Include(s => s.Customer)
+                .Include(s => s.SaleItems)
+                    .ThenInclude(i => i.Product)
+                .Where(s =>
+                    s.Customer != null && s.Customer.CustomerName.Contains(query) ||
+                    s.SaleItems.Any(si => (si.Product != null && si.Product.ProductName.Contains(query))) ||
+                    s.SaleItems.Any(si => (si.Product != null && si.Product.ProductBrand.Contains(query))))
+                .ToListAsync();
+                
+            return sales is not null
+                ? Results.Ok(sales)
+                : Results.NotFound("Could not locate such a sale in the database.");
+        }
 
         // Post new sale entry
         public static async Task<IResult> PostSale(AppDbContext db, Sale newSale)

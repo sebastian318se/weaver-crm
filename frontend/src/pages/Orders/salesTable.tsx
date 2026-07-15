@@ -9,7 +9,7 @@ type ProductProps = {
 }
 
 type SaleItemProps = {
-    product: ProductProps,
+    product: ProductProps | null,
     productQuantity: number
 }
 
@@ -30,28 +30,33 @@ export default function SalesTable({saleItems, customer, orderPrice, createdAt }
     if (!saleItems) return;
 
     return (
-        <div className="salestablecontainer">
 
-            <div className="containerheader">
-                <div className="top">
-                    <span>{customer?.customerName ?? "Unknown Customer"}</span>
-                    <span className="totalprice">${orderPrice}</span>
-                </div>
-                <div className="date">
-                    <Calendar size={15}/>
-                    <span className="date"> {new Date(createdAt).toLocaleDateString("pt-BR")}</span>
-                </div>
+    <div className="salestablecontainer">
+
+        <div className="containerheader">
+
+            <div className="top">
+                <span>{customer?.customerName ?? "Unknown Customer"}</span>
+                <span className="totalprice">${orderPrice}</span>
             </div>
 
-            <div className="tablerow">
-                 {saleItems.map(item =>(
-                    <SalesRow
-                        key={item.product.productId}
-                        product={item.product}
-                        productQuantity={item.productQuantity}/>
-                 ))}
+            <div className="date">
+                <Calendar size={15}/>
+                <span className="date"> {new Date(createdAt).toLocaleDateString("pt-BR")}</span>
             </div>
-
         </div>
+
+        <div className="tablerow">
+            {saleItems
+            .filter(item => item.product !== null)
+            .map(item =>(
+                <SalesRow
+                key={item.product!.productId}
+                product={item.product!}
+                productQuantity={item.productQuantity}/>
+            ))}
+        </div>
+
+    </div>
     );
 }

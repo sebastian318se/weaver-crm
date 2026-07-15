@@ -12,6 +12,8 @@ namespace TennisCrmApiEndpoints
             app.MapGet("/api/strung/{id}", GetSJById);
             app.MapGet("api/strung/deleted", GetDeleted);
 
+            app.MapGet("api/strung/search", GetSjByQuery);
+
             app.MapPost("/api/strung/", PostSJ);
 
             app.MapPut("api/strung/{id}", PutSJ);
@@ -29,7 +31,9 @@ namespace TennisCrmApiEndpoints
                 .Where(x => !x.IsDeleted)
                 .ToListAsync();
                 
-            return Results.Ok(sj);
+            return sj is not null
+                ? Results.Ok(sj)
+                : Results.NotFound("Could not locate string job");
         }
 
         // Get stringjob on ID match
@@ -57,6 +61,24 @@ namespace TennisCrmApiEndpoints
             return sj is not null
                 ? Results.Ok(sj)
                 : Results.NotFound("Could not locate deleted stringjob entries.");
+        }
+
+        // Get sj on query match 
+        public static async Task<IResult> GetSjByQuery(AppDbContext db, string query)
+        {
+            var sj = await db.StringJobs
+                .Include(s => s.Customer)
+                .Include(s => s.Racket)
+                .Include(s => s.TennisString)
+                .Where(s =>
+                    (s.Customer != null && s.Customer.CustomerName.Contains(query)) ||
+                    (s.TennisString != null && s.TennisString.ProductName.Contains(query)) ||
+                    (s.Racket != null && s.Racket.ProductName.Contains(query)))
+                .ToListAsync();
+                
+            return sj is not null
+                ? Results.Ok(sj)
+                : Results.NotFound("Could not locate such a string job in the database.");
         }
 
         // Post new SJ entry

@@ -20,21 +20,38 @@ export default function Customers() {
     const [showNewCustomer, setShowNewCustomer] = useState(false);
 
     const fetchCustomers = async () => {
-        const response = await fetch("http://localhost:5000/api/customers");
-        const data: Customer[] = await response.json();
+    const response = await fetch("http://localhost:5000/api/customers");
+    const data: Customer[] = await response.json();
 
+    setCustomers(data);
+        };
+
+    const searchCustomers = async (query: string) => {
+        if (!query.trim()) {
+            fetchCustomers();
+            return;
+        }
+
+        const response = await fetch(`http://localhost:5000/api/customers/search?query=${encodeURIComponent(query)}`);
+
+        if (!response.ok) {
+            // No match (404) or bad query (400) — treat as empty result set
+            setCustomers([]);
+            return;
+        }
+
+        const data: Customer[] = await response.json();
         setCustomers(data);
     };
 
-
     useEffect(() => {
-        fetchCustomers();
-    }, []);
+    fetchCustomers();
+        }, []);
 
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat("pt-BR", {
             timeZone: "America/Sao_Paulo"
-        }).format(new Date(dateString));
+            }).format(new Date(dateString));
         };
 
     return (
@@ -46,48 +63,50 @@ export default function Customers() {
             </div>
 
 
-                <div className={`newcustomerdiv ${showNewCustomer ? "open" : ""}`}>
-                    <NewCustomerBox
-                        action={()=>setShowNewCustomer(false)}
-                        onCustomerCreated={fetchCustomers}
-                    />
-                </div>
+            <div className={`newcustomerdiv ${showNewCustomer ? "open" : ""}`}>
+                <NewCustomerBox
+                action={()=>setShowNewCustomer(false)}
+                onCustomerCreated={fetchCustomers}
+                />
+            </div>
 
             <div className="customerlookup">
 
                 <LookupTable 
-                    action={()=>setShowNewCustomer(prev => ! prev)} // Toggle whenever pressed
-                    onEntryCreated={() => fetchCustomers()}
+                action={()=>setShowNewCustomer(prev => ! prev)} // Toggle whenever pressed
+                onEntryCreated={() => fetchCustomers()}
+                onSearch={searchCustomers}
                 />
-                
+
                 <div>
 
                     {customers.length <= 0
                         ? (<div className="unpopulated">
-                            <span>There are no customer entries yet. Click add new to get started!</span>
-                        </div>)
+                
+                <span>There are no customer entries yet. Click add new to get started!</span>
+                
+                </div>)
                         : (<div className="customerboxes">
                             {customers
                                 .slice() // Make copy
                                 .sort((a, b) => 
-                                    new Date(b.lastModified).getTime() - 
-                                    new Date(a.lastModified).getTime()) // Sort by date a to be where
+                                new Date(b.lastModified).getTime() - 
+                                new Date(a.lastModified).getTime()) // Sort by date a to be where
                                 .slice(0, 8) // Keep only most recent entries
                                 .map(customer => (
 
                                 <CustomerBox
-                                    key={customer.customerId}
-                                    customerid={customer.customerId}
-                                    name={customer.customerName}
-                                    email={customer.customerEmail}
-                                    phone={customer.customerPhone}
-                                    totalSpent={customer.totalSpent}
-                                    racketsstrung={customer.racketsStrung}
-                                    lastvisit={formatDate(customer.lastModified)}
-                                />
-                    ))}</div>)}
+                                key={customer.customerId}
+                                customerid={customer.customerId}
+                                name={customer.customerName}
+                                email={customer.customerEmail}
+                                phone={customer.customerPhone}
+                                totalSpent={customer.totalSpent}
+                                racketsstrung={customer.racketsStrung}
+                                lastvisit={formatDate(customer.lastModified)}
+                            />
+                            ))}</div>)}
 
-                    
                 </div>
             </div>
         </div>
