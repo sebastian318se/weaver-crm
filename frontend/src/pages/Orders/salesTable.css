@@ -22,3 +22,50 @@
 .totalprice{
     color: #7c3aed;
 }
+
+.salestablecontainer{
+    cursor: pointer;
+}
+
+.saleRowActions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.saleRowActions .editBtn,
+.saleRowActions .deleteBtn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 14px;
+
+    background-color: transparent;
+    border: solid 1px transparent;
+    border-radius: 12px;
+
+    font-size: 13px;
+    color: #5b4b71;
+
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.saleRowActions .editBtn:hover{
+    border: solid 1px #7c3aed;
+    color: #7c3aed;
+}
+
+.saleRowActions .deleteBtn:hover{
+    border: solid 1px #b91c1c;
+    color: #b91c1c;
+}
+
+.saleRowActions .editBtn:active,
+.saleRowActions .deleteBtn:active{
+    transform: scale(0.96);
+    background-color: #f7f7f8;
+}

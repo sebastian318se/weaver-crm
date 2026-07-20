@@ -16,6 +16,11 @@ type ProductProps = {
 interface SaleItem {
     productId: number;
     productQuantity: number;
+    product: {
+        productId: number;
+        productName: string;
+        productPrice: number;
+    } | null;
 }
 
 interface Customer {
@@ -42,7 +47,7 @@ interface Sale {
     customerId: number;
     customer: Customer | null;
     orderPrice: number;
-    status: number;
+    status: string;
     createdAt: string;
     completedAt: string | null;
     isDeleted: boolean;
@@ -64,6 +69,8 @@ interface StringJob{
     expectedAt: string | null;
     mainTension: number;
     crossTension: number;
+    isStoreOwned: boolean;
+    isDeleted?: boolean;
 }
 
 export default function Orders() {
@@ -73,6 +80,7 @@ export default function Orders() {
     const [sales, setSales] = useState<Sale[]>([]);
 
     const [showNewSaleBox, setShowNewSaleBox] = useState(false);
+    const [editingSale, setEditingSale] = useState<Sale | null>(null);
 
     const fetchSales = async () => {
         const response = await fetch("http://localhost:5000/api/sales");
@@ -87,6 +95,9 @@ export default function Orders() {
 
 
     const [stringjobs, setStringjobs] = useState<StringJob[]>([]);
+    const [showNewSjBox, setShowNewSjBox] = useState(false);
+    const [editingJob, setEditingJob] = useState<StringJob | null>(null);
+
     const fetchStringJob = async () => {
         const response = await fetch("http://localhost:5000/api/strung");
         const data = await response.json();
@@ -146,6 +157,88 @@ export default function Orders() {
     const displayedStringJobs = sjSearchResults !== null ? sjSearchResults : stringjobs;
     const displayedSales = saleSearchResults !== null ? saleSearchResults : sales;
 
+    // ---- String job edit/delete ----
+
+    const handleCloseSjForm = () => {
+        setShowNewSjBox(false);
+        setEditingJob(null);
+    };
+
+    const handleEditSj = (orderId: number) => {
+        const target = stringjobs.find(j => j.orderId === orderId);
+        if (!target) return;
+        setEditingJob(target);
+        setShowNewSjBox(true);
+    };
+
+    const handleDeleteSj = async (orderId: number) => {
+        const target = stringjobs.find(j => j.orderId === orderId);
+        if (!target) return;
+
+        const confirmed = window.confirm("Delete this string job? This won't show up in the list anymore.");
+        if (!confirmed) return;
+
+        // Send the full existing job back (with isDeleted flipped) since PutSJ's
+        // SetValues reads racketId/tennisStringId/etc. straight off the deserialized body
+        const payload = {
+            ...target,
+            isDeleted: true
+        };
+
+        const response = await fetch(`http://localhost:5000/api/strung/${orderId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            fetchStringJob();
+        }
+    };
+
+    // ---- Sale edit/delete ----
+
+    const handleCloseSaleForm = () => {
+        setShowNewSaleBox(false);
+        setEditingSale(null);
+    };
+
+    const handleEditSale = (orderId: number) => {
+        const target = sales.find(s => s.orderId === orderId);
+        if (!target) return;
+        setEditingSale(target);
+        setShowNewSaleBox(true);
+    };
+
+    const handleDeleteSale = async (orderId: number) => {
+        const target = sales.find(s => s.orderId === orderId);
+        if (!target) return;
+
+        const confirmed = window.confirm("Delete this sale? This won't show up in the list anymore.");
+        if (!confirmed) return;
+
+        // PutSale only updates OrderPrice/Status/CompletedAt/IsDeleted via SetValues,
+        // plus SaleItems set manually — send saleItems back in the {productId, productQuantity} shape
+        const payload = {
+            ...target,
+            saleItems: target.saleItems.map(item => ({
+                productId: item.productId,
+                productQuantity: item.productQuantity
+            })),
+            isDeleted: true
+        };
+
+        const response = await fetch(`http://localhost:5000/api/sales/${orderId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            fetchSales();
+        }
+    };
+
     return (
         <div>
             <div className="pageHeader">
@@ -175,10 +268,11 @@ export default function Orders() {
                 </div>
                 {activeTab === "orderstab" && (
                     <div>
-                        <div className={`newsalediv ${showNewSaleBox ? "open" : ""}`}>
+                        <div className={`newsalediv ${showNewSjBox ? "open" : ""}`}>
                             <NewSjBox
-                                action={() => setShowNewSaleBox(prev => !prev)}
+                                action={handleCloseSjForm}
                                 onSjCreated={fetchStringJob}
+                                existingJob={editingJob}
                             />
                         </div>
 
@@ -187,7 +281,10 @@ export default function Orders() {
                                 
                                 <LookupTable
                                     onEntryCreated={fetchSales}
-                                    action={() => setShowNewSaleBox(prev => !prev)}
+                                    action={() => {
+                                        setEditingJob(null);
+                                        setShowNewSjBox(prev => !prev);
+                                    }}
                                     onSearch={searchStringJobs}/>
 
                                 <div>
@@ -206,7 +303,10 @@ export default function Orders() {
 
                                                     <SjTable
                                                     key={job.orderId}
-                                                    {...job}/>
+                                                    {...job}
+                                                    onEdit={handleEditSj}
+                                                    onDelete={handleDeleteSj}
+                                                    />
                                             ))}
                                         </div>)}
                                 </div>
@@ -219,15 +319,19 @@ export default function Orders() {
                     <div>
                         <div className={`newsalediv ${showNewSaleBox ? "open" : ""}`}>
                             <NewSaleBox
-                                action={() => setShowNewSaleBox(prev => !prev)}
+                                action={handleCloseSaleForm}
                                 onSaleCreated={fetchSales}
+                                existingSale={editingSale}
                             />
                         </div>
                         <div className="ordersmargin">
                             <div className="salescontainer">
 
                                     <LookupTable
-                                        action={()=> setShowNewSaleBox(prev => !prev)}
+                                        action={()=> {
+                                            setEditingSale(null);
+                                            setShowNewSaleBox(prev => !prev);
+                                        }}
                                         onEntryCreated={fetchSales}
                                         onSearch={searchSales}/>
         
@@ -249,6 +353,8 @@ export default function Orders() {
                                                     <SalesTable
                                                         key={sale.orderId}
                                                         {...sale}
+                                                        onEdit={handleEditSale}
+                                                        onDelete={handleDeleteSale}
                                                     />
                                             ))}
                                         </div>)}

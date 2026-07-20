@@ -6,6 +6,7 @@ import "./neworderform.css";
 type sjBoxProps = {
     action: () => void;
     onSjCreated: () => void;
+    existingJob?: ExistingStringJob | null;
 }
 
 interface Customer {
@@ -40,7 +41,36 @@ type StringEntry = {
     price: number;
 }
 
-export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
+// Shape matches what Orders.tsx already fetches per string job
+type ExistingStringJob = {
+    orderId: number;
+    customerId: number;
+    customer: { customerId: number; customerName: string } | null;
+    racketId: number;
+    racket: { productId: number; productName: string } | null;
+    tennisStringId: number;
+    tennisString: { productId: number; productName: string; productPrice: number } | null;
+    orderPrice: number;
+    status: string;
+    completedAt: string | null;
+    expectedAt: string | null;
+    mainTension: number;
+    crossTension: number;
+    isStoreOwned: boolean;
+    isDeleted?: boolean;
+}
+
+const STATUS_OPTIONS = ["Collected", "InProgress", "Completed", "Cancelled", "Delivered"];
+
+// Formats an ISO date string into yyyy-MM-dd for a native date input
+function toDateInputValue(iso: string | null): string {
+    if (!iso) return "";
+    return new Date(iso).toISOString().slice(0, 10);
+}
+
+export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps) {
+
+    const isEditing = existingJob != null;
 
     const [customerSearch, setCustomerSearch] = useState("");
     const [customers, setCustomers] = useState<Customer[]>([]);
@@ -60,8 +90,10 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
     const [mainTension, setMainTension] = useState<number>(50);
     const [crossTension, setCrossTension] = useState<number>(50);
     const [expectedDays, setExpectedDays] = useState<number>(7);
+    const [expectedDate, setExpectedDate] = useState<string>(""); // yyyy-MM-dd, edit mode only
     const [laborCost, setLaborCost] = useState<number>(0);
     const [isStoreOwned, setIsStoreOwned] = useState<boolean>(true);
+    const [status, setStatus] = useState<string>("Collected");
 
     // Normalize names and id's
     const customerEntries = customers.map(customer => ({
@@ -80,6 +112,47 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
         price: string.productPrice
     }));
 
+    // Pre-fill everything when handed a job to edit; reset when cleared
+    useEffect(() => {
+        if (existingJob) {
+            setSelectedCustomer(existingJob.customer
+                ? { id: existingJob.customer.customerId, label: existingJob.customer.customerName }
+                : { id: existingJob.customerId, label: "Unknown customer" });
+            setCustomerSearch(existingJob.customer?.customerName ?? "");
+
+            setSelectedRacket(existingJob.racket
+                ? { id: existingJob.racket.productId, label: existingJob.racket.productName }
+                : { id: existingJob.racketId, label: "Unknown racket" });
+            setRacketSearch(existingJob.racket?.productName ?? "");
+
+            setSelectedString(existingJob.tennisString
+                ? { id: existingJob.tennisString.productId, label: existingJob.tennisString.productName, price: existingJob.tennisString.productPrice }
+                : { id: existingJob.tennisStringId, label: "Unknown string", price: 0 });
+            setStringSearch(existingJob.tennisString?.productName ?? "");
+
+            setMainTension(existingJob.mainTension);
+            setCrossTension(existingJob.crossTension);
+            setExpectedDate(toDateInputValue(existingJob.expectedAt));
+
+            // Recover the labor cost portion from the stored order price
+            const stringPrice = existingJob.tennisString?.productPrice ?? 0;
+            setLaborCost(Math.max(0, existingJob.orderPrice - stringPrice));
+
+            setIsStoreOwned(existingJob.isStoreOwned);
+            setStatus(existingJob.status);
+        } else {
+            setSelectedCustomer(null); setCustomerSearch("");
+            setSelectedRacket(null); setRacketSearch("");
+            setSelectedString(null); setStringSearch("");
+            setMainTension(50);
+            setCrossTension(50);
+            setExpectedDays(7);
+            setExpectedDate("");
+            setLaborCost(0);
+            setIsStoreOwned(true);
+            setStatus("Collected");
+        }
+    }, [existingJob]);
 
     useEffect(() => {
         if (customerSearch.length < 2) {
@@ -147,26 +220,46 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
 
         if (!selectedCustomer || !selectedRacket || !selectedString) return;
 
-        const expectedAt = new Date();
-        expectedAt.setUTCDate(expectedAt.getUTCDate() + expectedDays);
+        let expectedAtIso: string;
+        if (isEditing) {
+            if (!expectedDate) return;
+            expectedAtIso = new Date(expectedDate + "T00:00:00.000Z").toISOString();
+        } else {
+            const expectedAt = new Date();
+            expectedAt.setUTCDate(expectedAt.getUTCDate() + expectedDays);
+            expectedAtIso = expectedAt.toISOString();
+        }
 
-        const stringJob = {
-            customerId: selectedCustomer.id,
+        // Only flips CompletedAt to "now" the moment status becomes Completed;
+        // otherwise carries forward whatever it already was
+        const completedAt = isEditing
+            ? (status === "Completed"
+                ? (existingJob!.completedAt ?? new Date().toISOString())
+                : existingJob!.completedAt)
+            : null;
+
+        const basePayload = {
             racketId: selectedRacket.id,
             tennisStringId: selectedString.id,
             mainTension: mainTension,
             crossTension: crossTension,
-            expectedAt: expectedAt.toISOString(),
-            isStoreOwned: true,
-            
-            status: "Collected", // Collected
-            orderPrice: selectedString.price + laborCost
+            expectedAt: expectedAtIso,
+            isStoreOwned: isStoreOwned,
+            status: status,
+            orderPrice: selectedString.price + laborCost,
+            completedAt: completedAt
         };
 
-        console.log(stringJob);
+        const url = isEditing
+            ? `http://localhost:5000/api/strung/${existingJob!.orderId}`
+            : "http://localhost:5000/api/strung";
 
-        const response = await fetch("http://localhost:5000/api/strung", {
-            method: "POST",
+        const stringJob = isEditing
+            ? { ...existingJob, ...basePayload, isDeleted: existingJob!.isDeleted ?? false }
+            : { customerId: selectedCustomer.id, ...basePayload };
+
+        const response = await fetch(url, {
+            method: isEditing ? "PUT" : "POST",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -174,8 +267,7 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
         });
 
         if (response.ok) {
-            console.log("String job added to db.");
-            console.log(response);
+            console.log(isEditing ? "String job updated." : "String job added to db.");
         }
 
         onSjCreated();
@@ -183,10 +275,13 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
         setMainTension(50);
         setCrossTension(50);
         setExpectedDays(7);
+        setExpectedDate("");
         setLaborCost(0);
         setIsStoreOwned(true);
+        setStatus("Collected");
         setRacketSearch(""); setRackets([]); setSelectedRacket(null);
         setStringSearch(""); setStrings([]); setSelectedString(null);
+        setCustomerSearch(""); setCustomers([]); setSelectedCustomer(null);
     }
 
     return (
@@ -196,21 +291,25 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
                 <div className="formcontents">
 
                     <div className="newOrderTopRow">
-                        <span className='addnewspan'>Add New String Job</span>
+                        <span className='addnewspan'>{isEditing ? "Edit String Job" : "Add New String Job"}</span>
                     </div>
                     
                     <div className="forminputs">
                         <div className="forminput">
                             <span>Customer:</span>
-                            <InputDropdown
-                                inputPlaceholder="Search customer..."
-                                list="customers"
-                                search={customerSearch}
-                                entries={customerEntries}
-                                setSearch={setCustomerSearch}
-                                setSelected={setSelectedCustomer}
-                                counter={false}
-                            />
+                            {isEditing ? (
+                                <input type="text" value={customerSearch} disabled />
+                            ) : (
+                                <InputDropdown
+                                    inputPlaceholder="Search customer..."
+                                    list="customers"
+                                    search={customerSearch}
+                                    entries={customerEntries}
+                                    setSearch={setCustomerSearch}
+                                    setSelected={setSelectedCustomer}
+                                    counter={false}
+                                />
+                            )}
                         </div>
                         <div className="forminput">
                                 <span>Racket:</span>
@@ -249,6 +348,22 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
                         </div>
                     </div>
 
+                    {isEditing && (
+                        <div className="forminputs">
+                            <div className="forminput">
+                                <span>Status:</span>
+                                <select
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                >
+                                    {STATUS_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="forminputs">
                         <div className="forminput">
                             <span>Main Tension (Vertical):</span>
@@ -274,14 +389,27 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
 
                     <div className="forminputs">
                         <div className="forminput">
-                            <span>Expected Days:</span>
-                            <input
-                                type="number"
-                                value={expectedDays}
-                                onChange={(e) => setExpectedDays(Number(e.target.value))}
-                                placeholder="Days until completion..."
-                                min="1"
-                            />
+                            {isEditing ? (
+                                <>
+                                    <span>Expected Date:</span>
+                                    <input
+                                        type="date"
+                                        value={expectedDate}
+                                        onChange={(e) => setExpectedDate(e.target.value)}
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <span>Expected Days:</span>
+                                    <input
+                                        type="number"
+                                        value={expectedDays}
+                                        onChange={(e) => setExpectedDays(Number(e.target.value))}
+                                        placeholder="Days until completion..."
+                                        min="1"
+                                    />
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -315,7 +443,7 @@ export default function NewSjBox({action, onSjCreated}: sjBoxProps) {
                         <button 
                             className='addsale'
                             onClick={handleSubmit}>
-                                Add String Job
+                                {isEditing ? "Save Changes" : "Add String Job"}
                         </button>
                         <button 
                             className='cancel'

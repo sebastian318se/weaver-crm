@@ -73,3 +73,50 @@
     display: flex;
     justify-content: space-between;
 }
+
+.sjtablecontainer{
+    cursor: pointer;
+}
+
+.sjRowActions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.sjRowActions .editBtn,
+.sjRowActions .deleteBtn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 14px;
+
+    background-color: transparent;
+    border: solid 1px transparent;
+    border-radius: 12px;
+
+    font-size: 13px;
+    color: #5b4b71;
+
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.sjRowActions .editBtn:hover{
+    border: solid 1px #7c3aed;
+    color: #7c3aed;
+}
+
+.sjRowActions .deleteBtn:hover{
+    border: solid 1px #b91c1c;
+    color: #b91c1c;
+}
+
+.sjRowActions .editBtn:active,
+.sjRowActions .deleteBtn:active{
+    transform: scale(0.96);
+    background-color: #f7f7f8;
+}
