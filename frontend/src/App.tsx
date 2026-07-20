@@ -10,15 +10,15 @@ import Settings from "./pages/Settings/settings";
 import Support from "./pages/AppSupport/appsupport";
 import Expenses from "./pages/Expenses/expenses";
 import LoginPage from "./pages/Login/loginpage";
+import LandingPage from "./pages/Login/landingpage";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Login page w/o sidebar */}
+                <Route path="/landing" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
-
-                {/* Pages with sidebar */}
+            
                 <Route element={<Layout />}>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/dashboard" element={<Dashboard />} />
