@@ -18,13 +18,14 @@ export default function Customers() {
 
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [showNewCustomer, setShowNewCustomer] = useState(false);
+    const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
     const fetchCustomers = async () => {
-    const response = await fetch("http://localhost:5000/api/customers");
-    const data: Customer[] = await response.json();
+        const response = await fetch("http://localhost:5000/api/customers");
+        const data: Customer[] = await response.json();
 
-    setCustomers(data);
-        };
+        setCustomers(data);
+    };
 
     const searchCustomers = async (query: string) => {
         if (!query.trim()) {
@@ -44,15 +45,55 @@ export default function Customers() {
         setCustomers(data);
     };
 
+    const handleCloseForm = () => {
+        setShowNewCustomer(false);
+        setEditingCustomer(null);
+    };
+
+    const handleEdit = (customerId: number) => {
+        const target = customers.find(c => c.customerId === customerId);
+        if (!target) return;
+
+        setEditingCustomer(target);
+        setShowNewCustomer(true);
+    };
+
+    const handleDelete = async (customerId: number) => {
+        const target = customers.find(c => c.customerId === customerId);
+        if (!target) return;
+
+        const confirmed = window.confirm(`Delete ${target.customerName}? The entry will become unavailable if you do, and associated transactions will stay in the database.`);
+        if (!confirmed) return;
+
+        const payload = {
+            customerName: target.customerName,
+            customerPhone: target.customerPhone,
+            customerEmail: target.customerEmail,
+            isDeleted: true
+        };
+
+        const response = await fetch(`http://localhost:5000/api/customers/${customerId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            fetchCustomers();
+        }
+    };
+
     useEffect(() => {
-    fetchCustomers();
-        }, []);
+        fetchCustomers();
+    }, []);
 
     const formatDate = (dateString: string) => {
         return new Intl.DateTimeFormat("pt-BR", {
             timeZone: "America/Sao_Paulo"
-            }).format(new Date(dateString));
-        };
+        }).format(new Date(dateString));
+    };
 
     return (
         <div>
@@ -62,49 +103,52 @@ export default function Customers() {
                 <hr />
             </div>
 
-
             <div className={`newcustomerdiv ${showNewCustomer ? "open" : ""}`}>
                 <NewCustomerBox
-                action={()=>setShowNewCustomer(false)}
-                onCustomerCreated={fetchCustomers}
+                    action={handleCloseForm}
+                    onCustomerCreated={fetchCustomers}
+                    existingCustomer={editingCustomer}
                 />
             </div>
 
             <div className="customerlookup">
 
                 <LookupTable 
-                action={()=>setShowNewCustomer(prev => ! prev)} // Toggle whenever pressed
-                onEntryCreated={() => fetchCustomers()}
-                onSearch={searchCustomers}
+                    action={() => {
+                        setEditingCustomer(null); // Make sure "Add New" never opens a stale edit
+                        setShowNewCustomer(prev => !prev);
+                    }}
+                    onEntryCreated={() => fetchCustomers()}
+                    onSearch={searchCustomers}
                 />
 
                 <div>
 
                     {customers.length <= 0
                         ? (<div className="unpopulated">
-                
-                <span>There are no customer entries yet. Click add new to get started!</span>
-                
-                </div>)
+                            <span>There are no customer entries yet. Click add new to get started!</span>
+                        </div>)
                         : (<div className="customerboxes">
                             {customers
                                 .slice() // Make copy
                                 .sort((a, b) => 
-                                new Date(b.lastModified).getTime() - 
-                                new Date(a.lastModified).getTime()) // Sort by date a to be where
+                                    new Date(b.lastModified).getTime() - 
+                                    new Date(a.lastModified).getTime()) // Sort by date a to be where
                                 .slice(0, 8) // Keep only most recent entries
                                 .map(customer => (
 
                                 <CustomerBox
-                                key={customer.customerId}
-                                customerid={customer.customerId}
-                                name={customer.customerName}
-                                email={customer.customerEmail}
-                                phone={customer.customerPhone}
-                                totalSpent={customer.totalSpent}
-                                racketsstrung={customer.racketsStrung}
-                                lastvisit={formatDate(customer.lastModified)}
-                            />
+                                    key={customer.customerId}
+                                    customerid={customer.customerId}
+                                    name={customer.customerName}
+                                    email={customer.customerEmail}
+                                    phone={customer.customerPhone}
+                                    totalSpent={customer.totalSpent}
+                                    racketsstrung={customer.racketsStrung}
+                                    lastvisit={formatDate(customer.lastModified)}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                />
                             ))}</div>)}
 
                 </div>

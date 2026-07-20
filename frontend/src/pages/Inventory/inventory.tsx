@@ -13,6 +13,10 @@ interface Product {
     productStockAmount: number;
     productStockCapacity: number;
     lastModified: string;
+    isDeleted?: boolean;
+    notes?: string;
+    productAcquisitionPrice?: number;
+    [key: string]: any;
 }
 
 export default function Inventory() {
@@ -27,6 +31,17 @@ export default function Inventory() {
         "Balls",
         "Other"
     ]
+
+    // Maps each tab to its POST/discriminator value, used for both creating and editing
+    const tabDiscriminatorMap: Record<string, string> = {
+        Rackets: "racket",
+        Strings: "string",
+        Grips: "grip",
+        Clothing: "clothing",
+        Shoes: "shoes",
+        Balls: "balls",
+        Other: "other"
+    };
 
     const [rackets, setRackets] = useState<Product[]>([]);
     const [strings, setStrings] = useState<Product[]>([]);
@@ -136,6 +151,7 @@ export default function Inventory() {
     }, [activeTab]);
 
     const [newProductForm, setNewProductForm] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     // Fetch active tab
     const activeMapper = fetchMappers.find(
@@ -156,6 +172,49 @@ export default function Inventory() {
         )
         .slice(0, 16);
 
+    const handleCloseForm = () => {
+        setNewProductForm(false);
+        setEditingProduct(null);
+    };
+
+    const handleEdit = (productId: number) => {
+        // Look up in the active tab's full fetched list (not the sliced/sorted view)
+        // so we have every field, including type-specific ones
+        const target = activeMapper?.data.find(p => p.productId === productId);
+        if (!target) return;
+
+        setEditingProduct(target);
+        setNewProductForm(true);
+    };
+
+    const handleDelete = async (productId: number) => {
+        const target = activeMapper?.data.find(p => p.productId === productId);
+        if (!target) return;
+
+        const confirmed = window.confirm(`Delete ${target.productName}? The entry will become unavailable if you do.`);
+        if (!confirmed) return;
+
+        // Send the full existing product back (with isDeleted flipped) since
+        // PutItem's SetValues overwrites every field with what's in the body
+        const payload = {
+            discriminator: tabDiscriminatorMap[activeTab],
+            ...target,
+            isDeleted: true
+        };
+
+        const response = await fetch(`http://localhost:5000/api/inventory/${productId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            fetchProducts();
+        }
+    };
+
     return (
         <div>
             <div className="pageHeader">
@@ -167,8 +226,10 @@ export default function Inventory() {
             <div className="inventorypage">
                 <div className={`newproductdiv ${newProductForm ? "open" : ""}`}>
                     <NewProductBox
-                        action={()=>setNewProductForm(false)}
+                        action={handleCloseForm}
                         onCustomerCreated={fetchProducts}
+                        existingProduct={editingProduct}
+                        existingProductType={editingProduct ? tabDiscriminatorMap[activeTab] : undefined}
                     />
                 </div>
                 
@@ -189,7 +250,10 @@ export default function Inventory() {
                     {activeMapper && (
                         <div>
                             <LookupTable
-                                action={() => setNewProductForm(prev => !prev)}
+                                action={() => {
+                                    setEditingProduct(null); // Never open "Add New" with a stale edit loaded
+                                    setNewProductForm(prev => !prev);
+                                }}
                                 onEntryCreated={fetchProducts}
                                 onSearch={searchProducts}
                             />
@@ -203,6 +267,8 @@ export default function Inventory() {
                             ) : (
                                 <InventoryTable
                                     products={sortedProducts}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
                                 />
                             )}
                         </div>

@@ -1,28 +1,54 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './newcustomerform.css'
+
+type ExistingCustomer = {
+    customerId: number;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+};
 
 type customerBoxProps = {
     action: () => void;
     onCustomerCreated: () => void;
+    existingCustomer?: ExistingCustomer | null;
 }
 
-export default function NewCustomerBox({action, onCustomerCreated} : customerBoxProps){
+export default function NewCustomerBox({action, onCustomerCreated, existingCustomer} : customerBoxProps){
 
     const [name, setName] = useState<string | null>(null);
     const [phone, setPhone] = useState<string | null>(null);
     const [email, setEmail] = useState<string | null>(null);
     const [notes, setNotes] = useState<string | null>(null);
 
+    const isEditing = existingCustomer != null;
+
+    // Pre-fill fields whenever we're handed a customer to edit (or reset when cleared)
+    useEffect(() => {
+        if (existingCustomer) {
+            setName(existingCustomer.customerName ?? null);
+            setEmail(existingCustomer.customerEmail ?? null);
+            setPhone(existingCustomer.customerPhone ?? null);
+        } else {
+            setName(null); setEmail(null); setPhone(null); setNotes(null);
+        }
+    }, [existingCustomer]);
+
     async function handleSubmit() {
         const customer = {
             customerName: name,
             customerPhone: phone,
             customerEmail: email,
-            customerNotes: notes
+            customerNotes: notes,
+            isDeleted: false
         };
 
-        const response = await fetch("http://localhost:5000/api/customers", {
-            method: "POST",
+        const url = isEditing
+            ? `http://localhost:5000/api/customers/${existingCustomer!.customerId}`
+            : "http://localhost:5000/api/customers";
+
+        const response = await fetch(url, {
+            method: isEditing ? "PUT" : "POST",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -30,7 +56,7 @@ export default function NewCustomerBox({action, onCustomerCreated} : customerBox
         });
 
         if (response.ok) {
-            console.log("Customer added to db.");
+            console.log(isEditing ? "Customer updated." : "Customer added to db.");
         }
 
         onCustomerCreated();
@@ -68,15 +94,11 @@ export default function NewCustomerBox({action, onCustomerCreated} : customerBox
     return (
         <div>
             <div className="formcontainer">
-
                 <div className="formcontents">
-
-                    <span className='addnewspan'>Add New Customer</span>
-                    
+                    <span className='addnewspan'>{isEditing ? "Edit Customer" : "Add New Customer"}</span>
                     <div className="forminputs">
-
                         {inputMappers.map(inputMapper => (
-                            <div className="forminput">
+                            <div className="forminput" key={inputMapper.title}>
                                 <span>{inputMapper.title}</span>
                                 <input 
                                     value={inputMapper.value ?? ""}
@@ -85,22 +107,20 @@ export default function NewCustomerBox({action, onCustomerCreated} : customerBox
                                 />
                             </div>
                         ))}
-
                     </div>
 
                     <div className="formbuttons">
                         <button 
                             className='addcustomer'
                             onClick={handleSubmit}>
-                                Add Customer
-                            </button>
+                            {isEditing ? "Save Changes" : "Add Customer"}
+                        </button>
                         <button 
                             className='cancel'
                             onClick={action}>
-                                Cancel
-                            </button>
+                            Cancel
+                        </button>
                     </div>
-
                 </div>
             </div>
         </div>

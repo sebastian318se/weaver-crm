@@ -1,4 +1,5 @@
-import { Mail, Phone, Calendar } from 'lucide-react';
+import { Mail, Phone, Calendar, Pencil, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import './customerbox.css';
 
 type CustomerBoxProps = {
@@ -8,20 +9,38 @@ type CustomerBoxProps = {
     phone: string,
     totalSpent?: number,
     racketsstrung?: number,
-    lastvisit: string
+    lastvisit: string,
+    onEdit: (customerid: number) => void,
+    onDelete: (customerid: number) => void
 };
 
-export default function CustomerBox({customerid, name, email, phone, lastvisit, totalSpent, racketsstrung} : CustomerBoxProps) {
-    
+export default function CustomerBox({customerid, name, email, phone, lastvisit, totalSpent, racketsstrung, onEdit, onDelete} : CustomerBoxProps) {
+
+    const [showActions, setShowActions] = useState(false);
+
+    const handleBoxClick = () => {
+        setShowActions(prev => !prev);
+    };
+
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowActions(false);
+        onEdit(customerid);
+    };
+
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowActions(false);
+        onDelete(customerid);
+    };
+
     return (
-        <div className='customerBox'>
+        <div className='customerBox' onClick={handleBoxClick}>
             <div className='upperSection'>
                 <span>{name}</span> 
-                
                 {totalSpent === null ? 
                 (<span className='metric'>$0</span>) : 
                 (<span className='metric'>${totalSpent}</span>)}
-
             </div>
             <div className='lowerSection'>
                 <div className='lowerLeftSection'>
@@ -41,6 +60,17 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
                     : (<span>{racketsstrung} rackets strung </span>)}
                 </div>
             </div>
+
+            {showActions && (
+                <div className='actionsRow' onClick={(e) => e.stopPropagation()}>
+                    <button className='editBtn' onClick={handleEditClick}>
+                        <Pencil size={14} /> Edit
+                    </button>
+                    <button className='deleteBtn' onClick={handleDeleteClick}>
+                        <Trash2 size={14} /> Delete
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

@@ -85,3 +85,50 @@
     
     line-height: 1.2;
 }
+
+.actionsRow{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    border-top: solid 1px #e9e9e9;
+}
+
+.editBtn,
+.deleteBtn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 14px;
+
+    background-color: transparent;
+    border: solid 1px transparent;
+    border-radius: 12px;
+
+    font-size: 13px;
+    color: #5b4b71;
+
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.editBtn:hover{
+    border: solid 1px #7c3aed;
+    color: #7c3aed;
+}
+
+.deleteBtn:hover{
+    border: solid 1px #b91c1c;
+    color: #b91c1c;
+}
+
+.editBtn:active,
+.deleteBtn:active{
+    transform: scale(0.96);
+    background-color: #f7f7f8;
+}

@@ -100,3 +100,49 @@
     border-radius: inherit;
     transition: width 0.3s ease-in-out;
 }
+
+.productRow{
+    cursor: pointer;
+}
+
+.rowActions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.rowActions .editBtn,
+.rowActions .deleteBtn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 14px;
+
+    background-color: transparent;
+    border: solid 1px transparent;
+    border-radius: 12px;
+
+    font-size: 13px;
+    color: #5b4b71;
+
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.rowActions .editBtn:hover{
+    border: solid 1px #7c3aed;
+    color: #7c3aed;
+}
+
+.rowActions .deleteBtn:hover{
+    border: solid 1px #b91c1c;
+    color: #b91c1c;
+}
+
+.rowActions .editBtn:active,
+.rowActions .deleteBtn:active{
+    transform: scale(0.96);
+    background-color: #f7f7f8;
+}

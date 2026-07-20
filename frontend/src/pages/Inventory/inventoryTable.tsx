@@ -6,16 +6,17 @@ type Product = {
     productName: string;
     productBrand: string;
     productPrice: number;
-
     productStockAmount: number;
     productStockCapacity: number;
 };
 
 type Props = {
     products: Product[];
+    onEdit: (id: number) => void;
+    onDelete: (id: number) => void;
 };
 
-export default function InventoryTable({ products }: Props) {
+export default function InventoryTable({ products, onEdit, onDelete }: Props) {
 
     return (
         <div className="inventorypage">
@@ -39,6 +40,8 @@ export default function InventoryTable({ products }: Props) {
                         price={product.productPrice}
                         stock={product.productStockAmount}
                         capacity={product.productStockCapacity}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
                     />
                 ))}
             </div>

@@ -2,6 +2,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TennisCrmApi
 {
+    using System.Text.Json.Serialization;
+
+    // Polymorphyc deserealization: convert the json data into the correct subclass since it doesnt understand abstract types.
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "discriminator")]
+    [JsonDerivedType(typeof(Racket), "racket")]
+    [JsonDerivedType(typeof(TennisString), "string")]
+    [JsonDerivedType(typeof(Grip), "grip")]
+    [JsonDerivedType(typeof(Clothing), "clothing")]
+    [JsonDerivedType(typeof(Shoe), "shoes")]
+    [JsonDerivedType(typeof(Ball), "balls")]
+    [JsonDerivedType(typeof(Other), "other")]
+
     public abstract class Product
     {
         public string ProductName { get; set; } = string.Empty;
@@ -17,6 +29,7 @@ namespace TennisCrmApi
         public DateTime LastModified { get; set; }  = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
         [NotMapped]
+        [JsonIgnore]
         public string Discriminator => GetType().Name;
     }
 
