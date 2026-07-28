@@ -12,357 +12,176 @@ body {
         sans-serif;
 }
 
-/* =====================================================
-   PAGE
-===================================================== */
-
 .loginPage {
-
     position: relative;
-
     min-height: 100vh;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
     overflow: hidden;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
     background: #0e0918;
-
     color: white;
-
 }
 
-/* =====================================================
-   BACKGROUND
-===================================================== */
-
 .loginBackground {
-
     position: absolute;
-
     inset: 0;
-
-    z-index: 0;
-
-    /* background-image:
-        url("/images/login-background.jpg"); */
-
     background-size: cover;
-
     background-position: center;
-
     transform: scale(1.08);
-
 }
 
 .loginOverlay {
-
     position: absolute;
-
     inset: 0;
-
-    z-index: 1;
-
     background:
-
         radial-gradient(
             circle at 20% 10%,
             rgba(124,58,237,.45),
             transparent 35%
         ),
-
         radial-gradient(
             circle at 90% 80%,
             rgba(146,84,252,.35),
             transparent 40%
         ),
-
         linear-gradient(
             rgba(10,7,18,.72),
             rgba(10,7,18,.95)
         );
-
 }
-
-.loginPage>*:not(.loginBackground):not(.loginOverlay) {
-
-    position: relative;
-
-    z-index: 2;
-
-}
-
-/* =====================================================
-   GLASS PANEL
-===================================================== */
 
 .loginContainer {
-
-    width: 70vw;
-
-    max-width: 1400px;
-
-    min-height: 70vh;
-
-    display: grid;
-
-    grid-template-columns: 1.1fr .9fr;
-
-    overflow: hidden;
-
-    border-radius: 24px;
-
-    background: rgba(20,16,32,.55);
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    backdrop-filter: blur(24px);
-
-    box-shadow:
-        0 35px 80px rgba(0,0,0,.45);
-
-}
-
-/* =====================================================
-   LEFT
-===================================================== */
-
-.loginInfo {
-
+    position: relative;
+    z-index: 5;
     display: flex;
-
     flex-direction: column;
-
-    justify-content: center;
-
-    padding: 80px;
-
+    align-items: center;
+    gap: 24px;
 }
 
-.loginBadge {
-
-    width: fit-content;
-
-    padding: 10px 18px;
-
-    border-radius: 999px;
-
-    background: rgba(124,58,237,.18);
-
-    border: 1px solid rgba(124,58,237,.25);
-
-    color: #d8b4fe;
-
-    font-size: 14px;
-
+.loginBrand {
+    text-align: center;
 }
 
-.loginTitle {
-
-    margin: 28px 0 0;
-
-    font-size: 68px;
-
-    line-height: .95;
-
-    letter-spacing: -3px;
-
-}
-
-.loginSubtitle {
-
-    margin-top: 24px;
-
-    max-width: 500px;
-
-    font-size: 20px;
-
-    line-height: 1.7;
-
-    color: rgba(255,255,255,.72);
-
-}
-
-/* =====================================================
-   FORM
-===================================================== */
-
-.loginFormWrapper {
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    padding: 80px;
-
-    background: rgba(255,255,255,.02);
-
-    border-left: 1px solid rgba(255,255,255,.06);
-
-}
-
-.loginFormWrapper h2 {
-
+.loginBrand h1 {
     margin: 0;
-
-    font-size: 34px;
-
+    font-size: 42px;
+    letter-spacing: -2px;
+    font-weight: 700;
 }
 
-.loginFormWrapper p {
-
+.loginBrand p {
     margin-top: 12px;
-
-    color: rgba(255,255,255,.65);
-
-}
-
-.loginForm {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 22px;
-
-    margin-top: 40px;
-
-}
-
-.loginField {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-
-}
-
-.loginField label {
-
-    font-size: 14px;
-
     color: rgba(255,255,255,.72);
-
-}
-
-.loginField input {
-
-    height: 56px;
-
-    padding: 0 18px;
-
-    border-radius: 14px;
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    background: rgba(255,255,255,.04);
-
-    color: white;
-
     font-size: 15px;
+}
 
-    outline: none;
+.clerkCard {
+    width: 100.5% !important;
+    border-radius: 20px !important;
+    background: rgba(20,16,32,.65) !important;
+    border: 1px solid rgba(124,58,237,.15) !important;
+    backdrop-filter: blur(22px);
+    box-shadow: 0 30px 70px rgba(0,0,0,.35) !important;
+}
 
+.clerkTitle {
+    color: white !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+}
+
+.clerkSubtitle {
+    font-size: 14px !important;
+    color: rgba(255,255,255,.65) !important;
+}
+
+.clerkInput {
+    background: rgba(255,255,255,.06) !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+    color: white !important;
+    border-radius: 12px !important;
     transition: .25s;
-
 }
 
-.loginField input::placeholder {
-
-    color: rgba(255,255,255,.35);
-
+.clerkInput:focus {
+    border-color: #7c3aed !important;
+    box-shadow: 0 0 0 3px rgba(124,58,237,.25) !important;
 }
 
-.loginField input:focus {
-
-    border-color: #7c3aed;
-
-    background: rgba(255,255,255,.06);
-
+.clerkLabel {
+    color: rgba(255,255,255,.75) !important;
 }
 
-.loginButton {
-
-    margin-top: 10px;
-
-    height: 58px;
-
-    border: none;
-
-    border-radius: 14px;
-
-    background: #7c3aed;
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: .25s;
-
+.clerkButtonPrimary {
+    height: 48px !important;
+    border-radius: 12px !important;
+    background: #7c3aed !important;
+    transition: .25s !important;
+    height: 44px !important;
 }
 
-.loginButton:hover {
-
-    background: #9254fc;
-
-    transform: translateY(-2px);
-
+.clerkButtonPrimary:hover {
+    background: #9254fc !important;
 }
 
-.loginButton:active {
-
-    transform: scale(.98);
-
+.clerkButtonPrimary:active {
+    background: #601dd5 !important;
 }
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+.clerkButtonSecondary {
+    background: rgba(255,255,255,.06) !important;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+    border-radius: 12px !important;
+    transition: .25s !important;
+    height: 44px !important;
+}
 
-@media (max-width: 1000px) {
+.clerkButtonSecondary:hover {
+    background: rgba(255,255,255,.12) !important;
+}
 
-    .loginContainer {
+.clerkLink {
+    color: #c084fc !important;
+}
 
-        width: 92vw;
+.clerkLink:hover {
+    color: white !important;
+}
 
-        min-height: auto;
+.clerkDivider {
+    background: rgba(255,255,255,.08) !important;
+}
 
-        grid-template-columns: 1fr;
+.clerkDividerText {
+    color: rgba(255,255,255,.45) !important;
+}
 
+@media (max-width) {
+    .loginPage {
+        padding: 24px;
     }
 
-    .loginInfo {
-
-        padding: 60px 40px 20px;
-
+    .loginBrand h1 {
+        font-size: 40px;
     }
 
-    .loginFormWrapper {
-
-        padding: 40px;
-
-        border-left: none;
-
-        border-top: 1px solid rgba(255,255,255,.06);
-
+    .clerkCard {
+        width: 100% !important;
     }
+}
 
-    .loginTitle {
+.clerkFooter {
+    color: rgba(255,255,255,.65) !important;
+}
 
-        font-size: 48px;
+.clerkFooterText {
+    color: rgba(255,255,255,.65) !important;
+}
 
-    }
-
+.clerkText {
+    color: rgba(255,255,255,.72) !important;
 }

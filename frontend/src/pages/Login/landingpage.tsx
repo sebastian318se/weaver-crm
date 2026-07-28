@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import "./landingpage.css";
 
 import {
@@ -60,18 +61,25 @@ export default function LandingPage() {
                     Weaver CRM
                 </h2>
 
-                <div className="landingHeaderActions">
+                <nav>
 
-                    <button className="landingHeaderSecondaryButton">
-                        Sign In
-                    </button>
+                    <div className="landingHeaderActions">
+                        <NavLink
+                            className="landingHeaderSecondaryButton"
+                            to="/login">
+                                <span>Sign In</span>
+                        </NavLink>
 
-                    <button className="landingHeaderPrimaryButton">
-                        Get Started
-                    </button>
+                        <NavLink 
+                            className="landingHeaderPrimaryButton"
+                            to="/login">
+                                <span>Get Started</span>
+                        </NavLink>
+                    </div>
 
-                </div>
+                </nav>
 
+                
             </header>
 
             {/* Hero */}
@@ -103,23 +111,24 @@ export default function LandingPage() {
 
                 </p>
 
-                <div className="landingHeroButtons">
+                <nav>
+                    <div className="landingHeroButtons">
+                        <NavLink 
+                            className="landingPrimaryButton"
+                            to="/login">
+                                <span>Start Free Trial</span>
+                                <ArrowRight size={18} />
+                        </NavLink>
 
-                    <button className="landingPrimaryButton">
+                        <NavLink 
+                            className="landingSecondaryButton"
+                            to="/login">
+                                <span>Sign In</span>
+                        </NavLink>
 
-                        Start Free Trial
-
-                        <ArrowRight size={18} />
-
-                    </button>
-
-                    <button className="landingSecondaryButton">
-
-                        Sign In
-
-                    </button>
-
-                </div>
+                    </div> 
+                </nav>
+                
 
             </section>
 
