@@ -30,18 +30,12 @@ body {
     background-size: cover;
     background-position: center;
     transform: scale(1.08);
-
 }
 
-
 .landingOverlay {
-
     position: absolute;
-
     inset: 0;
-
     z-index: 1;
-
     background:
 
         radial-gradient(
@@ -60,31 +54,17 @@ body {
             rgba(10,7,18,.72),
             rgba(10,7,18,.95)
         );
-
 }
-
-
-/* All content above background */
 
 .landingPage > *:not(.landingBackground):not(.landingOverlay) {
-
     position: relative;
-
     z-index: 2;
-
 }
-
-
-/* =========================================================
-   HEADER
-========================================================= */
 
 .landingHeader {
 
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
 
 }
@@ -191,45 +171,24 @@ body {
 
 }
 
-
-
-/* =========================================================
-   HERO
-========================================================= */
-
 .landingHero {
-
     max-width:900px;
-
     margin:140px auto 100px;
-
     text-align:center;
-
 }
 
 
 .landingBadge {
-
     display:inline-flex;
-
     align-items:center;
-
     gap:10px;
-
     padding:10px 18px;
-
     border-radius:999px;
-
     background:rgba(255,255,255,.06);
-
     border:1px solid rgba(255,255,255,.08);
-
     backdrop-filter:blur(14px);
-
     color:#e9ddff;
-
     font-size:14px;
-
 }
 
 
@@ -237,7 +196,7 @@ body {
 
     margin:34px 0 0;
 
-    font-size:88px;
+    font-size:70px;
 
     line-height:.95;
 
@@ -254,7 +213,7 @@ body {
 
     margin:35px auto 0;
 
-    font-size:21px;
+    font-size:17px;
 
     line-height:1.7;
 

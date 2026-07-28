@@ -243,7 +243,7 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
         { title: "Price", placeholder: "e.g. 200", key: "price", type: "decimal" },
         { title: "Stock to Add", placeholder: "Number of items owned", key: "stockAmount", type: "numeric" },
         { title: "In-Store Stock Capacity", placeholder: "Highest possible in-stock count of the item", key: "stockCapacity", type: "numeric" },
-        { title: "Acquisition Price", placeholder: "Product expense", key: "productAcquisitionPrice", type: "decimal" },
+        { title: "Batch Acquisition Price", placeholder: "Product expense", key: "productAcquisitionPrice", type: "decimal" },
         { title: "Model (Optional)", placeholder: "e.g. Pro Staff 97", key: "productModel", type: "text" },
         { title: "Image URL (Optional)", placeholder: "https://...", key: "productImageUrl", type: "text" },
         { title: "Notes (Optional)", placeholder: "Notes about this product", key: "notes", type: "text" }
