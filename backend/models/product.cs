@@ -28,6 +28,12 @@ namespace TennisCrmApi
         public decimal ProductAcquisitionPrice { get; set; } = 0;
         public DateTime LastModified { get; set; }  = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
+
+        // Product ownership
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
+
+        // Discr to facilitate data transfer
         [NotMapped]
         [JsonIgnore]
         public string Discriminator => GetType().Name;

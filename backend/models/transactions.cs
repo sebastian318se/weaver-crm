@@ -11,6 +11,10 @@ namespace TennisCrmApi
         public bool IsDeleted { get; set; } = false;
         public int? CustomerId { get; set; }
         public Customer? Customer { get; set; }
+
+        // Transaction Ownership
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
     }
 
     public enum TransactionCategory

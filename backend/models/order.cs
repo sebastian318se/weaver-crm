@@ -6,7 +6,11 @@ namespace TennisCrmApi
     {
         public int OrderId { get; set; }
 
-        // Define foreign key and respective object to retrieve data from
+        // Tenant Ownership
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
+
+        // Customer Ownership
         public int CustomerId { get; set; }
         public Customer? Customer { get; set; }
 
