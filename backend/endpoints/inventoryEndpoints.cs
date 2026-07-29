@@ -8,31 +8,31 @@ namespace TennisCrmApiEndpoints
     {
         public static IEndpointRouteBuilder MapInventoryEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/inventory", GetItems);
-            app.MapGet("/api/inventory/{id}", GetItemById);
-            app.MapGet("/api/inventory/deleted", GetDeleted);
+            app.MapGet("/api/inventory", GetItems).RequireAuthorization();
+            app.MapGet("/api/inventory/{id}", GetItemById).RequireAuthorization();
+            app.MapGet("/api/inventory/deleted", GetDeleted).RequireAuthorization();
 
-            app.MapGet("/api/inventory/search", GetItemByQuery);
-            app.MapGet("/api/inventory/racket/search", GetRacketByQuery);
-            app.MapGet("/api/inventory/string/search", GetStringByQuery);
+            app.MapGet("/api/inventory/search", GetItemByQuery).RequireAuthorization();
+            app.MapGet("/api/inventory/racket/search", GetRacketByQuery).RequireAuthorization();
+            app.MapGet("/api/inventory/string/search", GetStringByQuery).RequireAuthorization();
 
-            app.MapGet("/api/inventory/racket", GetAll<Racket>);
-            app.MapGet("/api/inventory/string", GetAll<TennisString>);
-            app.MapGet("/api/inventory/grip", GetAll<Grip>);
-            app.MapGet("/api/inventory/clothing", GetAll<Clothing>);
-            app.MapGet("/api/inventory/shoe", GetAll<Shoe>);
-            app.MapGet("/api/inventory/ball", GetAll<Ball>);
-            app.MapGet("/api/inventory/other", GetAll<Other>);
+            app.MapGet("/api/inventory/racket", GetAll<Racket>).RequireAuthorization();
+            app.MapGet("/api/inventory/string", GetAll<TennisString>).RequireAuthorization();
+            app.MapGet("/api/inventory/grip", GetAll<Grip>).RequireAuthorization();
+            app.MapGet("/api/inventory/clothing", GetAll<Clothing>).RequireAuthorization();
+            app.MapGet("/api/inventory/shoe", GetAll<Shoe>).RequireAuthorization();
+            app.MapGet("/api/inventory/ball", GetAll<Ball>).RequireAuthorization();
+            app.MapGet("/api/inventory/other", GetAll<Other>).RequireAuthorization();
 
-            app.MapPost("/api/inventory/racket", PostItem<Racket>);
-            app.MapPost("/api/inventory/string", PostItem<TennisString>);
-            app.MapPost("/api/inventory/grip", PostItem<Grip>);
-            app.MapPost("/api/inventory/clothing", PostItem<Clothing>);
-            app.MapPost("/api/inventory/shoe", PostItem<Shoe>);
-            app.MapPost("/api/inventory/ball", PostItem<Ball>);
-            app.MapPost("/api/inventory/other", PostItem<Other>);
+            app.MapPost("/api/inventory/racket", PostItem<Racket>).RequireAuthorization();
+            app.MapPost("/api/inventory/string", PostItem<TennisString>).RequireAuthorization();
+            app.MapPost("/api/inventory/grip", PostItem<Grip>).RequireAuthorization();
+            app.MapPost("/api/inventory/clothing", PostItem<Clothing>).RequireAuthorization();
+            app.MapPost("/api/inventory/shoe", PostItem<Shoe>).RequireAuthorization();
+            app.MapPost("/api/inventory/ball", PostItem<Ball>).RequireAuthorization();
+            app.MapPost("/api/inventory/other", PostItem<Other>).RequireAuthorization();
 
-            app.MapPut("/api/inventory/{id}", PutItem);
+            app.MapPut("/api/inventory/{id}", PutItem).RequireAuthorization();
 
             return app;
         }

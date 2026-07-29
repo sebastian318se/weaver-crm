@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TennisCrmApiEndpoints;
 using System.Text.Json.Serialization;
+using TennisCrmApi.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -41,6 +44,9 @@ if (app.Environment.IsDevelopment())
 
 else Console.Write("Environment is Production");
 
+app.UseAuthentication();
+// app.UseMiddleware<CurrentUserMiddleware>();
+app.UseAuthorization();
 
 app.MapSJEndpoints();
 app.MapSalesEndpoints();

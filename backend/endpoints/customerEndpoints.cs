@@ -7,14 +7,14 @@ namespace TennisCrmApiEndpoints
     {
         public static IEndpointRouteBuilder MapCustomerEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/customers", GetCustomers);
-            app.MapGet("/api/customers/{id}", GetCustomersById);
-            app.MapGet("api/customers/deleted", GetDeleted);
-            app.MapGet("api/customers/search", GetCustomersByQuery);
+            app.MapGet("/api/customers", GetCustomers).RequireAuthorization();
+            app.MapGet("/api/customers/{id}", GetCustomersById).RequireAuthorization();
+            app.MapGet("api/customers/deleted", GetDeleted).RequireAuthorization();
+            app.MapGet("api/customers/search", GetCustomersByQuery).RequireAuthorization();
 
-            app.MapPost("/api/customers", PostCustomer);
+            app.MapPost("/api/customers", PostCustomer).RequireAuthorization();
 
-            app.MapPut("/api/customers/{id}", PutCustomer);
+            app.MapPut("/api/customers/{id}", PutCustomer).RequireAuthorization();
 
             return app;
         }

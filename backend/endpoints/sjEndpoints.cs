@@ -8,15 +8,15 @@ namespace TennisCrmApiEndpoints
         public static IEndpointRouteBuilder MapSJEndpoints(this IEndpointRouteBuilder app)
         {
 
-            app.MapGet("/api/strung", GetSJ);
-            app.MapGet("/api/strung/{id}", GetSJById);
-            app.MapGet("api/strung/deleted", GetDeleted);
+            app.MapGet("/api/strung", GetSJ).RequireAuthorization();
+            app.MapGet("/api/strung/{id}", GetSJById).RequireAuthorization();
+            app.MapGet("api/strung/deleted", GetDeleted).RequireAuthorization();
 
-            app.MapGet("api/strung/search", GetSjByQuery);
+            app.MapGet("api/strung/search", GetSjByQuery).RequireAuthorization();
 
-            app.MapPost("/api/strung/", PostSJ);
+            app.MapPost("/api/strung/", PostSJ).RequireAuthorization();
 
-            app.MapPut("api/strung/{id}", PutSJ);
+            app.MapPut("api/strung/{id}", PutSJ).RequireAuthorization();
 
             return app;
         }

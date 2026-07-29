@@ -7,15 +7,15 @@ namespace TennisCrmApiEndpoints
     {
         public static IEndpointRouteBuilder MapSalesEndpoints (this IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/sales", GetSales);
-            app.MapGet("/api/sales/{id}", GetSalesById);
-            app.MapGet("api/sales/deleted", GetDeleted);
+            app.MapGet("/api/sales", GetSales).RequireAuthorization();
+            app.MapGet("/api/sales/{id}", GetSalesById).RequireAuthorization();
+            app.MapGet("api/sales/deleted", GetDeleted).RequireAuthorization();
 
-            app.MapGet("api/sales/search", GetSaleByQuery);
+            app.MapGet("api/sales/search", GetSaleByQuery).RequireAuthorization();
 
-            app.MapPost("/api/sales/", PostSale);
+            app.MapPost("/api/sales/", PostSale).RequireAuthorization();
 
-            app.MapPut("/api/sales/{id}", PutSale);
+            app.MapPut("/api/sales/{id}", PutSale).RequireAuthorization();
 
             return app;
         }

@@ -7,13 +7,13 @@ namespace TennisCrmApiEndpoints
     {
         public static IEndpointRouteBuilder MapTransactionEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("api/transactions", GetTransactions);
-            app.MapGet("api/transactions/{id}", GetTransactionsById);
-            app.MapGet("api/transactions/deleted", GetDeletedTransactions);
+            app.MapGet("api/transactions", GetTransactions).RequireAuthorization();
+            app.MapGet("api/transactions/{id}", GetTransactionsById).RequireAuthorization();
+            app.MapGet("api/transactions/deleted", GetDeletedTransactions).RequireAuthorization();
 
-            app.MapPost("api/transactions", PostTransaction);
+            app.MapPost("api/transactions", PostTransaction).RequireAuthorization();
 
-            app.MapPut("api/transactions/{id}", PutTransaction);
+            app.MapPut("api/transactions/{id}", PutTransaction).RequireAuthorization();
 
             return app;
         }

@@ -52,10 +52,15 @@ namespace tenniscrm.Migrations
                     b.Property<int?>("RacketsStrung")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("TotalSpent")
                         .HasColumnType("numeric");
 
                     b.HasKey("CustomerId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Customers");
                 });
@@ -91,9 +96,14 @@ namespace tenniscrm.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.HasKey("OrderId");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Orders");
 
@@ -177,11 +187,55 @@ namespace tenniscrm.Migrations
                     b.Property<int>("ProductStockCapacity")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.HasKey("ProductId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Products");
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Tenant", b =>
+                {
+                    b.Property<int>("TenantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TenantId"));
+
+                    b.Property<string>("BusinessName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("SubscriptionStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("TenantId");
+
+                    b.ToTable("Tenant");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Transaction", b =>
@@ -196,6 +250,7 @@ namespace tenniscrm.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
@@ -203,6 +258,9 @@ namespace tenniscrm.Migrations
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("TransactionCategory")
                         .HasColumnType("integer");
@@ -217,7 +275,45 @@ namespace tenniscrm.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("TennisCrmApi.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("ClerkUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserDisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserRole")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Sale", b =>
@@ -357,6 +453,17 @@ namespace tenniscrm.Migrations
                     b.ToTable("TennisStrings");
                 });
 
+            modelBuilder.Entity("TennisCrmApi.Customer", b =>
+                {
+                    b.HasOne("TennisCrmApi.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("TennisCrmApi.Order", b =>
                 {
                     b.HasOne("TennisCrmApi.Customer", "Customer")
@@ -365,7 +472,15 @@ namespace tenniscrm.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TennisCrmApi.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("TennisCrmApi.OrderItems", b =>
@@ -385,13 +500,43 @@ namespace tenniscrm.Migrations
                     b.Navigation("Sale");
                 });
 
+            modelBuilder.Entity("TennisCrmApi.Product", b =>
+                {
+                    b.HasOne("TennisCrmApi.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("TennisCrmApi.Transaction", b =>
                 {
                     b.HasOne("TennisCrmApi.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId");
 
+                    b.HasOne("TennisCrmApi.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("TennisCrmApi.User", b =>
+                {
+                    b.HasOne("TennisCrmApi.Tenant", "Tenant")
+                        .WithMany("Users")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("TennisCrmApi.StringJob", b =>
@@ -474,6 +619,11 @@ namespace tenniscrm.Migrations
                         .HasForeignKey("TennisCrmApi.TennisString", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TennisCrmApi.Tenant", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Sale", b =>
