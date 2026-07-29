@@ -121,7 +121,7 @@ export default function Orders() {
         const response = await fetch(`http://localhost:5000/api/sales/search?query=${encodeURIComponent(query)}`);
 
         if (!response.ok) {
-            // No match (404) or bad query (400) — treat as empty result set
+            // No match or bad query
             setSaleSearchResults([]);
             return;
         }
@@ -139,7 +139,7 @@ export default function Orders() {
         const response = await fetch(`http://localhost:5000/api/strung/search?query=${encodeURIComponent(query)}`);
 
         if (!response.ok) {
-            // No match (404) or bad query (400) — treat as empty result set
+            // No match or bad query
             setSjSearchResults([]);
             return;
         }
@@ -156,8 +156,6 @@ export default function Orders() {
 
     const displayedStringJobs = sjSearchResults !== null ? sjSearchResults : stringjobs;
     const displayedSales = saleSearchResults !== null ? saleSearchResults : sales;
-
-    // ---- String job edit/delete ----
 
     const handleCloseSjForm = () => {
         setShowNewSjBox(false);
@@ -195,8 +193,6 @@ export default function Orders() {
             fetchStringJob();
         }
     };
-
-    // ---- Sale edit/delete ----
 
     const handleCloseSaleForm = () => {
         setShowNewSaleBox(false);

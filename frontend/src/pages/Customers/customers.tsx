@@ -2,6 +2,7 @@ import LookupTable from "../../components/lookuptable";
 import CustomerBox from "./customerbox";
 import NewCustomerBox from "./newcustomerform";
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
 import './customers.css'
 
 interface Customer {
@@ -20,8 +21,17 @@ export default function Customers() {
     const [showNewCustomer, setShowNewCustomer] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
+    const { getToken } = useAuth();
+
     const fetchCustomers = async () => {
-        const response = await fetch("http://localhost:5000/api/customers");
+        const token = await getToken({
+            template: "api"
+        });
+        const response = await fetch("http://localhost:5000/api/customers", {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
         const data: Customer[] = await response.json();
 
         setCustomers(data);

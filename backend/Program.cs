@@ -54,4 +54,10 @@ app.MapInventoryEndpoints();
 app.MapCustomerEndpoints();
 app.MapTransactionEndpoints();
 
+// app.MapGet("api/test", (HttpContext ctx) => 
+// {
+//     var clerkId = ctx.User.FindFirst("sub")?.Value;
+//     return Results.Ok(clerkId);
+// }).RequireAuthorization();
+
 app.Run();

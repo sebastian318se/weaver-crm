@@ -1,4 +1,4 @@
-// Backend-wide JWT configuration - How ASP.NET trusts Clerk
+// Backend-wide JWT configuration
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,16 +19,15 @@ namespace TennisCrmApi.Authentication
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = "...";
-
-                    options.Audience = "...";
+                    options.Authority = configuration["Clerk:Authority"];
 
                     options.TokenValidationParameters = new()
                     {
                         ValidateIssuer = true,
-                        ValidateAudience = true,
+                        ValidateAudience = false,
                         ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true
+                        ValidateIssuerSigningKey = true,
+                        NameClaimType = "sub"
                     };
                 });
 

@@ -13,7 +13,7 @@ import {
     Line,
 } from "recharts";
 import InfoBox from "../../components/infobox";
-import { DollarSign, TrendingUp, TrendingDown, ChartColumnIncreasing } from "lucide-react";
+import { DollarSign, TrendingUp, ChartColumnIncreasing } from "lucide-react";
 import './dashboard.css';
 
 type TimePeriod = '7d' | '30d' | '3m' | '6m' | 'ytd';
