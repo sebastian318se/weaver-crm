@@ -1,5 +1,5 @@
 // Active User DTO
-namespace TennisCrmApi
+namespace TennisCrmApi.Authentication
 {
     public class CurrentUser
     {
