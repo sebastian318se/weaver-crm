@@ -1,0 +1,1 @@
+// Backend-wide JWT configuration - How ASP.NET trusts Clerk
