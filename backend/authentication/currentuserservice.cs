@@ -6,15 +6,16 @@ using Microsoft.EntityFrameworkCore;
 namespace TennisCrmApi.Authentication
 {
     public class CurrentUserService
-{
-    private readonly IHttpContextAccessor _http;
-
-    public CurrentUserService(IHttpContextAccessor http)
     {
-        _http = http;
-    }
+        private readonly IHttpContextAccessor _http;
+        
+        // Store the object that knows the http context
+        public CurrentUserService(IHttpContextAccessor http)
+        {
+            _http = http;
+        }
 
-    public User CurrentUser =>
-        (User)_http.HttpContext!.Items["CurrentUser"]!;
-}
+        public User User =>
+            (User)_http.HttpContext!.Items["CurrentUser"]!;
+    }
 }
