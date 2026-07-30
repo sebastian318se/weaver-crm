@@ -20,7 +20,7 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get all customers
-        public static async Task<IResult> GetCustomers(AppDbContext db)
+        public static async Task<IResult> GetCustomers(AppDbContext db, HttpContext ctx)
         {
             var customers = await db.Customers
                 .Where(x => !x.IsDeleted)

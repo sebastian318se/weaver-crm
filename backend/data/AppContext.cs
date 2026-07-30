@@ -27,4 +27,8 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Sale> Sales => Set<Sale>();
     public DbSet<StringJob> StringJobs => Set<StringJob>();
+
+    // Tenants + Users
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<User> Users => Set<User>();
 }
