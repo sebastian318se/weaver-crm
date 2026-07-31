@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace TennisCrmApi
 {
+    [Table("Tentants")]
     public class Tenant
     {
         // Tenant info

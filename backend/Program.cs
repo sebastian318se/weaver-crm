@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using TennisCrmApiEndpoints;
 using System.Text.Json.Serialization;
 using TennisCrmApi.Authentication;
@@ -10,9 +11,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter Clerk JWT token."
+    });
+
+    options.AddSecurityRequirement(document =>
+        new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference("Bearer", document)] =
+                new List<string>()
+        });
+});
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUserService>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -35,29 +58,21 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    Console.Write($"Environment = Development");
     app.UseSwagger();
     app.UseSwaggerUI();
 
     app.UseCors("ReactApp");
 }
 
-else Console.Write("Environment is Production");
-
 app.UseAuthentication();
-// app.UseMiddleware<CurrentUserMiddleware>();
 app.UseAuthorization();
+
+app.UseMiddleware<CurrentUserMiddleware>();
 
 app.MapSJEndpoints();
 app.MapSalesEndpoints();
 app.MapInventoryEndpoints();
 app.MapCustomerEndpoints();
 app.MapTransactionEndpoints();
-
-// app.MapGet("api/test", (HttpContext ctx) => 
-// {
-//     var clerkId = ctx.User.FindFirst("sub")?.Value;
-//     return Results.Ok(clerkId);
-// }).RequireAuthorization();
 
 app.Run();

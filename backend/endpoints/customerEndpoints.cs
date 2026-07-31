@@ -22,10 +22,10 @@ namespace TennisCrmApiEndpoints
 
         // Get all customers
         public static async Task<IResult> GetCustomers(AppDbContext db, CurrentUserService currentUser)
-        {
+        {            
             var user = currentUser.User;
             // Validate user match on backend
-            if(user == null) 
+            if(user == null)
                 return Results.Unauthorized();
 
             // Return tenant-specific results
@@ -58,8 +58,12 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> GetDeleted(AppDbContext db, CurrentUserService currentUser)
         {
             var user = currentUser.User;
-            if(user == null) 
+            if(user == null)
+            {
+                Console.Write("USER NULL UUSER NULL");
                 return Results.Unauthorized();
+            }
+                
 
             var customer = await db.Customers
                 .Where(x => x.IsDeleted

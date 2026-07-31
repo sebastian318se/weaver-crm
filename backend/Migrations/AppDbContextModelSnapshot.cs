@@ -235,7 +235,7 @@ namespace tenniscrm.Migrations
 
                     b.HasKey("TenantId");
 
-                    b.ToTable("Tenant");
+                    b.ToTable("Tentants");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Transaction", b =>
@@ -313,7 +313,7 @@ namespace tenniscrm.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Sale", b =>

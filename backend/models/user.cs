@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace TennisCrmApi
 {
+    [Table("Users")]
     public class User
     {
         // User info
