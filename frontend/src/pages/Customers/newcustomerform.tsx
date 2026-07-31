@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import './newcustomerform.css'
 
 type ExistingCustomer = {
@@ -23,6 +24,8 @@ export default function NewCustomerBox({action, onCustomerCreated, existingCusto
 
     const isEditing = existingCustomer != null;
 
+    const { getToken } = useAuth();
+
     // Pre-fill fields whenever we're handed a customer to edit (or reset when cleared)
     useEffect(() => {
         if (existingCustomer) {
@@ -43,6 +46,10 @@ export default function NewCustomerBox({action, onCustomerCreated, existingCusto
             isDeleted: false
         };
 
+        const token = await getToken({
+            template: "api"
+        });
+
         const url = isEditing
             ? `http://localhost:5000/api/customers/${existingCustomer!.customerId}`
             : "http://localhost:5000/api/customers";
@@ -50,7 +57,8 @@ export default function NewCustomerBox({action, onCustomerCreated, existingCusto
         const response = await fetch(url, {
             method: isEditing ? "PUT" : "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(customer)
         });

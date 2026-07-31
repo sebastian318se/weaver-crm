@@ -32,6 +32,14 @@ namespace TennisCrmApiEndpoints
             var customers = await db.Customers
                 .Where(x => !x.IsDeleted
                     && x.TenantId == user.TenantId)
+                .Select(c => new CustomerDTO(
+                    c.CustomerId,
+                    c.CustomerName,
+                    c.CustomerEmail,
+                    c.CustomerPhone,
+                    c.LastModified,
+                    c.RacketsStrung,
+                    c.TotalSpent))
                 .ToListAsync();
 
             return Results.Ok(customers);
@@ -47,6 +55,14 @@ namespace TennisCrmApiEndpoints
             var customer = await db.Customers
                 .Where(x => !x.IsDeleted
                     && x.TenantId == user.TenantId)
+                .Select(c => new CustomerDTO(
+                    c.CustomerId,
+                    c.CustomerName,
+                    c.CustomerEmail,
+                    c.CustomerPhone,
+                    c.LastModified,
+                    c.RacketsStrung,
+                    c.TotalSpent))
                 .FirstOrDefaultAsync(x => x.CustomerId == id);
 
             return customer is not null
@@ -59,15 +75,19 @@ namespace TennisCrmApiEndpoints
         {
             var user = currentUser.User;
             if(user == null)
-            {
-                Console.Write("USER NULL UUSER NULL");
                 return Results.Unauthorized();
-            }
-                
 
             var customer = await db.Customers
                 .Where(x => x.IsDeleted
                     && x.TenantId == user.TenantId)
+                .Select(c => new CustomerDTO(
+                    c.CustomerId,
+                    c.CustomerName,
+                    c.CustomerEmail,
+                    c.CustomerPhone,
+                    c.LastModified,
+                    c.RacketsStrung,
+                    c.TotalSpent))
                 .ToListAsync();
 
             return Results.Ok(customer);
@@ -93,8 +113,15 @@ namespace TennisCrmApiEndpoints
                 .Where(c =>
                     c.CustomerName.Contains(query) ||
                     c.CustomerEmail != null && c.CustomerEmail.Contains(query) ||
-                    c.CustomerPhone != null && c.CustomerPhone.Contains(query)
-                )
+                    c.CustomerPhone != null && c.CustomerPhone.Contains(query))
+                .Select(c => new CustomerDTO(
+                    c.CustomerId,
+                    c.CustomerName,
+                    c.CustomerEmail,
+                    c.CustomerPhone,
+                    c.LastModified,
+                    c.RacketsStrung,
+                    c.TotalSpent))
                 .ToListAsync();
 
             return Results.Ok(customer);
@@ -122,7 +149,15 @@ namespace TennisCrmApiEndpoints
             db.Customers.Add(newCustomer);
             await db.SaveChangesAsync();
 
-            return Results.Created($"Successfully added {newCustomer} added to the database", newCustomer);
+            return Results.Created($"Successfully added {newCustomer} added to the database", new CustomerDTO(
+                    newCustomer.CustomerId,
+                    newCustomer.CustomerName,
+                    newCustomer.CustomerEmail,
+                    newCustomer.CustomerPhone,
+                    newCustomer.LastModified,
+                    newCustomer.RacketsStrung,
+                    newCustomer.TotalSpent
+            ));
         }
 
         // Edit customer entry on ID match

@@ -43,7 +43,15 @@ export default function Customers() {
             return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/customers/search?query=${encodeURIComponent(query)}`);
+        const token = await getToken({
+            template: "api"
+        });
+
+        const response = await fetch(`http://localhost:5000/api/customers/search?query=${encodeURIComponent(query)}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         if (!response.ok) {
             // No match (404) or bad query (400) — treat as empty result set
@@ -82,10 +90,15 @@ export default function Customers() {
             isDeleted: true
         };
 
+        const token = await getToken({
+            template: "api"
+        });
+
         const response = await fetch(`http://localhost:5000/api/customers/${customerId}`, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(payload)
         });
