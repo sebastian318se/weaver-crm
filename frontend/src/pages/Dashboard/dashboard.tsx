@@ -15,6 +15,7 @@ import {
 import InfoBox from "../../components/infobox";
 import { DollarSign, TrendingUp, ChartColumnIncreasing } from "lucide-react";
 import './dashboard.css';
+import { useAuth } from "@clerk/clerk-react";
 
 type TimePeriod = '7d' | '30d' | '3m' | '6m' | 'ytd';
 
@@ -288,14 +289,29 @@ export default function Dashboard() {
     const [stringJobs, setStringJobs] = useState<StringJob[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const { getToken } = useAuth();
+
     useEffect(() => {
         async function fetchDashboardData() {
             setIsLoading(true);
             try {
+                const token = await getToken({
+                    template: "api"
+                });
+
                 const [transactionsRes, salesRes, stringJobsRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/transactions'),
-                    fetch('http://localhost:5000/api/sales'),
-                    fetch('http://localhost:5000/api/strung'),
+                    fetch('http://localhost:5000/api/transactions', {
+                        headers:{
+                            Authorization: `Bearer ${token}`
+                        }}),
+                    fetch('http://localhost:5000/api/sales', {
+                        headers:{
+                            Authorization: `Bearer ${token}`
+                        }}),
+                    fetch('http://localhost:5000/api/strung', {
+                        headers:{
+                            Authorization: `Bearer ${token}`
+                        }}),
                 ]);
 
                 const [transactionsData, salesData, stringJobsData] = await Promise.all([

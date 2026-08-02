@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useAuth } from "@clerk/clerk-react";
 import InputDropdown from "./inputdropdown";
+import { useEffect } from "react";
+import { useState } from "react";
 import "./neworderform.css";
 
 type sjBoxProps = {
@@ -69,6 +70,8 @@ function toDateInputValue(iso: string | null): string {
 }
 
 export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps) {
+
+    const { getToken } = useAuth();
 
     const isEditing = existingJob != null;
 
@@ -154,13 +157,22 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
         }
     }, [existingJob]);
 
-    useEffect(() => {
+    const handleCustomerSearch = async () => {
+
+        const token = await getToken({
+            template: "api"
+        });
+
         if (customerSearch.length < 2) {
             setCustomers([]);
             return;
         }
 
-        fetch(`http://localhost:5000/api/customers/search?query=${customerSearch}`)
+        fetch(`http://localhost:5000/api/customers/search?query=${customerSearch}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 // Deduplication of results where name and email match by choosing only the first occurrence of an ID
@@ -173,16 +185,28 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
                 );
 
             setCustomers(uniqueCustomerEntries)
-            })
-    }, [customerSearch, selectedCustomer])
+            });
+    }
 
     useEffect(() => {
+        handleCustomerSearch();
+    }, [customerSearch, selectedCustomer])
+
+    const handleRacketSearch = async () => {
+        const token = await getToken({
+            template: "api"
+        });
+
         if (racketSearch.length < 2) {
             setRackets([]);
             return;
         }
 
-        fetch(`http://localhost:5000/api/inventory/racket/search?query=${racketSearch}`)
+        fetch(`http://localhost:5000/api/inventory/racket/search?query=${racketSearch}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 const uniqueRacketEntries = data.filter(
@@ -194,15 +218,27 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
 
             setRackets(uniqueRacketEntries)
             })
-    }, [racketSearch, selectedRacket])
+    }
 
     useEffect(() => {
+        handleRacketSearch();
+    }, [racketSearch, selectedRacket])
+
+    const handleStringSearch = async () => {
+        const token = await getToken({
+            template: "api"
+        })
+
         if (stringSearch.length < 2) {
             setStrings([]);
             return;
         }
 
-        fetch(`http://localhost:5000/api/inventory/string/search?query=${stringSearch}`)
+        fetch(`http://localhost:5000/api/inventory/string/search?query=${stringSearch}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 const uniqueStringEntries = data.filter(
@@ -214,11 +250,19 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
 
             setStrings(uniqueStringEntries)
             })
+    }
+
+    useEffect(() => {
+        handleStringSearch();
     }, [stringSearch, selectedString])
 
     async function handleSubmit() {
 
         if (!selectedCustomer || !selectedRacket || !selectedString) return;
+
+        const token = await getToken({
+            template: "api"
+        });
 
         let expectedAtIso: string;
         if (isEditing) {
@@ -261,7 +305,8 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
         const response = await fetch(url, {
             method: isEditing ? "PUT" : "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(stringJob)
         });

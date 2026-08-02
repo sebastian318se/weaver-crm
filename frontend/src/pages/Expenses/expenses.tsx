@@ -13,6 +13,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import "./expenses.css";
 import NewExpenseForm from "./newOperationalCostForm";
+import { useAuth } from "@clerk/clerk-react";
 
 interface Transaction {
     transactionId: number;
@@ -69,7 +70,7 @@ function buildBuckets(period: TimePeriod) {
         for (let i = 0; i < 5; i++) {
             buckets.push({
                 key: current.getTime(),
-                label: current.toLocaleDateString("pt-BR", {
+                label: current.toLocaleDateString("en-GB", {
                     month: "short",
                     day: "numeric",
                 }),
@@ -88,7 +89,7 @@ function buildBuckets(period: TimePeriod) {
         for (let i = 0; i < 5; i++) {
             buckets.push({
                 key: current.getTime(),
-                label: current.toLocaleDateString("pt-BR", {
+                label: current.toLocaleDateString("en-GB", {
                     month: "short",
                     year: "2-digit",
                 }),
@@ -164,15 +165,23 @@ export default function Expenses() {
     const [timePeriod, setTimePeriod] = useState<TimePeriod>("weeks");
     const [loading, setLoading] = useState(true);
 
+    const { getToken } = useAuth();
+
     async function fetchTransactions() {
 
         try {
 
+            const token = await getToken({
+                template: "api"
+            });
+
             setLoading(true);
 
-            const response = await fetch(
-                "http://localhost:5000/api/transactions"
-            );
+            const response = await fetch("http://localhost:5000/api/transactions", {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
             const data: Transaction[] = await response.json();
 

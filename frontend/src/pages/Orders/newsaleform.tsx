@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import './newsaleform.css'
 import InputDropdown from "./inputdropdown";
+import { useAuth } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
+import './newsaleform.css'
 
 type saleBoxProps = {
     action: () => void;
@@ -59,6 +60,8 @@ const STATUS_OPTIONS = ["Collected", "InProgress", "Completed", "Cancelled", "De
 
 export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBoxProps) {
 
+    const { getToken } = useAuth();
+
     const isEditing = existingSale != null;
 
     const [customerSearch, setCustomerSearch] = useState("");
@@ -114,13 +117,20 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         }
     }, [existingSale]);
 
-    useEffect(() => {
+    const handleCustomerSearch = async () => {
+        const token = await getToken({
+            template: "api"
+        });
+
         if (customerSearch.length < 2) {
             setCustomers([]);
             return;
         }
 
-        fetch(`http://localhost:5000/api/customers/search?query=${customerSearch}`)
+        fetch(`http://localhost:5000/api/customers/search?query=${customerSearch}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }})
             .then(response => response.json())
             .then(data => {
                 // Deduplication of results where name and email match by choosing only the first occurrence of an ID
@@ -132,17 +142,27 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                     )
                 );
 
-            setCustomers(uniqueCustomerEntries)
-            })
-    }, [customerSearch, selectedCustomer])
+        setCustomers(uniqueCustomerEntries)
+    })}
 
     useEffect(() => {
+        handleCustomerSearch();
+    }, [customerSearch, selectedCustomer])
+
+    const handleProductSearch = async () => {
+        const token = await getToken({
+            template: "api"
+        });
+
         if (productSearch.length < 2) {
             setProducts([]);
             return;
         }
 
-        fetch(`http://localhost:5000/api/inventory/search?query=${productSearch}`)
+        fetch(`http://localhost:5000/api/inventory/search?query=${productSearch}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }})
             .then(response => response.json())
             .then(data => {
                 const uniqueProductEntries = data.filter(
@@ -153,8 +173,11 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                     )
                 );
 
-            setProducts(uniqueProductEntries)
-            })
+        setProducts(uniqueProductEntries)
+    })}
+
+    useEffect(() => {
+        handleProductSearch();
     }, [productSearch, selectedProduct])
 
     const handleAddProduct = () => {
@@ -194,6 +217,10 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
 
         if (!selectedCustomer || finalProducts.length === 0) return;
 
+        const token = await getToken({
+            template: "api"
+        });
+
         const saleItems = finalProducts.map(finalProduct => 
             ({productId: finalProduct.productId, 
             productQuantity: finalProduct.quantity}));
@@ -226,7 +253,8 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         const response = await fetch(url, {
             method: isEditing ? "PUT" : "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(sale)
         });

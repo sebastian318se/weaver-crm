@@ -1,10 +1,11 @@
-import SalesTable from "./salesTable";
-import { useEffect, useState } from "react";
-import './orders.css'
 import LookupTable from "../../components/lookuptable";
-import SjTable from "./sjTable";
+import { useAuth } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import SalesTable from "./salesTable";
 import NewSaleBox from "./newsaleform";
 import NewSjBox from "./neworderform";
+import SjTable from "./sjTable";
+import './orders.css'
 
 type ProductProps = {
     productId: number,
@@ -75,6 +76,8 @@ interface StringJob{
 
 export default function Orders() {
 
+    const { getToken } = useAuth();
+
     const [activeTab, setActiveTab] = useState("orderstab");
 
     const [sales, setSales] = useState<Sale[]>([]);
@@ -83,7 +86,16 @@ export default function Orders() {
     const [editingSale, setEditingSale] = useState<Sale | null>(null);
 
     const fetchSales = async () => {
-        const response = await fetch("http://localhost:5000/api/sales");
+
+        const token = await getToken({
+            template: "api"
+        });
+
+        const response = await fetch("http://localhost:5000/api/sales", {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
         const data = await response.json();
 
         setSales(data);
@@ -99,7 +111,16 @@ export default function Orders() {
     const [editingJob, setEditingJob] = useState<StringJob | null>(null);
 
     const fetchStringJob = async () => {
-        const response = await fetch("http://localhost:5000/api/strung");
+
+        const token = await getToken({
+            template: "api"
+        });
+
+        const response = await fetch("http://localhost:5000/api/strung", {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
         const data = await response.json();
 
         setStringjobs(data);
@@ -113,12 +134,21 @@ export default function Orders() {
     const [sjSearchResults, setSjSearchResults] = useState<StringJob[] | null>(null);
 
     const searchSales = async (query: string) => {
+
+        const token = await getToken({
+            template: "api"
+        });
+
         if (!query.trim()) {
             setSaleSearchResults(null);
             return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/sales/search?query=${encodeURIComponent(query)}`);
+        const response = await fetch(`http://localhost:5000/api/sales/search?query=${encodeURIComponent(query)}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         if (!response.ok) {
             // No match or bad query
@@ -131,12 +161,21 @@ export default function Orders() {
     };
 
     const searchStringJobs = async (query: string) => {
+
+        const token = await getToken({
+            template: "api"
+        })
+
         if (!query.trim()) {
             setSjSearchResults(null);
             return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/strung/search?query=${encodeURIComponent(query)}`);
+        const response = await fetch(`http://localhost:5000/api/strung/search?query=${encodeURIComponent(query)}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         if (!response.ok) {
             // No match or bad query
@@ -170,6 +209,11 @@ export default function Orders() {
     };
 
     const handleDeleteSj = async (orderId: number) => {
+
+        const token = await getToken({
+            template: "api"
+        });
+
         const target = stringjobs.find(j => j.orderId === orderId);
         if (!target) return;
 
@@ -185,8 +229,11 @@ export default function Orders() {
 
         const response = await fetch(`http://localhost:5000/api/strung/${orderId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer: ${token}`
+            },
+            body: JSON.stringify(payload),
         });
 
         if (response.ok) {
@@ -207,6 +254,11 @@ export default function Orders() {
     };
 
     const handleDeleteSale = async (orderId: number) => {
+
+        const token = await getToken({
+            template: "api"
+        });
+
         const target = sales.find(s => s.orderId === orderId);
         if (!target) return;
 
@@ -226,7 +278,10 @@ export default function Orders() {
 
         const response = await fetch(`http://localhost:5000/api/sales/${orderId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
             body: JSON.stringify(payload)
         });
 

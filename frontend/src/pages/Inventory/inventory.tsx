@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import InventoryTable from "./inventoryTable";
-import './inventory.css'
 import LookupTable from "../../components/lookuptable";
+import InventoryTable from "./inventoryTable";
 import NewProductBox from "./newproductform";
+import { useAuth } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import './inventory.css'
 
 interface Product {
     productId: number;
@@ -20,6 +21,8 @@ interface Product {
 }
 
 export default function Inventory() {
+
+    const { getToken } = useAuth();
 
     const [activeTab, setActiveTab] = useState("Rackets");
     const tabs = [
@@ -102,6 +105,10 @@ export default function Inventory() {
     // Get data for active tab
     const fetchProducts = async () => {
 
+        const token = await getToken({
+            template: "api"
+        });
+
         // Find active tab to use parameter
         const activeMapper = fetchMappers.find(
             mapper => mapper.tab === activeTab
@@ -109,7 +116,11 @@ export default function Inventory() {
 
         if (!activeMapper) return;
 
-        const response = await fetch(activeMapper.apilink);
+        const response = await fetch(activeMapper.apilink, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
         const data: Product[] = await response.json();
 
         activeMapper.setter(data);
@@ -117,6 +128,11 @@ export default function Inventory() {
 
     // Searches globally, then narrows results down to whatever belongs to the active tab
     const searchProducts = async (query: string) => {
+
+        const token = await getToken({
+            template: "api"
+        });
+
         if (!query.trim()) {
             setSearchResults(null);
             return;
@@ -128,7 +144,11 @@ export default function Inventory() {
 
         if (!activeMapper) return;
 
-        const response = await fetch(`http://localhost:5000/api/inventory/search?query=${encodeURIComponent(query)}`);
+        const response = await fetch(`http://localhost:5000/api/inventory/search?query=${encodeURIComponent(query)}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
 
         if (!response.ok) {
             // No match (404) or bad query (400) — treat as empty result set
@@ -188,6 +208,11 @@ export default function Inventory() {
     };
 
     const handleDelete = async (productId: number) => {
+
+        const token = await getToken({
+            template: "api"
+        });
+
         const target = activeMapper?.data.find(p => p.productId === productId);
         if (!target) return;
 
@@ -205,7 +230,8 @@ export default function Inventory() {
         const response = await fetch(`http://localhost:5000/api/inventory/${productId}`, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(payload)
         });

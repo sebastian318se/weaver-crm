@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@clerk/clerk-react";
 import { useEffect, useState } from 'react';
 import './newproductform.css'
 
@@ -24,6 +25,8 @@ function humanize(value: string): string {
 }
 
 export default function NewProductBox({action, onCustomerCreated, existingProduct, existingProductType} : NewProductBoxProps){
+
+    const { getToken } = useAuth();
 
     const [formData, setFormData] = useState<Record<string, any>>({
         name: "",
@@ -150,6 +153,11 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
 
     async function handleSubmit() {
         try {
+
+            const token = await getToken({
+                template: "api"
+            });
+
             const validation = validateForm();
             if (!validation.isValid) {
                 console.warn("Form validation failed:", validation.errors);
@@ -205,7 +213,8 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
             const response = await fetch(url, {
                 method: isEditing ? "PUT" : "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(product)
             });
