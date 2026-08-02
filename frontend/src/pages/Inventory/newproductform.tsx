@@ -334,7 +334,7 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
                         <AnimatePresence mode="wait">
                             {fields[discriminator]?.map(field => (
                                 <motion.div
-                                    className="productforminput"
+                                    className={`productforminput${field.type === "checkbox" ? " productforminput--checkbox" : ""}`}
                                     key={field.key}
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
