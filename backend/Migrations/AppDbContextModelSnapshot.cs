@@ -356,7 +356,7 @@ namespace tenniscrm.Migrations
                 {
                     b.HasBaseType("TennisCrmApi.Product");
 
-                    b.Property<int>("BallSurface")
+                    b.Property<int?>("BallSurface")
                         .HasColumnType("integer");
 
                     b.ToTable("Balls");
@@ -405,20 +405,19 @@ namespace tenniscrm.Migrations
                     b.Property<string>("GripSize")
                         .HasColumnType("text");
 
-                    b.Property<int>("HeadSize")
+                    b.Property<int?>("HeadSize")
                         .HasColumnType("integer");
 
                     b.Property<decimal?>("Length")
                         .HasColumnType("numeric");
 
                     b.Property<string>("StringPattern")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int?>("SwingWeight")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Weight")
+                    b.Property<int?>("Weight")
                         .HasColumnType("integer");
 
                     b.ToTable("Rackets");
@@ -428,7 +427,7 @@ namespace tenniscrm.Migrations
                 {
                     b.HasBaseType("TennisCrmApi.Product");
 
-                    b.Property<int>("ShoeSurface")
+                    b.Property<int?>("ShoeSurface")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Size")
@@ -531,7 +530,7 @@ namespace tenniscrm.Migrations
             modelBuilder.Entity("TennisCrmApi.User", b =>
                 {
                     b.HasOne("TennisCrmApi.Tenant", "Tenant")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -619,11 +618,6 @@ namespace tenniscrm.Migrations
                         .HasForeignKey("TennisCrmApi.TennisString", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TennisCrmApi.Tenant", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("TennisCrmApi.Sale", b =>

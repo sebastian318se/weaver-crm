@@ -43,7 +43,6 @@ export default function InputDropdown({inputPlaceholder, list, search, setSearch
                     const match = entries.find(entry => entry.label === value);
                         if (match) {
                             setSelected(match);
-                            console.log("when selected:", match)
                         } else {
                             setSelected(null);
                         }                

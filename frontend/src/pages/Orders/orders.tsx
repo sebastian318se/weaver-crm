@@ -340,7 +340,7 @@ export default function Orders() {
 
                                 <div>
 
-                                    {sales.length <= 0
+                                    {stringjobs.length <= 0
                                     ? (<div className="unpopulated">
                                             <span>There are no string jobs yet. Click add new to get started!</span>
                                         </div>)

@@ -110,6 +110,7 @@ namespace TennisCrmApiEndpoints
                 return Results.Unauthorized();
                 
             var items = await db.Products
+                .Where(x => !x.IsDeleted)
                 .Where(x =>
                     x.ProductName.Contains(query) ||
                     x.ProductBrand.Contains(query) ||
@@ -127,6 +128,7 @@ namespace TennisCrmApiEndpoints
         {
             var rackets = await db.Products
                 .OfType<Racket>()
+                .Where(x => !x.IsDeleted)
                 .Where(x =>
                     x.ProductName.Contains(query) ||
                     x.ProductBrand.Contains(query) ||
@@ -149,6 +151,7 @@ namespace TennisCrmApiEndpoints
 
             var strings = await db.Products
                 .OfType<TennisString>()
+                .Where(x => !x.IsDeleted)
                 .Where(x =>
                     x.ProductName.Contains(query) ||
                     x.ProductBrand.Contains(query) ||
@@ -236,6 +239,9 @@ namespace TennisCrmApiEndpoints
             }
             else
             {
+                item.TenantId = user.TenantId;
+                item.LastModified = DateTime.UtcNow;
+
                 db.Set<T>().Add(item);
                 await db.SaveChangesAsync();
 
@@ -268,7 +274,7 @@ namespace TennisCrmApiEndpoints
             existingProduct.LastModified = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
-            return Results.Ok("Successfully updated customer entry");
+            return Results.Ok("Successfully updated inventory entry");
         }
     }
 }

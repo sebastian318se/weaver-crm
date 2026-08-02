@@ -56,8 +56,6 @@ type ExistingSale = {
     }[];
 }
 
-const STATUS_OPTIONS = ["Collected", "InProgress", "Completed", "Cancelled", "Delivered"];
-
 export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBoxProps) {
 
     const { getToken } = useAuth();
@@ -77,7 +75,6 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
     const [productCount, setProductCount] = useState(1);
     
     const [finalProducts, setFinalProducts] = useState<ProductProps[]>([]);
-    const [status, setStatus] = useState<string>("Delivered");
 
     // Normalize names and id's
     const customerEntries = customers.map(customer => ({
@@ -108,12 +105,9 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                         price: item.product!.productPrice
                     }))
             );
-
-            setStatus(existingSale.status);
         } else {
             setSelectedCustomer(null); setCustomerSearch("");
             setFinalProducts([]);
-            setStatus("Delivered");
         }
     }, [existingSale]);
 
@@ -236,14 +230,12 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         const sale = isEditing
             ? {
                 ...existingSale,
-                status: status,
                 orderPrice: orderPrice,
                 saleItems: saleItems,
                 isDeleted: existingSale!.isDeleted ?? false
             }
             : {
                 customerId: selectedCustomer.id,
-                status: 4, // Delivered
                 saleItems: saleItems,
                 orderPrice: orderPrice
             };
@@ -267,7 +259,6 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         onSaleCreated();
         action();
         setProductCount(1);
-        setStatus("Delivered");
         setProductSearch(""); setProducts([]); setSelectedProduct(null);
         setFinalProducts([]);
         setCustomerSearch(""); setCustomers([]); setSelectedCustomer(null);
@@ -318,22 +309,6 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                 />
                         </div>
                     </div>
-
-                    {isEditing && (
-                        <div className="saleforminputs">
-                            <div className="saleforminput">
-                                <span>Status:</span>
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                >
-                                    {STATUS_OPTIONS.map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    )}
                   
                     {finalProducts.length > 0 && (<hr />)}
 

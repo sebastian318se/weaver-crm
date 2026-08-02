@@ -41,10 +41,10 @@ namespace TennisCrmApi
 
     public class Racket : Product
     {
-        public string StringPattern { get; set; } = string.Empty;
+        public string? StringPattern { get; set; }
         public string? GripSize { get; set; }
-        public int HeadSize { get; set; }
-        public int Weight { get; set; }
+        public int? HeadSize { get; set; }
+        public int? Weight { get; set; }
         public int? SwingWeight { get; set; }
         public int? BeamThickness { get; set; }
         public int? Flex { get; set; }
@@ -71,13 +71,13 @@ namespace TennisCrmApi
 
     public class Shoe : Product
     {
-        public Surface ShoeSurface { get; set; }
+        public Surface? ShoeSurface { get; set; }
         public decimal Size { get; set; }
     }
 
     public class Ball : Product
     {
-        public Surface BallSurface { get; set; }
+        public Surface? BallSurface { get; set; }
     }
 
     // Class for all miscellaneous gear and products of low store volume

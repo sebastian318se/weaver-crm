@@ -208,10 +208,11 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> PutSale(AppDbContext db, CurrentUserService currentUser, Sale updatedSale, int id)
         {
             var user = currentUser.User;
-                if(user == null)
-                    return Results.Unauthorized();
-            
+            if(user == null)
+                return Results.Unauthorized();
+
             var existingSale = await db.Sales
+                .Include(s => s.SaleItems)
                 .FirstOrDefaultAsync(x => 
                     x.OrderId == id
                     && x.TenantId == user.TenantId);
@@ -221,14 +222,17 @@ namespace TennisCrmApiEndpoints
             db.Entry(existingSale).CurrentValues.SetValues(new
             {
                 updatedSale.OrderPrice,
-                updatedSale.Status,
                 updatedSale.CompletedAt,
                 updatedSale.IsDeleted
             });
 
-            // SetValues does not supports List<T> Ts properties
-            existingSale.SaleItems = updatedSale.SaleItems;
-            
+            // Fully replace sale items so removed items are actually deleted, not orphaned
+            existingSale.SaleItems.Clear();
+            foreach (var item in updatedSale.SaleItems)
+            {
+                existingSale.SaleItems.Add(item);
+            }
+
             await db.SaveChangesAsync();
             return Results.Ok("Successfully updated sale entry.");
         }

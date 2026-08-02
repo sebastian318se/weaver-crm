@@ -49,8 +49,8 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
         racket: [
             { title: "String Pattern", placeholder: "e.g. 16x19", key: "stringPattern", type: "text"},
             { title: "Grip Size", placeholder: "e.g. L3, 4 3/8, etc.", key: "gripSize", type: "text" },
-            { title: "Head Size (sq in)", placeholder: "e.g. 98", key: "headSize", type: "numeric", required: true },
-            { title: "Weight (g)", placeholder: "e.g. 305", key: "weight", type: "numeric", required: true },
+            { title: "Head Size (sq in)", placeholder: "e.g. 98", key: "headSize", type: "numeric"},
+            { title: "Weight (g)", placeholder: "e.g. 305", key: "weight", type: "numeric"},
             { title: "Swing Weight", placeholder: "e.g. 320", key: "swingWeight", type: "numeric" },
             { title: "Beam Thickness (mm)", placeholder: "e.g. 24", key: "beamThickness", type: "numeric" },
             { title: "Stiffness (Flex)", placeholder: "e.g. 63", key: "flex", type: "numeric" },
@@ -58,8 +58,7 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
         ],
         string: [
             { title: "Material", key: "material", type: "select", options: ["Gut", "Polyester", "Nylon", "Multifilament"] },
-            { title: "Store Owned", key: "isStoreOwned", type: "checkbox" },
-            { title: "Gauge", placeholder: "e.g. 1.25", key: "gauge", type: "decimal", required: true }
+            { title: "Gauge", placeholder: "e.g. 1.25", key: "gauge", type: "decimal"}
         ],
         grip: [
             { title: "Type", key: "type", type: "select", options: ["Overgrip", "CushionGrip", "LeatherCushionGrip"], required: true }
@@ -68,12 +67,12 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
             { title: "Type", key: "type", type: "select", options: ["Shirt", "Shorts", "Hoodie", "Pants", "Hat", "Wristband", "Headband", "Socks", "Other"], required: true },
             { title: "Size", key: "size", type: "select", options: ["ExtraSmall", "Small", "Medium", "Large", "ExtraLarge", "Other"], required: true }
         ],
-        shoes: [
-            { title: "Surface", key: "shoeSurface", type: "select", options: ["Hard", "Clay", "Grass", "Mixed"], required: true },
+        shoe: [
+            { title: "Surface", key: "shoeSurface", type: "select", options: ["Hard", "Clay", "Grass", "Mixed"]},
             { title: "Size", placeholder: "e.g. 10.5", key: "size", type: "decimal", required: true }
         ],
-        balls: [
-            { title: "Surface", key: "ballSurface", type: "select", options: ["Hard", "Clay", "Grass", "Mixed"], required: true }
+        ball: [
+            { title: "Surface", key: "ballSurface", type: "select", options: ["Hard", "Clay", "Grass", "Mixed"]}
         ],
         other: []
     }
@@ -300,8 +299,8 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
                                 <option value="string">String</option>
                                 <option value="grip">Grip</option>
                                 <option value="clothing">Clothing</option>
-                                <option value="shoes">Shoes</option>
-                                <option value="balls">Balls</option>
+                                <option value="shoe">Shoes</option>
+                                <option value="ball">Balls</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>

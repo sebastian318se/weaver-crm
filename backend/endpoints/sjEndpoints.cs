@@ -117,7 +117,7 @@ namespace TennisCrmApiEndpoints
                 if(user == null)
                     return Results.Unauthorized();
 
-                db.StringJobs.Add(newSJ);
+                newSJ.TenantId = user.TenantId;
                 
                 // Fetch customer (handle whether exists or not)
                 var existingCustomer = await db.Customers
@@ -128,7 +128,7 @@ namespace TennisCrmApiEndpoints
                 if (existingCustomer is null)
                     return Results.BadRequest("Invalid customer.");
 
-                if (newSJ.IsStoreOwned != false)
+                if (newSJ.IsStoreOwned == true)
                 {
                     // Deduct quantity from string db entry
                     var existingProduct = await db.Products
@@ -155,14 +155,15 @@ namespace TennisCrmApiEndpoints
                         CustomerId = newSJ.CustomerId,
                         TenantId = user.TenantId
                     };
+
+                db.StringJobs.Add(newSJ);
                 db.Transactions.Add(newTransaction);
 
                 existingCustomer.TotalSpent += newSJ.OrderPrice;
                 existingCustomer.RacketsStrung += 1;
                 existingCustomer.LastModified = DateTime.UtcNow;
-                await db.SaveChangesAsync();
-
-                 // Save
+                
+                // Save
                 await db.SaveChangesAsync();
                 await dbTransaction.CommitAsync();
                 return Results.Created($"Successfully added {newSJ} to database.", newSJ);
