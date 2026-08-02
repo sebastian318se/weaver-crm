@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TennisCrmApi;
+using TennisCrmApi.Authentication;
 
 namespace TennisCrmApiEndpoints
 {
@@ -21,10 +22,16 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get all sales
-        public static async Task<IResult> GetSales(AppDbContext db)
+        public static async Task<IResult> GetSales(AppDbContext db, CurrentUserService currentUser)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sales = await db.Sales
-                .Where(x => !x.IsDeleted)
+                .Where(x => 
+                    !x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .Include(s => s.Customer)
                 .Include(s => s.SaleItems)
                     .ThenInclude(i => i.Product)
@@ -34,9 +41,14 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get sales on ID match
-        public static async Task<IResult> GetSalesById(int id, AppDbContext db)
+        public static async Task<IResult> GetSalesById(AppDbContext db, CurrentUserService currentUser, int id)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sale = await db.Sales
+                .Where(x => x.TenantId == user.TenantId)
                 .Include(s => s.Customer)
                 .Include(s => s.SaleItems)
                     .ThenInclude(i => i.Product)
@@ -48,46 +60,59 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get sales on IsDeleted == true
-        public static async Task<IResult> GetDeleted(AppDbContext db)
+        public static async Task<IResult> GetDeleted(AppDbContext db, CurrentUserService currentUser)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sale = await db.Sales
-                .Where(x => x.IsDeleted)
+                .Where(x => 
+                    x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .ToListAsync();
 
-            return sale is not null
-                ? Results.Ok(sale)
-                : Results.NotFound("Could not locate deleted sale entries.");
+            return Results.Ok(sale);
         }
 
         // Get sales on query match 
-        public static async Task<IResult> GetSaleByQuery(AppDbContext db, string query)
+        public static async Task<IResult> GetSaleByQuery(AppDbContext db, CurrentUserService currentUser, string query)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sales = await db.Sales
-                .Include(s => s.Customer)
-                .Include(s => s.SaleItems)
-                    .ThenInclude(i => i.Product)
+                .Where(x => x.TenantId == user.TenantId)
                 .Where(s =>
                     s.Customer != null && s.Customer.CustomerName.Contains(query) ||
                     s.SaleItems.Any(si => (si.Product != null && si.Product.ProductName.Contains(query))) ||
                     s.SaleItems.Any(si => (si.Product != null && si.Product.ProductBrand.Contains(query))))
+                .Include(s => s.Customer)
+                .Include(s => s.SaleItems)
+                    .ThenInclude(i => i.Product)
                 .ToListAsync();
                 
-            return sales is not null
-                ? Results.Ok(sales)
-                : Results.NotFound("Could not locate such a sale in the database.");
+            return Results.Ok(sales);
         }
 
         // Post new sale entry
-        public static async Task<IResult> PostSale(AppDbContext db, Sale newSale)
+        public static async Task<IResult> PostSale(AppDbContext db, CurrentUserService currentUser, Sale newSale)
         {
             // Make sure that the whole request succeeds or fails uniformly
             await using var dbTransaction = await db.Database.BeginTransactionAsync();
 
             try
             {
+                var user = currentUser.User;
+                if(user == null)
+                    return Results.Unauthorized();
+
                 // Fetch customer (handle whether exists or not)
                 var existingCustomer = await db.Customers
-                    .FindAsync(newSale.CustomerId);
+                    .FirstOrDefaultAsync(x => 
+                        x.CustomerId == newSale.CustomerId
+                        &&  x.TenantId == user.TenantId);
 
                 if (existingCustomer is null)
                     return Results.BadRequest("Invalid customer.");
@@ -125,7 +150,9 @@ namespace TennisCrmApiEndpoints
                 foreach (var item in groupedItems)
                 {
                     var existingProduct = await db.Products
-                        .FindAsync(item.ProductId);
+                        .FirstOrDefaultAsync(x => 
+                            x.ProductId == item.ProductId
+                            && x.TenantId == user.TenantId);
 
                     if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
                     
@@ -151,6 +178,7 @@ namespace TennisCrmApiEndpoints
                 existingCustomer.TotalSpent += total;
                 existingCustomer.LastModified = DateTime.UtcNow;
                 sale.OrderPrice = total;
+                sale.TenantId = user.TenantId;
                 db.Sales.Add(sale);
 
                 // Add transaction to db
@@ -160,6 +188,7 @@ namespace TennisCrmApiEndpoints
                     TransactionCategory = TransactionCategory.Sale,
                     Description = "Origin: API sale post transaction.",
                     CustomerId = sale.CustomerId,
+                    TenantId = user.TenantId
                 };
                 db.Transactions.Add(newTransaction);
 
@@ -176,10 +205,16 @@ namespace TennisCrmApiEndpoints
         }
 
         // Edit sale entry on ID match
-        public static async Task<IResult> PutSale(AppDbContext db, Sale updatedSale, int id)
+        public static async Task<IResult> PutSale(AppDbContext db, CurrentUserService currentUser, Sale updatedSale, int id)
         {
+            var user = currentUser.User;
+                if(user == null)
+                    return Results.Unauthorized();
+            
             var existingSale = await db.Sales
-                .FirstOrDefaultAsync(x => x.OrderId == id);
+                .FirstOrDefaultAsync(x => 
+                    x.OrderId == id
+                    && x.TenantId == user.TenantId);
 
             if (existingSale is null) return Results.NotFound("Could not locate sale entry.");
 

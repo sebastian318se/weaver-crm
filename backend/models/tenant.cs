@@ -18,7 +18,7 @@ namespace TennisCrmApi
         public string Timezone { get; set; } = "UTC";
 
         // Users
-        public ICollection<User> Users { get; set; } = [];
+        // public ICollection<User> Users { get; set; } = [];
     }
 
     public enum SubscriptionStatus

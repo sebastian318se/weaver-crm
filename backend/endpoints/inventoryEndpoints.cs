@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TennisCrmApi;
+using TennisCrmApi.Authentication;
 
 namespace TennisCrmApiEndpoints
 {
@@ -38,11 +39,17 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get all inventory
-        public static async Task<IResult> GetItems(AppDbContext db)
+        public static async Task<IResult> GetItems(AppDbContext db, CurrentUserService currentUser)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             // Order by class name then product name
             var items = await db.Products
-                .Where(x => !x.IsDeleted)
+                .Where(x => 
+                    !x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .Select(x => new
                 {
                     Product = x,
@@ -54,10 +61,17 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get inventory on ID match, including discriminator for dashboard graphing
-        public static async Task<IResult> GetItemById(int id, AppDbContext db)
+        public static async Task<IResult> GetItemById(AppDbContext db, CurrentUserService currentUser, int id)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var item = await db.Products
-                .Where(x => !x.IsDeleted && x.ProductId == id)
+                .Where(x => 
+                    !x.IsDeleted 
+                    && x.ProductId == id
+                    && x.TenantId == user.TenantId)
                 .Select(x => new
                 {
                     Product = x,
@@ -67,14 +81,20 @@ namespace TennisCrmApiEndpoints
 
             return item is not null
                 ? Results.Ok(item)
-                : Results.NotFound("Could not locate item");
+                : Results.NotFound("Could not locate item entry");
         }
 
         // Get inventory on IsDeleted == true
-        public static async Task<IResult> GetDeleted(AppDbContext db)
+        public static async Task<IResult> GetDeleted(AppDbContext db, CurrentUserService currentUser)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var items = await db.Products
-                .Where(x => x.IsDeleted)
+                .Where(x => 
+                    x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .ToListAsync();
 
             return items is not null
@@ -83,14 +103,19 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get products on query match
-        public static async Task<IResult> GetItemByQuery(AppDbContext db, string query)
+        public static async Task<IResult> GetItemByQuery(AppDbContext db, CurrentUserService currentUser, string query)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+                
             var items = await db.Products
                 .Where(x =>
                     x.ProductName.Contains(query) ||
                     x.ProductBrand.Contains(query) ||
                     x.ProductModel != null && x.ProductModel.Contains(query)
-                ).ToListAsync();
+                ).Where(x => x.TenantId == user.TenantId)
+                .ToListAsync();
 
             return items is not null
                 ? Results.Ok(items)
@@ -116,14 +141,19 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get strings on query match
-        public static async Task<IResult> GetStringByQuery(AppDbContext db, string query)
+        public static async Task<IResult> GetStringByQuery(AppDbContext db, CurrentUserService currentUser, string query)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var strings = await db.Products
                 .OfType<TennisString>()
                 .Where(x =>
                     x.ProductName.Contains(query) ||
                     x.ProductBrand.Contains(query) ||
                     x.ProductModel != null && x.ProductModel.Contains(query))
+                .Where(x => x.TenantId == user.TenantId)
                 .ToListAsync();
 
             return strings is not null
@@ -132,30 +162,47 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get all items per category
-        public static async Task<IResult> GetAll<T>(AppDbContext db)
+        public static async Task<IResult> GetAll<T>(AppDbContext db, CurrentUserService currentUser)
             where T : Product
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var items = await db.Set<T>()
-                .Where(x => !x.IsDeleted)
+                .Where(x => 
+                    !x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .ToListAsync();
 
-            return Results.Ok(items);
+            return items is not null
+                ? Results.Ok(items)
+                : Results.NotFound("Could not locate any items of this category");
         }
 
         // Post inventory entry to correct type
-        public static async Task<IResult> PostItem<T>(AppDbContext db, T item)
+        public static async Task<IResult> PostItem<T>(AppDbContext db, CurrentUserService currentUser, T item)
             where T : Product
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var existingProduct = await db.Products
-                .Where( p => p.ProductName.ToLower() == item.ProductName.ToLower())
+                .Where( p => 
+                    p.ProductName.ToLower() == item.ProductName.ToLower()
+                    && p.TenantId == user.TenantId)
                 .FirstOrDefaultAsync();
 
             // Add purchase cost to transaction db
             var newTransaction = new Transaction{
                 TransactionValue = item.ProductAcquisitionPrice,
                 TransactionCategory = TransactionCategory.ProductAcquisition,
-                Description = "Origin: Expense via API add product"
+                Description = "Origin: Expense via API add product",
+                TenantId = user.TenantId
             };
+
+            newTransaction.TenantId = user.TenantId;
 
             db.Transactions.Add(newTransaction);
 
@@ -198,14 +245,20 @@ namespace TennisCrmApiEndpoints
         }
 
         // Edit inventory entry on ID match
-        public static async Task<IResult> PutItem(AppDbContext db, Product updatedProduct, int id)
+        public static async Task<IResult> PutItem(AppDbContext db, Product updatedProduct, CurrentUserService currentUser, int id)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var existingProduct = await db.Products
-                .FirstOrDefaultAsync(x => x.ProductId == id);
+                .FirstOrDefaultAsync(x => 
+                    x.ProductId == id
+                    && x.TenantId == user.TenantId);
 
             if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
             
-            if (existingProduct.GetType() != updatedProduct.GetType()) return Results.BadRequest("Producy entry types do not match.");
+            if (existingProduct.GetType() != updatedProduct.GetType()) return Results.BadRequest("Product entry types do not match.");
             
             var originalId = existingProduct.ProductId;
             db.Entry(existingProduct).CurrentValues.SetValues(updatedProduct);

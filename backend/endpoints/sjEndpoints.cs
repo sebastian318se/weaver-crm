@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TennisCrmApi;
+using TennisCrmApi.Authentication;
 
 namespace TennisCrmApiEndpoints
 {
@@ -22,13 +23,19 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get all stringjobs
-        public static async Task<IResult> GetSJ(AppDbContext db)
+        public static async Task<IResult> GetSJ(AppDbContext db, CurrentUserService currentUser)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sj = await db.StringJobs
+                .Where(x => 
+                    !x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .Include(s => s.Customer)
                 .Include(s => s.Racket)
                 .Include(s => s.TennisString)
-                .Where(x => !x.IsDeleted)
                 .ToListAsync();
                 
             return sj is not null
@@ -37,14 +44,22 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get stringjob on ID match
-        public static async Task<IResult> GetSJById(int id, AppDbContext db)
+        public static async Task<IResult> GetSJById(AppDbContext db, CurrentUserService currentUser, int id)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+                
             // Return only valid non-null results else "NotFound".
             var sj = await db.StringJobs
+                .Where(x => 
+                    x.OrderId == id 
+                    && !x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .Include(s => s.Customer)
                 .Include(s => s.Racket)
                 .Include(s => s.TennisString)
-                .FirstOrDefaultAsync(x => x.OrderId == id && !x.IsDeleted);
+                .FirstOrDefaultAsync();
 
             return sj is not null
                 ? Results.Ok(sj)
@@ -52,28 +67,37 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get stringjob on IsDeleted == true
-        public static async Task<IResult> GetDeleted(AppDbContext db)
+        public static async Task<IResult> GetDeleted(AppDbContext db, CurrentUserService currentUser)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sj = await db.StringJobs
-                .Where(x => x.IsDeleted)
+                .Where(x => 
+                    x.IsDeleted
+                    && x.TenantId == user.TenantId)
                 .ToListAsync();
 
-            return sj is not null
-                ? Results.Ok(sj)
-                : Results.NotFound("Could not locate deleted stringjob entries.");
+            return Results.Ok(sj);
         }
 
         // Get sj on query match 
-        public static async Task<IResult> GetSjByQuery(AppDbContext db, string query)
+        public static async Task<IResult> GetSjByQuery(AppDbContext db, CurrentUserService currentUser, string query)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sj = await db.StringJobs
-                .Include(s => s.Customer)
-                .Include(s => s.Racket)
-                .Include(s => s.TennisString)
+                .Where(x => x.TenantId == user.TenantId)
                 .Where(s =>
                     (s.Customer != null && s.Customer.CustomerName.Contains(query)) ||
                     (s.TennisString != null && s.TennisString.ProductName.Contains(query)) ||
                     (s.Racket != null && s.Racket.ProductName.Contains(query)))
+                .Include(s => s.Customer)
+                .Include(s => s.Racket)
+                .Include(s => s.TennisString)
                 .ToListAsync();
                 
             return sj is not null
@@ -82,20 +106,24 @@ namespace TennisCrmApiEndpoints
         }
 
         // Post new SJ entry
-        public static async Task<IResult> PostSJ(AppDbContext db, StringJob newSJ)
+        public static async Task<IResult> PostSJ(AppDbContext db, CurrentUserService currentUser, StringJob newSJ)
         {
-
             // Make sure that the whole request succeeds or fails uniformly
             await using var dbTransaction = await db.Database.BeginTransactionAsync();
 
             try
             {
+                var user = currentUser.User;
+                if(user == null)
+                    return Results.Unauthorized();
+
                 db.StringJobs.Add(newSJ);
                 
-
                 // Fetch customer (handle whether exists or not)
                 var existingCustomer = await db.Customers
-                    .FindAsync(newSJ.CustomerId);
+                    .FirstOrDefaultAsync(x => 
+                        x.CustomerId == newSJ.CustomerId
+                        && x.TenantId == user.TenantId);
 
                 if (existingCustomer is null)
                     return Results.BadRequest("Invalid customer.");
@@ -104,7 +132,9 @@ namespace TennisCrmApiEndpoints
                 {
                     // Deduct quantity from string db entry
                     var existingProduct = await db.Products
-                        .FindAsync(newSJ.TennisStringId);
+                        .FirstOrDefaultAsync(x => 
+                            x.ProductId == newSJ.TennisStringId
+                            && x.TenantId == user.TenantId);
                     
                     if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
                     
@@ -123,6 +153,7 @@ namespace TennisCrmApiEndpoints
                         TransactionCategory = TransactionCategory.Stringjob,
                         Description = "Origin: API stringjob post transaction.",
                         CustomerId = newSJ.CustomerId,
+                        TenantId = user.TenantId
                     };
                 db.Transactions.Add(newTransaction);
 
@@ -144,10 +175,16 @@ namespace TennisCrmApiEndpoints
         }
 
         // Edit SJ on ID match
-        public static async Task<IResult> PutSJ(AppDbContext db, StringJob updatedSJ, int id)
+        public static async Task<IResult> PutSJ(AppDbContext db, StringJob updatedSJ, CurrentUserService currentUser, int id)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
             var sj = await db.StringJobs
-                .FirstOrDefaultAsync(x => x.OrderId == id);
+                .FirstOrDefaultAsync(x => 
+                    x.OrderId == id
+                    && x.TenantId == user.TenantId);
 
             if (sj is null) return Results.NotFound("Could not locate sale entry");
 
