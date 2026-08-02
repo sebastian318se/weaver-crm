@@ -188,7 +188,8 @@ namespace TennisCrmApiEndpoints
                     TransactionCategory = TransactionCategory.Sale,
                     Description = "Origin: API sale post transaction.",
                     CustomerId = sale.CustomerId,
-                    TenantId = user.TenantId
+                    TenantId = user.TenantId,
+                    Order = sale
                 };
                 db.Transactions.Add(newTransaction);
 
@@ -219,18 +220,65 @@ namespace TennisCrmApiEndpoints
 
             if (existingSale is null) return Results.NotFound("Could not locate sale entry.");
 
+            if (updatedSale.SaleItems == null || updatedSale.SaleItems.Count == 0)
+                return Results.BadRequest("No items provided.");
+
+            // Merge duplicate products (on id), same as PostSale
+            var groupedItems = updatedSale.SaleItems
+                .GroupBy(i => i.ProductId)
+                .Select(g => new OrderItems
+                {
+                    ProductId = g.Key,
+                    ProductQuantity = g.Sum(x => x.ProductQuantity)
+                })
+                .ToList();
+
+            decimal total = 0;
+            var newItems = new List<OrderItems>();
+
+            foreach (var item in groupedItems)
+            {
+                var existingProduct = await db.Products
+                    .FirstOrDefaultAsync(x => 
+                        x.ProductId == item.ProductId
+                        && x.TenantId == user.TenantId);
+
+                if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
+
+                total += existingProduct.ProductPrice * item.ProductQuantity;
+
+                newItems.Add(new OrderItems
+                {
+                    ProductId = item.ProductId,
+                    ProductQuantity = item.ProductQuantity,
+                    ProductPrice = existingProduct.ProductPrice
+                });
+            }
+
             db.Entry(existingSale).CurrentValues.SetValues(new
             {
-                updatedSale.OrderPrice,
+                OrderPrice = total,
                 updatedSale.CompletedAt,
                 updatedSale.IsDeleted
             });
 
             // Fully replace sale items so removed items are actually deleted, not orphaned
             existingSale.SaleItems.Clear();
-            foreach (var item in updatedSale.SaleItems)
+            foreach (var item in newItems)
             {
                 existingSale.SaleItems.Add(item);
+            }
+
+            var existingTransaction = await db.Transactions
+                .FirstOrDefaultAsync(t => 
+                    t.OrderId == existingSale.OrderId 
+                    && t.TransactionCategory == TransactionCategory.Sale
+                    && t.TenantId == user.TenantId);
+
+            if (existingTransaction is not null)
+            {
+                existingTransaction.TransactionValue = total;
+                existingTransaction.LastModified = DateTime.UtcNow;
             }
 
             await db.SaveChangesAsync();

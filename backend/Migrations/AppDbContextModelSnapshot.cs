@@ -259,6 +259,9 @@ namespace tenniscrm.Migrations
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
@@ -274,6 +277,8 @@ namespace tenniscrm.Migrations
                     b.HasKey("TransactionId");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("TenantId");
 
@@ -516,6 +521,10 @@ namespace tenniscrm.Migrations
                         .WithMany()
                         .HasForeignKey("CustomerId");
 
+                    b.HasOne("TennisCrmApi.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("TennisCrmApi.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -523,6 +532,8 @@ namespace tenniscrm.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+
+                    b.Navigation("Order");
 
                     b.Navigation("Tenant");
                 });

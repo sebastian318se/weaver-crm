@@ -153,7 +153,8 @@ namespace TennisCrmApiEndpoints
                         TransactionCategory = TransactionCategory.Stringjob,
                         Description = "Origin: API stringjob post transaction.",
                         CustomerId = newSJ.CustomerId,
-                        TenantId = user.TenantId
+                        TenantId = user.TenantId,
+                        Order = newSJ
                     };
 
                 db.StringJobs.Add(newSJ);
@@ -204,6 +205,19 @@ namespace TennisCrmApiEndpoints
 
             sj.Racket = null;
             sj.TennisString = null;
+
+            // Keep the linked transaction's value in sync with any price edit
+            var existingTransaction = await db.Transactions
+                .FirstOrDefaultAsync(t => 
+                    t.OrderId == sj.OrderId 
+                    && t.TransactionCategory == TransactionCategory.Stringjob
+                    && t.TenantId == user.TenantId);
+
+            if (existingTransaction is not null)
+            {
+                existingTransaction.TransactionValue = updatedSJ.OrderPrice;
+                existingTransaction.LastModified = DateTime.UtcNow;
+            }
 
             await db.SaveChangesAsync();
 

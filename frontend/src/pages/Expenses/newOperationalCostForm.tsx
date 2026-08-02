@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/clerk-react";
 import { useState } from "react";
 
 interface expenseProps {
@@ -7,10 +8,16 @@ interface expenseProps {
 
 export default function NewExpenseForm({onCancel, onTransactionCreated}: expenseProps){
 
+    const { getToken } = useAuth();
+
     const [price, setPrice] = useState<number>(0);
     const [note, setNote] = useState<string>("");
 
     async function handleSubmit() {
+
+        const token = await getToken({
+            template: "api"
+        });
 
         const transaction = {
             transactionValue: price,
@@ -21,7 +28,8 @@ export default function NewExpenseForm({onCancel, onTransactionCreated}: expense
         const response = await fetch("http://localhost:5000/api/transactions", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(transaction)
         });

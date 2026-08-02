@@ -9,6 +9,10 @@ namespace TennisCrmApi
         public DateTime? LastModified { get; set; }
         public string Description { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
+        
+        public int? OrderId { get; set; }
+        public Order? Order { get; set; }
+
         public int? CustomerId { get; set; }
         public Customer? Customer { get; set; }
 
