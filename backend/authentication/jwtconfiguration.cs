@@ -1,6 +1,7 @@
-// Backend-wide JWT configuration
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+
+// Backend-wide JWT configuration
 
 namespace TennisCrmApi.Authentication
 {

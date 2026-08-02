@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+
 // Intercept calls and centralize clerk user id matching and stores current user
 // Fetch from context -> get id from JWT -> store into context for user service to access
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
 
 namespace TennisCrmApi.Authentication
 {
