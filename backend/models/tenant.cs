@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TennisCrmApi
 {
-    [Table("Tentants")]
+    [Table("Tenants")]
     public class Tenant
     {
         // Tenant info
