@@ -13,6 +13,7 @@ export default function LoginPage() {
                 <div className="loginBrand">
                     <h1>Weaver CRM</h1>
                     <p>Welcome back. Sign in to continue.</p>
+                    <span>General public Onboarding available soon!</span>
                 </div>
 
                 <SignIn
