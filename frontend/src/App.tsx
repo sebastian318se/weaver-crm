@@ -1,10 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import ProtectedRoute from "./protectedroute";
-
-
-import { useUser } from "@clerk/clerk-react";
-
-
 import Sidebar from "./Sidebar/sidebar";
 import Dashboard from "./pages/Dashboard/dashboard";
 import Inventory from "./pages/Inventory/inventory";
@@ -18,22 +13,6 @@ import LoginPage from "./pages/Login/loginpage";
 import LandingPage from "./pages/Login/landingpage";
 
 export default function App() {
-
-
-
-
-    const { isLoaded, isSignedIn, user } = useUser();
-
-    console.log({
-        isLoaded,
-        isSignedIn,
-        userId: user?.id,
-        email: user?.primaryEmailAddress?.emailAddress,
-    });
-
-
-
-    
     return (
         <BrowserRouter>
             <Routes>
