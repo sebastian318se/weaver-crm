@@ -27,7 +27,7 @@ export default function Customers() {
         const token = await getToken({
             template: "api"
         });
-        const response = await fetch("weavercrm.com/api/customers", {
+        const response = await fetch(""https://weavercrm.com/api/customers", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -47,7 +47,7 @@ export default function Customers() {
             template: "api"
         });
 
-        const response = await fetch(`${API_URL}/api/customers/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch("https://weavercrm.com/api/customers/search?query=${encodeURIComponent(query)}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -94,7 +94,7 @@ export default function Customers() {
             template: "api"
         });
 
-        const response = await fetch(`${API_URL}/api/customers/${customerId}`, {
+        const response = await fetch("https://weavercrm.com/api/customers/${customerId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

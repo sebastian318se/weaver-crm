@@ -91,7 +91,7 @@ export default function Orders() {
             template: "api"
         });
 
-        const response = await fetch("weavercrm.com/api/sales", {
+        const response = await fetch(""https://weavercrm.com/api/sales", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -116,7 +116,7 @@ export default function Orders() {
             template: "api"
         });
 
-        const response = await fetch("weavercrm.com/api/strung", {
+        const response = await fetch(""https://weavercrm.com/api/strung", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -144,7 +144,7 @@ export default function Orders() {
             return;
         }
 
-        const response = await fetch(`${API_URL}/api/sales/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch("https://weavercrm.com/api/sales/search?query=${encodeURIComponent(query)}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -171,7 +171,7 @@ export default function Orders() {
             return;
         }
 
-        const response = await fetch(`${API_URL}/api/strung/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch("https://weavercrm.com/api/strung/search?query=${encodeURIComponent(query)}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -227,7 +227,7 @@ export default function Orders() {
             isDeleted: true
         };
 
-        const response = await fetch(`${API_URL}/api/strung/${orderId}`, {
+        const response = await fetch("https://weavercrm.com/api/strung/${orderId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -276,7 +276,7 @@ export default function Orders() {
             isDeleted: true
         };
 
-        const response = await fetch(`${API_URL}/api/sales/${orderId}`, {
+        const response = await fetch("https://weavercrm.com/api/sales/${orderId}`, {
             method: "PUT",
             headers: { 
                 "Content-Type": "application/json",

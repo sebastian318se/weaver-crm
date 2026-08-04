@@ -4,7 +4,7 @@ export async function apiFetch(
     endpoint: string,
     options?: RequestInit
 ) {
-    return fetch(`${API_URL}${endpoint}`, {
+    return fetch("https://weavercrm.com${endpoint}`, {
         ...options,
         headers: {
             "Content-Type": "application/json",

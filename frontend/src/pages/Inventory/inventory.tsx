@@ -60,43 +60,43 @@ export default function Inventory() {
     const fetchMappers = [
         {
             tab: "Rackets",
-            apilink: "weavercrm.com/api/inventory/racket",
+            apilink: ""https://weavercrm.com/api/inventory/racket",
             data: rackets,
             setter: setRackets
         },
         {
             tab: "Strings",
-            apilink: "weavercrm.com/api/inventory/string",
+            apilink: ""https://weavercrm.com/api/inventory/string",
             data: strings,
             setter: setStrings
         },
         {
             tab: "Grips",
-            apilink: "weavercrm.com/api/inventory/grip",
+            apilink: ""https://weavercrm.com/api/inventory/grip",
             data: grips,
             setter: setGrips
         },
         {
             tab: "Clothing",
-            apilink: "weavercrm.com/api/inventory/clothing",
+            apilink: ""https://weavercrm.com/api/inventory/clothing",
             data: clothing,
             setter: setClothing
         },
         {
             tab: "Shoes",
-            apilink: "weavercrm.com/api/inventory/shoe",
+            apilink: ""https://weavercrm.com/api/inventory/shoe",
             data: shoes,
             setter: setShoes
         },
         {
             tab: "Balls",
-            apilink: "weavercrm.com/api/inventory/ball",
+            apilink: ""https://weavercrm.com/api/inventory/ball",
             data: balls,
             setter: setBalls
         },
         {
             tab: "Other",
-            apilink: "weavercrm.com/api/inventory/other",
+            apilink: ""https://weavercrm.com/api/inventory/other",
             data: other,
             setter: setOther
         }
@@ -144,7 +144,7 @@ export default function Inventory() {
 
         if (!activeMapper) return;
 
-        const response = await fetch(`${API_URL}/api/inventory/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch("https://weavercrm.com/api/inventory/search?query=${encodeURIComponent(query)}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -227,7 +227,7 @@ export default function Inventory() {
             isDeleted: true
         };
 
-        const response = await fetch(`${API_URL}/api/inventory/${productId}`, {
+        const response = await fetch("https://weavercrm.com/api/inventory/${productId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

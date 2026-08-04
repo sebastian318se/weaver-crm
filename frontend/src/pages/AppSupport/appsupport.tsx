@@ -25,7 +25,7 @@ export default function Support() {
                 <SupportBox
                     icon={Mail}
                     title="General Support and Inquiries"
-                    value="support@weavercrm.com"
+                    value="support@weaver.com"
                     emptyMessage="No email support provided at this time."
                     additionalInfo="Responses are typically provided within 24 hours."
                 />

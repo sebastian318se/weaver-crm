@@ -206,8 +206,8 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
             });
 
             const url = isEditing
-                ? `${API_URL}/api/inventory/${existingProduct!.productId}`
-                : `${API_URL}/api/inventory/${discriminator}`;
+                ? "https://weavercrm.com/api/inventory/${existingProduct!.productId}`
+                : "https://weavercrm.com/api/inventory/${discriminator}`;
 
             const response = await fetch(url, {
                 method: isEditing ? "PUT" : "POST",
