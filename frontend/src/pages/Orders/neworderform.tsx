@@ -168,7 +168,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             return;
         }
 
-        fetch(`http://localhost:5000/api/customers/search?query=${customerSearch}`, {
+        fetch(`${API_URL}/api/customers/search?query=${customerSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -202,7 +202,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             return;
         }
 
-        fetch(`http://localhost:5000/api/inventory/racket/search?query=${racketSearch}`, {
+        fetch(`${API_URL}/api/inventory/racket/search?query=${racketSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -234,7 +234,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             return;
         }
 
-        fetch(`http://localhost:5000/api/inventory/string/search?query=${stringSearch}`, {
+        fetch(`${API_URL}/api/inventory/string/search?query=${stringSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -295,8 +295,8 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
         };
 
         const url = isEditing
-            ? `http://localhost:5000/api/strung/${existingJob!.orderId}`
-            : "http://localhost:5000/api/strung";
+            ? `${API_URL}/api/strung/${existingJob!.orderId}`
+            : "${API_URL}/api/strung";
 
         const stringJob = isEditing
             ? { ...existingJob, ...basePayload, isDeleted: existingJob!.isDeleted ?? false }

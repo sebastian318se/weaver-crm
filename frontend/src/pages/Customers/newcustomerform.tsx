@@ -51,8 +51,8 @@ export default function NewCustomerBox({action, onCustomerCreated, existingCusto
         });
 
         const url = isEditing
-            ? `http://localhost:5000/api/customers/${existingCustomer!.customerId}`
-            : "http://localhost:5000/api/customers";
+            ? `${API_URL}/api/customers/${existingCustomer!.customerId}`
+            : "${API_URL}/api/customers";
 
         const response = await fetch(url, {
             method: isEditing ? "PUT" : "POST",

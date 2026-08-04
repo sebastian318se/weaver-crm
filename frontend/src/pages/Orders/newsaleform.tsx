@@ -121,7 +121,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
             return;
         }
 
-        fetch(`http://localhost:5000/api/customers/search?query=${customerSearch}`, {
+        fetch(`${API_URL}/api/customers/search?query=${customerSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }})
@@ -153,7 +153,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
             return;
         }
 
-        fetch(`http://localhost:5000/api/inventory/search?query=${productSearch}`, {
+        fetch(`${API_URL}/api/inventory/search?query=${productSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }})
@@ -224,8 +224,8 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                 total + product.price * product.quantity, 0);
 
         const url = isEditing
-            ? `http://localhost:5000/api/sales/${existingSale!.orderId}`
-            : "http://localhost:5000/api/sales";
+            ? `${API_URL}/api/sales/${existingSale!.orderId}`
+            : "${API_URL}/api/sales";
 
         const sale = isEditing
             ? {

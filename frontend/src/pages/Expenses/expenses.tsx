@@ -177,7 +177,7 @@ export default function Expenses() {
 
             setLoading(true);
 
-            const response = await fetch("http://localhost:5000/api/transactions", {
+            const response = await fetch("${API_URL}/api/transactions", {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }

@@ -60,43 +60,43 @@ export default function Inventory() {
     const fetchMappers = [
         {
             tab: "Rackets",
-            apilink: "http://localhost:5000/api/inventory/racket",
+            apilink: "${API_URL}/api/inventory/racket",
             data: rackets,
             setter: setRackets
         },
         {
             tab: "Strings",
-            apilink: "http://localhost:5000/api/inventory/string",
+            apilink: "${API_URL}/api/inventory/string",
             data: strings,
             setter: setStrings
         },
         {
             tab: "Grips",
-            apilink: "http://localhost:5000/api/inventory/grip",
+            apilink: "${API_URL}/api/inventory/grip",
             data: grips,
             setter: setGrips
         },
         {
             tab: "Clothing",
-            apilink: "http://localhost:5000/api/inventory/clothing",
+            apilink: "${API_URL}/api/inventory/clothing",
             data: clothing,
             setter: setClothing
         },
         {
             tab: "Shoes",
-            apilink: "http://localhost:5000/api/inventory/shoe",
+            apilink: "${API_URL}/api/inventory/shoe",
             data: shoes,
             setter: setShoes
         },
         {
             tab: "Balls",
-            apilink: "http://localhost:5000/api/inventory/ball",
+            apilink: "${API_URL}/api/inventory/ball",
             data: balls,
             setter: setBalls
         },
         {
             tab: "Other",
-            apilink: "http://localhost:5000/api/inventory/other",
+            apilink: "${API_URL}/api/inventory/other",
             data: other,
             setter: setOther
         }
@@ -144,7 +144,7 @@ export default function Inventory() {
 
         if (!activeMapper) return;
 
-        const response = await fetch(`http://localhost:5000/api/inventory/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch(`${API_URL}/api/inventory/search?query=${encodeURIComponent(query)}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -227,7 +227,7 @@ export default function Inventory() {
             isDeleted: true
         };
 
-        const response = await fetch(`http://localhost:5000/api/inventory/${productId}`, {
+        const response = await fetch(`${API_URL}/api/inventory/${productId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

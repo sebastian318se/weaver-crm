@@ -206,8 +206,8 @@ export default function NewProductBox({action, onCustomerCreated, existingProduc
             });
 
             const url = isEditing
-                ? `http://localhost:5000/api/inventory/${existingProduct!.productId}`
-                : `http://localhost:5000/api/inventory/${discriminator}`;
+                ? `${API_URL}/api/inventory/${existingProduct!.productId}`
+                : `${API_URL}/api/inventory/${discriminator}`;
 
             const response = await fetch(url, {
                 method: isEditing ? "PUT" : "POST",

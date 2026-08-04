@@ -300,15 +300,15 @@ export default function Dashboard() {
                 });
 
                 const [transactionsRes, salesRes, stringJobsRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/transactions', {
+                    fetch('${API_URL}/api/transactions', {
                         headers:{
                             Authorization: `Bearer ${token}`
                         }}),
-                    fetch('http://localhost:5000/api/sales', {
+                    fetch('${API_URL}/api/sales', {
                         headers:{
                             Authorization: `Bearer ${token}`
                         }}),
-                    fetch('http://localhost:5000/api/strung', {
+                    fetch('${API_URL}/api/strung', {
                         headers:{
                             Authorization: `Bearer ${token}`
                         }}),
