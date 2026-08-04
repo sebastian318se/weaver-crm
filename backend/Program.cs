@@ -10,6 +10,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+    Console.WriteLine($"DATABASE: {connection}");
+
+    options.UseNpgsql(connection);
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -38,13 +46,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseCors("ReactApp");
-}
+// }
+
+app.UseCors("ReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -56,5 +65,11 @@ app.MapSalesEndpoints();
 app.MapInventoryEndpoints();
 app.MapCustomerEndpoints();
 app.MapTransactionEndpoints();
+
+using(var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
