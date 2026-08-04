@@ -8,5 +8,5 @@ export default function ProtectedRoute() {
     return <div>Loading...</div>;
   }
 
-  return isSignedIn ? <Outlet /> : <Navigate to="/landing" replace />;
+  return isSignedIn ? <Outlet /> : <Navigate to="/" replace />;
 }

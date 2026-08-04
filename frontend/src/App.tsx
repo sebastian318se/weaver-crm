@@ -24,7 +24,6 @@ export default function App() {
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
                     <Route element={<Layout />}>
-                        <Route path="/" element={<Dashboard />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/inventory" element={<Inventory />} />
                         <Route path="/customers" element={<Customers />} />
