@@ -17,7 +17,7 @@ export default function Support() {
                 <SupportBox
                     icon={Phone}
                     title="Support Line"
-                    value="+55 (051) 99516-1556"
+                    value="+55 (051) 99516-1556 || +1 (239) 628 5682"
                     emptyMessage="No support line provided at this time."
                     additionalInfo="Mon–Fri, 9:00 AM – 5:00 PM"
                 />
@@ -25,7 +25,7 @@ export default function Support() {
                 <SupportBox
                     icon={Mail}
                     title="General Support and Inquiries"
-                    value="sebastianbferrari@gmail.com"
+                    value="support@weavercrm.com"
                     emptyMessage="No email support provided at this time."
                     additionalInfo="Responses are typically provided within 24 hours."
                 />
