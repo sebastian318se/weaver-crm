@@ -121,7 +121,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
             return;
         }
 
-        fetch("https://weavercrm.com/api/customers/search?query=${customerSearch}`, {
+        fetch("https://weavercrm.com/api/customers/search?query=${customerSearch}", {
             headers:{
                 Authorization: `Bearer ${token}`
             }})
@@ -153,7 +153,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
             return;
         }
 
-        fetch("https://weavercrm.com/api/inventory/search?query=${productSearch}`, {
+        fetch("https://weavercrm.com/api/inventory/search?query=${productSearch}", {
             headers:{
                 Authorization: `Bearer ${token}`
             }})
