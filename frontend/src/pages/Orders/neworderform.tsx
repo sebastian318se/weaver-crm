@@ -296,7 +296,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
 
         const url = isEditing
             ? "https://weavercrm.com/api/strung/${existingJob!.orderId}`
-            : ""https://weavercrm.com/api/strung";
+            : "https://weavercrm.com/api/strung";
 
         const stringJob = isEditing
             ? { ...existingJob, ...basePayload, isDeleted: existingJob!.isDeleted ?? false }

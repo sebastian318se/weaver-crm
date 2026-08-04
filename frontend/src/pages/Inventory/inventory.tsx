@@ -60,43 +60,43 @@ export default function Inventory() {
     const fetchMappers = [
         {
             tab: "Rackets",
-            apilink: ""https://weavercrm.com/api/inventory/racket",
+            apilink: "https://weavercrm.com/api/inventory/racket",
             data: rackets,
             setter: setRackets
         },
         {
             tab: "Strings",
-            apilink: ""https://weavercrm.com/api/inventory/string",
+            apilink: "https://weavercrm.com/api/inventory/string",
             data: strings,
             setter: setStrings
         },
         {
             tab: "Grips",
-            apilink: ""https://weavercrm.com/api/inventory/grip",
+            apilink: "https://weavercrm.com/api/inventory/grip",
             data: grips,
             setter: setGrips
         },
         {
             tab: "Clothing",
-            apilink: ""https://weavercrm.com/api/inventory/clothing",
+            apilink: "https://weavercrm.com/api/inventory/clothing",
             data: clothing,
             setter: setClothing
         },
         {
             tab: "Shoes",
-            apilink: ""https://weavercrm.com/api/inventory/shoe",
+            apilink: "https://weavercrm.com/api/inventory/shoe",
             data: shoes,
             setter: setShoes
         },
         {
             tab: "Balls",
-            apilink: ""https://weavercrm.com/api/inventory/ball",
+            apilink: "https://weavercrm.com/api/inventory/ball",
             data: balls,
             setter: setBalls
         },
         {
             tab: "Other",
-            apilink: ""https://weavercrm.com/api/inventory/other",
+            apilink: "https://weavercrm.com/api/inventory/other",
             data: other,
             setter: setOther
         }

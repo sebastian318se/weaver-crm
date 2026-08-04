@@ -91,7 +91,7 @@ export default function Orders() {
             template: "api"
         });
 
-        const response = await fetch(""https://weavercrm.com/api/sales", {
+        const response = await fetch("https://weavercrm.com/api/sales", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -116,7 +116,7 @@ export default function Orders() {
             template: "api"
         });
 
-        const response = await fetch(""https://weavercrm.com/api/strung", {
+        const response = await fetch("https://weavercrm.com/api/strung", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
