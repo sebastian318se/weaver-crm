@@ -225,7 +225,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
 
         const url = isEditing
             ? `${API_URL}/api/sales/${existingSale!.orderId}`
-            : "${API_URL}/api/sales";
+            : "weavercrm.com/api/sales";
 
         const sale = isEditing
             ? {

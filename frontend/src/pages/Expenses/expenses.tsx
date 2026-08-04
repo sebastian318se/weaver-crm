@@ -177,7 +177,7 @@ export default function Expenses() {
 
             setLoading(true);
 
-            const response = await fetch("${API_URL}/api/transactions", {
+            const response = await fetch("weavercrm.com/api/transactions", {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }

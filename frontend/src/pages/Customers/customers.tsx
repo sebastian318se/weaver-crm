@@ -27,7 +27,7 @@ export default function Customers() {
         const token = await getToken({
             template: "api"
         });
-        const response = await fetch("${API_URL}/api/customers", {
+        const response = await fetch("weavercrm.com/api/customers", {
             headers:{
                 Authorization: `Bearer ${token}`
             }

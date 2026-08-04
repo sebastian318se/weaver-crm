@@ -25,7 +25,7 @@ export default function NewExpenseForm({onCancel, onTransactionCreated}: expense
             transactionCategory: "OperationalCost"
         };
 
-        const response = await fetch("${API_URL}/api/transactions", {
+        const response = await fetch("weavercrm.com/api/transactions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
