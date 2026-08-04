@@ -1,7 +1,18 @@
+import { useAuth } from "@clerk/clerk-react";
 import { SignIn } from "@clerk/clerk-react";
+import { Navigate } from "react-router-dom";
 import "./loginpage.css";
 
 export default function LoginPage() {
+    const { isLoaded, isSignedIn } = useAuth();
+
+        if (!isLoaded) {
+            return <div>Loading...</div>;
+        }
+
+        if (isSignedIn) {
+            return <Navigate to="/dashboard" replace />;
+        }
 
     return (
 
