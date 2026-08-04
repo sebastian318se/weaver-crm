@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom";
 import { Info, LayoutDashboard, PackageIcon, Settings, ShoppingCart, TrendingDown, UserIcon } from "lucide-react";
+import { NavLink } from "react-router-dom";
 import './sidebar.css';
 
 export default function Sidebar() {
