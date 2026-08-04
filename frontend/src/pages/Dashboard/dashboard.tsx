@@ -300,15 +300,15 @@ export default function Dashboard() {
                 });
 
                 const [transactionsRes, salesRes, stringJobsRes] = await Promise.all([
-                    fetch('${API_URL}/api/transactions', {
+                    fetch('https://weavercrm.com/api/transactions', {
                         headers:{
                             Authorization: `Bearer ${token}`
                         }}),
-                    fetch('${API_URL}/api/sales', {
+                    fetch('https://weavercrm.com/api/sales', {
                         headers:{
                             Authorization: `Bearer ${token}`
                         }}),
-                    fetch('${API_URL}/api/strung', {
+                    fetch('https://weavercrm.com/api/strung', {
                         headers:{
                             Authorization: `Bearer ${token}`
                         }}),

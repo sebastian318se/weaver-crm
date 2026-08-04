@@ -51,7 +51,7 @@ export default function NewCustomerBox({action, onCustomerCreated, existingCusto
         });
 
         const url = isEditing
-            ? "https://weavercrm.com/api/customers/${existingCustomer!.customerId}`
+            ? `https://weavercrm.com/api/customers/${existingCustomer!.customerId}`
             : "https://weavercrm.com/api/customers";
 
         const response = await fetch(url, {

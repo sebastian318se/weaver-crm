@@ -168,7 +168,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             return;
         }
 
-        fetch("https://weavercrm.com/api/customers/search?query=${customerSearch}", {
+        fetch(`https://weavercrm.com/api/customers/search?query=${customerSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -202,7 +202,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             return;
         }
 
-        fetch("https://weavercrm.com/api/inventory/racket/search?query=${racketSearch}", {
+        fetch(`https://weavercrm.com/api/inventory/racket/search?query=${racketSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -234,7 +234,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             return;
         }
 
-        fetch("https://weavercrm.com/api/inventory/string/search?query=${stringSearch}", {
+        fetch(`https://weavercrm.com/api/inventory/string/search?query=${stringSearch}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -295,7 +295,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
         };
 
         const url = isEditing
-            ? "https://weavercrm.com/api/strung/${existingJob!.orderId}"
+            ? `https://weavercrm.com/api/strung/${existingJob!.orderId}`
             : "https://weavercrm.com/api/strung";
 
         const stringJob = isEditing

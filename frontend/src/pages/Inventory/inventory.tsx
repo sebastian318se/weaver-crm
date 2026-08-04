@@ -144,7 +144,7 @@ export default function Inventory() {
 
         if (!activeMapper) return;
 
-        const response = await fetch("https://weavercrm.com/api/inventory/search?query=${encodeURIComponent(query)}", {
+        const response = await fetch(`https://weavercrm.com/api/inventory/search?query=${encodeURIComponent(query)}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -227,7 +227,7 @@ export default function Inventory() {
             isDeleted: true
         };
 
-        const response = await fetch("https://weavercrm.com/api/inventory/${productId}", {
+        const response = await fetch(`https://weavercrm.com/api/inventory/${productId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
