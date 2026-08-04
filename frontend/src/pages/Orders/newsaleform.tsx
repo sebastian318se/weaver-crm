@@ -224,7 +224,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                 total + product.price * product.quantity, 0);
 
         const url = isEditing
-            ? "https://weavercrm.com/api/sales/${existingSale!.orderId}`
+            ? "https://weavercrm.com/api/sales/${existingSale!.orderId}"
             : "https://weavercrm.com/api/sales";
 
         const sale = isEditing
