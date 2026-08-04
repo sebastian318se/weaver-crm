@@ -144,7 +144,7 @@ export default function Orders() {
             return;
         }
 
-        const response = await fetch("https://weavercrm.com/api/sales/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch("https://weavercrm.com/api/sales/search?query=${encodeURIComponent(query)}", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -171,7 +171,7 @@ export default function Orders() {
             return;
         }
 
-        const response = await fetch("https://weavercrm.com/api/strung/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetch("https://weavercrm.com/api/strung/search?query=${encodeURIComponent(query)}", {
             headers:{
                 Authorization: `Bearer ${token}`
             }
