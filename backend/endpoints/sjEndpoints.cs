@@ -217,6 +217,7 @@ namespace TennisCrmApiEndpoints
             {
                 existingTransaction.TransactionValue = updatedSJ.OrderPrice;
                 existingTransaction.LastModified = DateTime.UtcNow;
+                existingTransaction.Description = "Origin: API stringjob post transaction. EDITED.";
             }
 
             await db.SaveChangesAsync();
