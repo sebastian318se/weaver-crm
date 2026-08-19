@@ -17,7 +17,7 @@ namespace TennisCrmApiEndpoints
 
             app.MapPost("/api/strung/", PostSJ).RequireAuthorization();
 
-            app.MapPut("api/strung/{id}", PutSJ).RequireAuthorization();
+            app.MapPut("/api/strung/{id}", PutSJ).RequireAuthorization();
 
             return app;
         }
