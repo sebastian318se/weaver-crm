@@ -180,49 +180,112 @@ namespace TennisCrmApiEndpoints
         public static async Task<IResult> PutSJ(AppDbContext db, StringJob updatedSJ, CurrentUserService currentUser, int id)
         {
             var user = currentUser.User;
-            if(user == null)
+            if (user == null)
                 return Results.Unauthorized();
 
-            var sj = await db.StringJobs
-                .FirstOrDefaultAsync(x => 
-                    x.OrderId == id
-                    && x.TenantId == user.TenantId);
+            await using var dbTransaction = await db.Database.BeginTransactionAsync();
 
-            if (sj is null) return Results.NotFound("Could not locate sale entry");
-
-            db.Entry(sj).CurrentValues.SetValues(new
+            try
             {
-                updatedSJ.OrderPrice,
-                updatedSJ.Status,
-                updatedSJ.CompletedAt,
-                updatedSJ.IsDeleted,
-                updatedSJ.MainTension,
-                updatedSJ.CrossTension,
-                updatedSJ.ExpectedAt,
-                updatedSJ.RacketId,
-                updatedSJ.TennisStringId
-            });
+                var sj = await db.StringJobs
+                    .FirstOrDefaultAsync(x =>
+                        x.OrderId == id
+                        && x.TenantId == user.TenantId);
 
-            sj.Racket = null;
-            sj.TennisString = null;
+                if (sj is null) return Results.NotFound("Could not locate sale entry");
 
-            // Keep the linked transaction's value in sync with any price edit
-            var existingTransaction = await db.Transactions
-                .FirstOrDefaultAsync(t => 
-                    t.OrderId == sj.OrderId 
-                    && t.TransactionCategory == TransactionCategory.Stringjob
-                    && t.TenantId == user.TenantId);
+                var oldOrderPrice = sj.OrderPrice;
+                var oldIsStoreOwned = sj.IsStoreOwned;
+                var oldTennisStringId = sj.TennisStringId;
 
-            if (existingTransaction is not null)
-            {
-                existingTransaction.TransactionValue = updatedSJ.OrderPrice;
-                existingTransaction.LastModified = DateTime.UtcNow;
-                existingTransaction.Description = "Origin: API stringjob post transaction. EDITED.";
+                db.Entry(sj).CurrentValues.SetValues(new
+                {
+                    updatedSJ.OrderPrice,
+                    updatedSJ.Status,
+                    updatedSJ.CompletedAt,
+                    updatedSJ.IsDeleted,
+                    updatedSJ.MainTension,
+                    updatedSJ.CrossTension,
+                    updatedSJ.ExpectedAt,
+                    updatedSJ.RacketId,
+                    updatedSJ.TennisStringId,
+                    updatedSJ.IsStoreOwned
+                });
+
+                sj.Racket = null;
+                sj.TennisString = null;
+
+                // Reconcile stock if the string used, or the store-owned flag, changed
+                if (oldIsStoreOwned && oldTennisStringId != null &&
+                    (!updatedSJ.IsStoreOwned || updatedSJ.TennisStringId != oldTennisStringId))
+                {
+                    // Restore stock to the old string
+                    var oldProduct = await db.Products
+                        .FirstOrDefaultAsync(x =>
+                            x.ProductId == oldTennisStringId
+                            && x.TenantId == user.TenantId);
+
+                    if (oldProduct is not null)
+                    {
+                        oldProduct.ProductStockAmount += 1;
+                        oldProduct.LastModified = DateTime.UtcNow;
+                    }
+                }
+
+                if (updatedSJ.IsStoreOwned &&
+                    (!oldIsStoreOwned || updatedSJ.TennisStringId != oldTennisStringId))
+                {
+                    // Deduct stock from the new string
+                    var newProduct = await db.Products
+                        .FirstOrDefaultAsync(x =>
+                            x.ProductId == updatedSJ.TennisStringId
+                            && x.TenantId == user.TenantId);
+
+                    if (newProduct is null) return Results.NotFound("Could not locate inventory entry");
+
+                    if ((newProduct.ProductStockAmount - 1) < 0)
+                        return Results.BadRequest($"Insufficient stock of id #{newProduct.ProductId} to execute sale.");
+
+                    newProduct.ProductStockAmount -= 1;
+                    newProduct.LastModified = DateTime.UtcNow;
+                }
+
+                // Keep the linked transaction's value in sync with any price edit
+                var existingTransaction = await db.Transactions
+                    .FirstOrDefaultAsync(t =>
+                        t.OrderId == sj.OrderId
+                        && t.TransactionCategory == TransactionCategory.Stringjob
+                        && t.TenantId == user.TenantId);
+
+                if (existingTransaction is not null)
+                {
+                    existingTransaction.TransactionValue = updatedSJ.OrderPrice;
+                    existingTransaction.LastModified = DateTime.UtcNow;
+                    existingTransaction.Description = "Origin: API stringjob post transaction. EDITED.";
+                }
+
+                // Keep customer's lifetime spend in sync with the price delta
+                var existingCustomer = await db.Customers
+                    .FirstOrDefaultAsync(x =>
+                        x.CustomerId == sj.CustomerId
+                        && x.TenantId == user.TenantId);
+
+                if (existingCustomer is not null)
+                {
+                    existingCustomer.TotalSpent += (updatedSJ.OrderPrice - oldOrderPrice);
+                    existingCustomer.LastModified = DateTime.UtcNow;
+                }
+
+                await db.SaveChangesAsync();
+                await dbTransaction.CommitAsync();
+
+                return Results.Ok("Successfully updated sale entry");
             }
-
-            await db.SaveChangesAsync();
-
-            return Results.Ok("Successfully updated sale entry");
+            catch
+            {
+                await dbTransaction.RollbackAsync();
+                throw;
+            } 
         }
     }
 }
