@@ -61,7 +61,7 @@ type ExistingStringJob = {
     isDeleted?: boolean;
 }
 
-const STATUS_OPTIONS = ["Collected", "InProgress", "Completed", "Cancelled", "Delivered"];
+const STATUS_OPTIONS = ["Collected", "In Progress", "Completed", "Cancelled", "Delivered"];
 
 // Formats an ISO date string into yyyy-MM-dd for a native date input
 function toDateInputValue(iso: string | null): string {
@@ -289,7 +289,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             crossTension: crossTension,
             expectedAt: expectedAtIso,
             isStoreOwned: isStoreOwned,
-            status: status,
+            status: status.split(' ').join(''),
             orderPrice: selectedString.price + laborCost,
             completedAt: completedAt
         };
