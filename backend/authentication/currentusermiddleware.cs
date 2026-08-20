@@ -21,12 +21,6 @@ namespace TennisCrmApi.Authentication
             AppDbContext db
         )
         {
-
-            foreach(var claim in ctx.User.Claims)
-            {
-                Console.Write($"{claim.Type} = {claim.Value}");
-            }
-
             if(ctx.User.Identity?.IsAuthenticated == true)
             {
                 var clerkId = ctx.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
