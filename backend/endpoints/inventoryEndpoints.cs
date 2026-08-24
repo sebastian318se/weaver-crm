@@ -109,12 +109,13 @@ namespace TennisCrmApiEndpoints
             if(user == null)
                 return Results.Unauthorized();
                 
+            var normalizedQuery = query.ToLower();
             var items = await db.Products
                 .Where(x => !x.IsDeleted)
                 .Where(x =>
-                    x.ProductName.Contains(query) ||
-                    x.ProductBrand.Contains(query) ||
-                    x.ProductModel != null && x.ProductModel.Contains(query)
+                    x.ProductName.ToLower().Contains(normalizedQuery) ||
+                    x.ProductBrand.ToLower().Contains(normalizedQuery) ||
+                    x.ProductModel != null && x.ProductModel.ToLower().Contains(normalizedQuery)
                 ).Where(x => x.TenantId == user.TenantId)
                 .ToListAsync();
 
@@ -124,15 +125,21 @@ namespace TennisCrmApiEndpoints
         }
 
         // Get rackets on query match 
-        public static async Task<IResult> GetRacketByQuery(AppDbContext db, string query)
+        public static async Task<IResult> GetRacketByQuery(AppDbContext db, CurrentUserService currentUser, string query)
         {
+            var user = currentUser.User;
+            if(user == null)
+                return Results.Unauthorized();
+
+            var normalizedQuery = query.ToLower();
             var rackets = await db.Products
                 .OfType<Racket>()
                 .Where(x => !x.IsDeleted)
                 .Where(x =>
-                    x.ProductName.Contains(query) ||
-                    x.ProductBrand.Contains(query) ||
-                    x.ProductModel != null && x.ProductModel.Contains(query))
+                    x.ProductName.ToLower().Contains(normalizedQuery) ||
+                    x.ProductBrand.ToLower().Contains(normalizedQuery) ||
+                    x.ProductModel != null && x.ProductModel.ToLower().Contains(normalizedQuery))
+                .Where(x => x.TenantId == user.TenantId)
                 .ToListAsync();
                 
             Console.Write(query);
@@ -149,13 +156,14 @@ namespace TennisCrmApiEndpoints
             if(user == null)
                 return Results.Unauthorized();
 
+            var normalizedQuery = query.ToLower();
             var strings = await db.Products
                 .OfType<TennisString>()
                 .Where(x => !x.IsDeleted)
                 .Where(x =>
-                    x.ProductName.Contains(query) ||
-                    x.ProductBrand.Contains(query) ||
-                    x.ProductModel != null && x.ProductModel.Contains(query))
+                    x.ProductName.ToLower().Contains(normalizedQuery) ||
+                    x.ProductBrand.ToLower().Contains(normalizedQuery) ||
+                    x.ProductModel != null && x.ProductModel.ToLower().Contains(normalizedQuery))
                 .Where(x => x.TenantId == user.TenantId)
                 .ToListAsync();
 

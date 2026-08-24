@@ -82,12 +82,13 @@ namespace TennisCrmApiEndpoints
             if(user == null)
                 return Results.Unauthorized();
 
+            var normalizedQuery = query.ToLower();
             var sales = await db.Sales
                 .Where(x => x.TenantId == user.TenantId)
                 .Where(s =>
-                    s.Customer != null && s.Customer.CustomerName.Contains(query) ||
-                    s.SaleItems.Any(si => (si.Product != null && si.Product.ProductName.Contains(query))) ||
-                    s.SaleItems.Any(si => (si.Product != null && si.Product.ProductBrand.Contains(query))))
+                    s.Customer != null && s.Customer.CustomerName.ToLower().Contains(normalizedQuery) ||
+                    s.SaleItems.Any(si => (si.Product != null && si.Product.ProductName.ToLower().Contains(normalizedQuery))) ||
+                    s.SaleItems.Any(si => (si.Product != null && si.Product.ProductBrand.ToLower().Contains(normalizedQuery))))
                 .Include(s => s.Customer)
                 .Include(s => s.SaleItems)
                     .ThenInclude(i => i.Product)

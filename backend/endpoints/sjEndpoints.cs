@@ -89,12 +89,13 @@ namespace TennisCrmApiEndpoints
             if(user == null)
                 return Results.Unauthorized();
 
+            var normalizedQuery = query.ToLower();
             var sj = await db.StringJobs
                 .Where(x => x.TenantId == user.TenantId)
                 .Where(s =>
-                    (s.Customer != null && s.Customer.CustomerName.Contains(query)) ||
-                    (s.TennisString != null && s.TennisString.ProductName.Contains(query)) ||
-                    (s.Racket != null && s.Racket.ProductName.Contains(query)))
+                    (s.Customer != null && s.Customer.CustomerName.ToLower().Contains(normalizedQuery)) ||
+                    (s.TennisString != null && s.TennisString.ProductName.ToLower().Contains(normalizedQuery)) ||
+                    (s.Racket != null && s.Racket.ProductName.ToLower().Contains(normalizedQuery)))
                 .Include(s => s.Customer)
                 .Include(s => s.Racket)
                 .Include(s => s.TennisString)

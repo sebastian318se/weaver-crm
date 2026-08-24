@@ -106,13 +106,14 @@ namespace TennisCrmApiEndpoints
             if(user == null) 
                 return Results.Unauthorized();
 
+            var normalizedQuery = query.ToLower();
             var customer = await db.Customers
                 .Where(c => 
                     !c.IsDeleted
                     && c.TenantId == user.TenantId)
                 .Where(c =>
-                    c.CustomerName.Contains(query) ||
-                    c.CustomerEmail != null && c.CustomerEmail.Contains(query) ||
+                    c.CustomerName.ToLower().Contains(normalizedQuery) ||
+                    c.CustomerEmail != null && c.CustomerEmail.ToLower().Contains(normalizedQuery) ||
                     c.CustomerPhone != null && c.CustomerPhone.Contains(query))
                 .Select(c => new CustomerDTO(
                     c.CustomerId,
