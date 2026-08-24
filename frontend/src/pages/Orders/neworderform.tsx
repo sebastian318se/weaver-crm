@@ -293,7 +293,14 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             isStoreOwned: isStoreOwned,
             status: status.split(' ').join(''),
             orderPrice: selectedString.price + laborCost,
-            completedAt: completedAt
+            completedAt: completedAt,
+            
+            // Only set created at if provided (not null)
+            // Backend defaults to DateTime.UtcNow if empty
+            // Also set proper iso format for a very happy backend.
+            ...(createdAt !== null && {
+                createdAt: new Date(createdAt).toISOString()
+            })
         };
 
         const url = isEditing
@@ -461,7 +468,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
 
                     <div className= "forminputs">
                         <div className="forminput">
-                            <span>String Job Creation Date:</span>
+                            <span>String Job Creation Date (Default to Current Time):</span>
                             <input
                                 type="datetime-local"
                                 value={createdAt ?? ""}
