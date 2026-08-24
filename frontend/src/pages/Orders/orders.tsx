@@ -304,7 +304,7 @@ export default function Orders() {
                         <button
                             className={activeTab === "orderstab" ? "tabactive" : "tab"}
                             onClick={() => setActiveTab("orderstab")}>
-                                Orders
+                                String Jobs
                         </button>
 
                         <button 
