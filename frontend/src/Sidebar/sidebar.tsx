@@ -30,11 +30,12 @@ export default function Sidebar() {
             // path: "/invoices",
             // icon: FileText
         // },
+        // {
+        //     name: "Settings",
+        //     path: "/settings",
+        //     icon: Settings
+        // },
         {
-            name: "Settings",
-            path: "/settings",
-            icon: Settings
-        }, {
             name: "Support",
             path: "support",
             icon: Info
