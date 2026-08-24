@@ -97,6 +97,8 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
     const [laborCost, setLaborCost] = useState<number>(0);
     const [isStoreOwned, setIsStoreOwned] = useState<boolean>(true);
     const [status, setStatus] = useState<string>("Collected");
+    
+    const [createdAt, setCreatedAt] = useState<string | null>(null);
 
     // Normalize names and id's
     const customerEntries = customers.map(customer => ({
@@ -327,6 +329,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
         setRacketSearch(""); setRackets([]); setSelectedRacket(null);
         setStringSearch(""); setStrings([]); setSelectedString(null);
         setCustomerSearch(""); setCustomers([]); setSelectedCustomer(null);
+        setCreatedAt(null);
     }
 
     return (
@@ -393,21 +396,19 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
                         </div>
                     </div>
 
-                    {isEditing && (
-                        <div className="forminputs">
-                            <div className="forminput">
-                                <span>Status:</span>
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                >
-                                    {STATUS_OPTIONS.map(opt => (
-                                        <option key={opt} value={opt}>{opt}</option>
-                                    ))}
-                                </select>
-                            </div>
+                    <div className="forminputs">
+                        <div className="forminput">
+                            <span>Status:</span>
+                            <select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                {STATUS_OPTIONS.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
                         </div>
-                    )}
+                    </div>
 
                     <div className="forminputs">
                         <div className="forminput">
@@ -455,6 +456,17 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
                                     />
                                 </>
                             )}
+                        </div>
+                    </div>
+
+                    <div className= "forminputs">
+                        <div className="forminput">
+                            <span>String Job Creation Date:</span>
+                            <input
+                                type="datetime-local"
+                                value={createdAt ?? ""}
+                                onChange={(e) => setCreatedAt(e.target.value)}    
+                            />
                         </div>
                     </div>
 
