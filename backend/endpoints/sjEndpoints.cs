@@ -252,7 +252,7 @@ namespace TennisCrmApiEndpoints
                     newProduct.LastModified = DateTime.UtcNow;
                 }
 
-                // Keep the linked transaction's value in sync with any price edit
+                // Keep the linked transaction's value and deleted-state in sync
                 var existingTransaction = await db.Transactions
                     .FirstOrDefaultAsync(t =>
                         t.OrderId == sj.OrderId
@@ -262,6 +262,7 @@ namespace TennisCrmApiEndpoints
                 if (existingTransaction is not null)
                 {
                     existingTransaction.TransactionValue = updatedSJ.OrderPrice;
+                    existingTransaction.IsDeleted = updatedSJ.IsDeleted;
                     existingTransaction.LastModified = DateTime.UtcNow;
                     existingTransaction.Description = "Origin: API stringjob post transaction. EDITED.";
                 }
@@ -277,7 +278,7 @@ namespace TennisCrmApiEndpoints
                 {
                     if (!oldIsDeleted && updatedSJ.IsDeleted)
                     {
-                        // Just deleted, strip out the value it was previously contributing
+                        // Just got deleted: strip out the value it was previously contributing
                         existingCustomer.TotalSpent -= oldOrderPrice;
                     }
                     else

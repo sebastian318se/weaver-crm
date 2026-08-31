@@ -309,6 +309,7 @@ namespace TennisCrmApiEndpoints
                     existingSale.SaleItems.Add(item);
                 }
 
+                // Keep the linked transaction's value and deleted-state in sync
                 var existingTransaction = await db.Transactions
                     .FirstOrDefaultAsync(t =>
                         t.OrderId == existingSale.OrderId
@@ -318,6 +319,7 @@ namespace TennisCrmApiEndpoints
                 if (existingTransaction is not null)
                 {
                     existingTransaction.TransactionValue = total;
+                    existingTransaction.IsDeleted = updatedSale.IsDeleted;
                     existingTransaction.LastModified = DateTime.UtcNow;
                 }
 
