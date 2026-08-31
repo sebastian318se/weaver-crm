@@ -229,6 +229,7 @@ namespace TennisCrmApiEndpoints
                     return Results.BadRequest("No items provided.");
 
                 var oldOrderPrice = existingSale.OrderPrice;
+                var oldIsDeleted = existingSale.IsDeleted;
 
                 // Snapshot old quantities per product so we can diff against the new items
                 var oldQuantities = existingSale.SaleItems
@@ -320,7 +321,8 @@ namespace TennisCrmApiEndpoints
                     existingTransaction.LastModified = DateTime.UtcNow;
                 }
 
-                // Keep customer's lifetime spend in sync with the price delta
+                // Keep customer's lifetime spend in sync with the price delta,
+                // or remove the order's value entirely if it was just soft-deleted
                 var existingCustomer = await db.Customers
                     .FirstOrDefaultAsync(x =>
                         x.CustomerId == existingSale.CustomerId
@@ -328,7 +330,16 @@ namespace TennisCrmApiEndpoints
 
                 if (existingCustomer is not null)
                 {
-                    existingCustomer.TotalSpent += (total - oldOrderPrice);
+                    if (!oldIsDeleted && updatedSale.IsDeleted)
+                    {
+                        // Just got deleted: strip out the value it was previously contributing
+                        existingCustomer.TotalSpent -= oldOrderPrice;
+                    }
+                    else
+                    {
+                        existingCustomer.TotalSpent += (total - oldOrderPrice);
+                    }
+
                     existingCustomer.LastModified = DateTime.UtcNow;
                 }
 

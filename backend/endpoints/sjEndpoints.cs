@@ -198,6 +198,7 @@ namespace TennisCrmApiEndpoints
                 var oldOrderPrice = sj.OrderPrice;
                 var oldIsStoreOwned = sj.IsStoreOwned;
                 var oldTennisStringId = sj.TennisStringId;
+                var oldIsDeleted = sj.IsDeleted;
 
                 db.Entry(sj).CurrentValues.SetValues(new
                 {
@@ -265,7 +266,8 @@ namespace TennisCrmApiEndpoints
                     existingTransaction.Description = "Origin: API stringjob post transaction. EDITED.";
                 }
 
-                // Keep customer's lifetime spend in sync with the price delta
+                // Keep customer's lifetime spend in sync with the price delta,
+                // or remove the order's value entirely if it was just soft-deleted
                 var existingCustomer = await db.Customers
                     .FirstOrDefaultAsync(x =>
                         x.CustomerId == sj.CustomerId
@@ -273,7 +275,16 @@ namespace TennisCrmApiEndpoints
 
                 if (existingCustomer is not null)
                 {
-                    existingCustomer.TotalSpent += (updatedSJ.OrderPrice - oldOrderPrice);
+                    if (!oldIsDeleted && updatedSJ.IsDeleted)
+                    {
+                        // Just deleted, strip out the value it was previously contributing
+                        existingCustomer.TotalSpent -= oldOrderPrice;
+                    }
+                    else
+                    {
+                        existingCustomer.TotalSpent += (updatedSJ.OrderPrice - oldOrderPrice);
+                    }
+
                     existingCustomer.LastModified = DateTime.UtcNow;
                 }
 
