@@ -67,7 +67,7 @@ namespace TennisCrmApi
     {
         Collected,
         InProgress,
-        Completed,
+        Paid,
         Cancelled,
         Delivered
     }
