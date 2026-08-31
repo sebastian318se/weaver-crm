@@ -249,7 +249,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
                 const uniqueStringEntries = data.filter(
                     (string, index, self) =>
                         index === self.findIndex(
-                            s => s.productid === string.productId
+                            s => s.productId === string.productId
                     )
                 );
 
