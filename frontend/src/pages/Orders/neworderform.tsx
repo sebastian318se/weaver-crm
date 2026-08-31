@@ -217,7 +217,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
                 const uniqueRacketEntries = data.filter(
                     (racket, index, self) =>
                         index === self.findIndex(
-                            r => r.racketId === racket.racketId
+                            r => r.productId === racket.productId
                     )
                 );
 
@@ -249,7 +249,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
                 const uniqueStringEntries = data.filter(
                     (string, index, self) =>
                         index === self.findIndex(
-                            s => s.tennisStringId === string.tennisStringId
+                            s => s.productid === string.productId
                     )
                 );
 
