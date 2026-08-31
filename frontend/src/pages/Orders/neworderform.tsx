@@ -140,9 +140,12 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             setExpectedDate(toDateInputValue(existingJob.expectedAt));
 
             // Recover the labor cost portion from the stored order price
-            const stringPrice = existingJob.tennisString?.productPrice ?? 0;
-            setLaborCost(Math.max(0, existingJob.orderPrice - stringPrice));
+            const stringPrice = existingJob.isStoreOwned
+                ? (existingJob.tennisString?.productPrice ?? 0)
+                : 0;
 
+            setLaborCost(Math.max(0, existingJob.orderPrice - stringPrice));
+            
             setIsStoreOwned(existingJob.isStoreOwned);
             setStatus(existingJob.status);
         } else {
@@ -292,7 +295,9 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
             expectedAt: expectedAtIso,
             isStoreOwned: isStoreOwned,
             status: status.split(' ').join(''),
-            orderPrice: selectedString.price + laborCost,
+            orderPrice: isStoreOwned
+                ? selectedString.price + laborCost
+                : laborCost,
             completedAt: completedAt,
             
             // Only set created at if provided (not null)
