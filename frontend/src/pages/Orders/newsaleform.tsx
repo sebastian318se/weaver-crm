@@ -249,8 +249,6 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                 ...createdAtData
             };
 
-        console.log(sale);
-
         const response = await fetch(url, {
             method: isEditing ? "PUT" : "POST",
             headers: {
@@ -260,9 +258,13 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
             body: JSON.stringify(sale)
         });
 
-        if (response.ok) {
-            console.log(isEditing ? "Sale updated." : "Sale added to db.");
-            console.log(response);
+        if (!response.ok) {
+            alert(
+                isEditing
+                    ? "Failed to update sale. Please try again."
+                    : "Failed to create sale. Please try again."
+            );
+            return;
         }
 
         onSaleCreated();
@@ -319,7 +321,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                 />
                         </div>
                         <div className="saleforminput">
-                            <span>Order Creation Date (Default to Current Time):</span>
+                            <span>Sale Creation Date (Default to Current Time):</span>
                             <input
                                 type="datetime-local"
                                 value={createdAtInput ?? ""}
