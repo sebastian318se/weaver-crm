@@ -282,7 +282,7 @@ export default function NewSjBox({action, onSjCreated, existingJob}: sjBoxProps)
         // Only flips CompletedAt to "now" the moment status becomes Completed;
         // otherwise carries forward whatever it already was
         const completedAt = isEditing
-            ? (status === "Completed"
+            ? (status === "Paid"
                 ? (existingJob!.completedAt ?? new Date().toISOString())
                 : existingJob!.completedAt)
             : null;
