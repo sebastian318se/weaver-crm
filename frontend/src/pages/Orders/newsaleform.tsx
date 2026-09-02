@@ -76,6 +76,8 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
     
     const [finalProducts, setFinalProducts] = useState<ProductProps[]>([]);
 
+    const [createdAtInput, setCreatedAtInput] = useState<string | null>(null);
+
     // Normalize names and id's
     const customerEntries = customers.map(customer => ({
         id: customer.customerId,
@@ -218,10 +220,15 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         const saleItems = finalProducts.map(finalProduct => 
             ({productId: finalProduct.productId, 
             productQuantity: finalProduct.quantity}));
-
+        
         const orderPrice = finalProducts.reduce(
             (total, product) => 
                 total + product.price * product.quantity, 0);
+
+        const createdAt = {
+            ...(createdAtInput !== null && {
+                createdAtInput: new Date(createdAtInput).toISOString()})
+            };
 
         const url = isEditing
             ? `https://weavercrm.com/api/sales/${existingSale!.orderId}`
@@ -232,12 +239,14 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                 ...existingSale,
                 orderPrice: orderPrice,
                 saleItems: saleItems,
-                isDeleted: existingSale!.isDeleted ?? false
+                isDeleted: existingSale!.isDeleted ?? false,
+                ...createdAt
             }
             : {
                 customerId: selectedCustomer.id,
                 saleItems: saleItems,
-                orderPrice: orderPrice
+                orderPrice: orderPrice,
+                ...createdAt
             };
 
         console.log(sale);
@@ -262,6 +271,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         setProductSearch(""); setProducts([]); setSelectedProduct(null);
         setFinalProducts([]);
         setCustomerSearch(""); setCustomers([]); setSelectedCustomer(null);
+        setCreatedAtInput(null);
     }
 
     return (
@@ -307,6 +317,14 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                     count={productCount}
                                     setCount={setProductCount}
                                 />
+                        </div>
+                        <div className="saleforminput">
+                            <span>Order Creation Date (Default to Current Time):</span>
+                            <input
+                                type="datetime-local"
+                                value={createdAtInput ?? ""}
+                                onChange={(e) => setCreatedAtInput(e.target.value)}    
+                            />
                         </div>
                     </div>
                   
