@@ -1,5 +1,9 @@
 import { DollarSign, TrendingUp, TrendingDown, ChartColumnIncreasing } from "lucide-react";
+import NewExpenseForm from "./newOperationalCostForm";
+import { useState, useEffect, useMemo } from "react";
 import InfoBox from "../../components/infobox";
+import { useAuth } from "@clerk/clerk-react";
+import "./expenses.css";
 import {
     BarChart,
     Bar,
@@ -10,10 +14,6 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-import { useState, useEffect, useMemo } from "react";
-import "./expenses.css";
-import NewExpenseForm from "./newOperationalCostForm";
-import { useAuth } from "@clerk/clerk-react";
 
 interface Transaction {
     transactionId: number;
@@ -70,7 +70,7 @@ function buildBuckets(period: TimePeriod) {
         for (let i = 0; i < 5; i++) {
             buckets.push({
                 key: current.getTime(),
-                label: current.toLocaleDateString("en-GB", {
+                label: current.toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                 }),
@@ -89,7 +89,7 @@ function buildBuckets(period: TimePeriod) {
         for (let i = 0; i < 5; i++) {
             buckets.push({
                 key: current.getTime(),
-                label: current.toLocaleDateString("en-GB", {
+                label: current.toLocaleDateString("en-US", {
                     month: "short",
                     year: "2-digit",
                 }),
