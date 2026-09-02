@@ -61,7 +61,7 @@ type ExistingStringJob = {
     isDeleted?: boolean;
 }
 
-const STATUS_OPTIONS = ["Collected", "In Progress", "Completed", "Cancelled", "Delivered"];
+const STATUS_OPTIONS = ["Collected", "In Progress", "Paid", "Cancelled", "Delivered"];
 
 // Formats an ISO date string into yyyy-MM-dd for a native date input
 function toDateInputValue(iso: string | null): string {
