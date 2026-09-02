@@ -225,9 +225,9 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
             (total, product) => 
                 total + product.price * product.quantity, 0);
 
-        const createdAt = {
+        const createdAtData = {
             ...(createdAtInput !== null && {
-                createdAtInput: new Date(createdAtInput).toISOString()})
+                createdAt: new Date(createdAtInput).toISOString()})
             };
 
         const url = isEditing
@@ -240,13 +240,13 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                 orderPrice: orderPrice,
                 saleItems: saleItems,
                 isDeleted: existingSale!.isDeleted ?? false,
-                ...createdAt
+                ...createdAtData
             }
             : {
                 customerId: selectedCustomer.id,
                 saleItems: saleItems,
                 orderPrice: orderPrice,
-                ...createdAt
+                ...createdAtData
             };
 
         console.log(sale);
