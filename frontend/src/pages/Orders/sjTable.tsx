@@ -100,12 +100,12 @@ export default function SjTable({
 
                 <div className="date">
                     <Calendar size={18}/>
-                    <span>Order date: {expectedAt ? new Date(createdAt).toLocaleDateString("en-GB") : ""}</span>
+                    <span>Order date: {expectedAt ? new Date(createdAt).toLocaleDateString("en-US") : ""}</span>
                 </div>
 
                 <div className="date">
                     <Check size={18}/>
-                    <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("pt-BR") : ""}</span>
+                    <span>Expected at: {expectedAt ? new Date(expectedAt).toLocaleDateString("en-US") : ""}</span>
                 </div>
             </div>
 

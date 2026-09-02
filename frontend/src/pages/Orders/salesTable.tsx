@@ -64,7 +64,7 @@ export default function SalesTable({saleItems, customer, orderPrice, createdAt, 
 
                 <div className="date">
                     <Calendar size={15}/>
-                    <span className="date"> {new Date(createdAt).toLocaleDateString("pt-BR")}</span>
+                    <span className="date"> {new Date(createdAt).toLocaleDateString("en-US")}</span>
                 </div>
             </div>
 

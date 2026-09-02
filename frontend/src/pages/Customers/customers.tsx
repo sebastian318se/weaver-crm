@@ -113,8 +113,8 @@ export default function Customers() {
     }, []);
 
     const formatDate = (dateString: string) => {
-        return new Intl.DateTimeFormat("pt-BR", {
-            timeZone: "America/Sao_Paulo"
+        return new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/New_York"
         }).format(new Date(dateString));
     };
 
