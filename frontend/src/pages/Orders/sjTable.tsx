@@ -62,6 +62,11 @@ export default function SjTable({
                 : `${mainTension} × ${crossTension}`;
     // Only diplay both tensions when they are different
 
+    const displayStatus = status === "InProgress"
+        ? "In Progress"
+        : status;
+
+
     const handleRowClick = () => {
         setShowActions(prev => !prev);
     };
@@ -87,7 +92,7 @@ export default function SjTable({
             </div>
 
             <div className="status">
-                <span className={status.replaceAll(" ", "")}>{status}</span>
+                <span className={status.replaceAll(" ", "")}>{displayStatus}</span>
             </div>
 
             <div className="middleSection">
