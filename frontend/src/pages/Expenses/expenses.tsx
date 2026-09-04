@@ -26,6 +26,33 @@ interface Transaction {
     customerId: number | null;
 }
 
+interface SaleItem {
+    productPrice: number;
+    productQuantity: number;
+    product: {
+        productType: string;
+    };
+}
+
+interface Sale {
+    orderId: number;
+    createdAt: string;
+    orderPrice: number;
+    saleItems: SaleItem[];
+    customer: {
+        customerId: number;
+    };
+    isDeleted: boolean;
+}
+
+interface StringJob {
+    orderId: number;
+    createdAt: string;
+    orderPrice: number;
+    isDeleted: boolean;
+}
+// -----------------------------------------------------
+
 interface ChartDataPoint {
     period: string;
     revenue: number;
@@ -162,6 +189,8 @@ function aggregateTransactions(
 export default function Expenses() {
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [sales, setSales] = useState<Sale[]>([]);
+    const [stringJobs, setStringJobs] = useState<StringJob[]>([]);
     const [timePeriod, setTimePeriod] = useState<TimePeriod>("weeks");
     const [loading, setLoading] = useState(true);
 
@@ -177,15 +206,33 @@ export default function Expenses() {
 
             setLoading(true);
 
-            const response = await fetch("https://weavercrm.com/api/transactions", {
-                headers:{
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const [transactionsRes, salesRes, stringJobsRes] = await Promise.all([
+                fetch("https://weavercrm.com/api/transactions", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }),
+                fetch("https://weavercrm.com/api/sales", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }),
+                fetch("https://weavercrm.com/api/strung", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }),
+            ]);
 
-            const data: Transaction[] = await response.json();
+            const [transactionsData, salesData, stringJobsData] = await Promise.all([
+                transactionsRes.json(),
+                salesRes.json(),
+                stringJobsRes.json(),
+            ]);
 
-            setTransactions(data);
+            setTransactions(transactionsData);
+            setSales(salesData);
+            setStringJobs(stringJobsData);
 
         } catch (err) {
 
@@ -226,15 +273,30 @@ export default function Expenses() {
         });
 
     }, [transactions]);
-        const monthlyRevenue = useMemo(() => {
-        return currentMonthTransactions
-            .filter(
-                (t) =>
-                    t.transactionCategory === "Sale" ||
-                    t.transactionCategory === "Stringjob"
-            )
-            .reduce((sum, t) => sum + t.transactionValue, 0);
-    }, [currentMonthTransactions]);
+
+    const monthlyRevenue = useMemo(() => {
+        const start = new Date();
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+
+        const salesRevenue = sales
+            .filter(s => !s.isDeleted && new Date(s.createdAt) >= start)
+            .reduce(
+                (sum, sale) =>
+                    sum +
+                    sale.saleItems.reduce(
+                        (itemSum, item) => itemSum + item.productPrice * item.productQuantity,
+                        0
+                    ),
+                0
+            );
+
+        const stringRevenue = stringJobs
+            .filter(sj => !sj.isDeleted && new Date(sj.createdAt) >= start)
+            .reduce((sum, sj) => sum + sj.orderPrice, 0);
+
+        return salesRevenue + stringRevenue;
+    }, [sales, stringJobs]);
 
     const monthlyExpenses = useMemo(() => {
         return currentMonthTransactions
