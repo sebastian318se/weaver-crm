@@ -72,25 +72,6 @@ export default function LandingPage() {
                 <h2 className="landingLogo">
                     Weaver CRM
                 </h2>
-
-                <nav>
-
-                    <div className="landingHeaderActions">
-                        <NavLink
-                            className="landingHeaderSecondaryButton"
-                            to="/login">
-                                <span>Sign In</span>
-                        </NavLink>
-
-                        <NavLink 
-                            className="landingHeaderPrimaryButton"
-                            to="/login">
-                                <span>Get Started</span>
-                        </NavLink>
-                    </div>
-
-                </nav>
-
                 
             </header>
 
@@ -128,7 +109,7 @@ export default function LandingPage() {
                         <NavLink 
                             className="landingPrimaryButton"
                             to="/login">
-                                <span>Start Free Trial</span>
+                                <span>Sign Up</span>
                                 <ArrowRight size={18} />
                         </NavLink>
 
