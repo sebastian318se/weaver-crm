@@ -1,3 +1,5 @@
+import { useAuth } from "@clerk/clerk-react";
+import { Navigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import "./landingpage.css";
 
@@ -43,6 +45,16 @@ function FeatureCard({
 }
 
 export default function LandingPage() {
+
+    const {isLoaded, isSignedIn } = useAuth();
+
+    if (!isLoaded) {
+        return <div className="landingPage">Loading...</div>
+    }
+
+    if (isSignedIn) {
+        return <Navigate to="/dashboard" replace/>
+    }
 
     return (
 

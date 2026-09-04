@@ -7,7 +7,7 @@ export default function LoginPage() {
     const { isLoaded, isSignedIn } = useAuth();
 
         if (!isLoaded) {
-            return <div>Loading...</div>;
+            return <div className="LoginPage">Loading...</div>;
         }
 
         if (isSignedIn) {
