@@ -116,7 +116,7 @@ export default function LandingPage() {
                         <NavLink 
                             className="landingSecondaryButton"
                             to="/login">
-                                <span>Sign In</span>
+                                <span>Log In</span>
                         </NavLink>
 
                     </div> 

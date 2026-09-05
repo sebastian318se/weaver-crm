@@ -25,8 +25,8 @@ body {
     position: absolute;
     inset: 0;
     z-index: 0;
-    /* background-image:
-        url("https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=2400&q=80"); */
+    background-image:
+        url("enhanced_photo-1699117686612-ece525e4f91a.png");
     background-size: cover;
     background-position: center;
     transform: scale(1.08);
@@ -37,22 +37,9 @@ body {
     inset: 0;
     z-index: 1;
     background:
-
-        radial-gradient(
-            circle at 20% 10%,
-            rgba(124,58,237,.45),
-            transparent 35%
-        ),
-
-        radial-gradient(
-            circle at 90% 80%,
-            rgba(146,84,252,.35),
-            transparent 40%
-        ),
-
         linear-gradient(
-            rgba(10,7,18,.72),
-            rgba(10,7,18,.95)
+            rgba(10, 7, 18, 0.3),
+            rgba(10,7,18,0.75)
         );
 }
 
@@ -285,7 +272,7 @@ body {
     padding:36px;
     border-radius:24px;
     background:
-        rgba(20,16,32,.62);
+        rgba(20,16,32,.3);
 
     border:
         1px solid rgba(124,58,237,.10);
