@@ -140,7 +140,7 @@ namespace TennisCrmApiEndpoints
                     CustomerId = newSale.CustomerId,
                     OrderPrice = newSale.OrderPrice,
                     Status = newSale.Status,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = newSale.CreatedAt,
                     IsDeleted = false,
                     SaleItems = new List<OrderItems>()
                 };
