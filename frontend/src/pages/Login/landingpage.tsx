@@ -60,8 +60,6 @@ export default function LandingPage() {
 
         <main className="landingPage">
 
-            {/* Background Layers */}
-
             <div className="landingBackground" />
             <div className="landingOverlay" />
 
@@ -74,8 +72,6 @@ export default function LandingPage() {
                 </h2>
                 
             </header>
-
-            {/* Hero */}
 
             <section className="landingHero">
 
