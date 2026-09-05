@@ -185,7 +185,7 @@ export default function LandingPage() {
                     <p className="landingSectionSubtitle">
 
                         Stop bouncing between spreadsheets,
-                        messaging apps, payment tools and sticky notes.
+                        payment tools and sticky notes.
                         Run your entire tennis business from one platform.
 
                     </p>
