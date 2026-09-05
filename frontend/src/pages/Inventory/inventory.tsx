@@ -190,7 +190,7 @@ export default function Inventory() {
                 new Date(b.lastModified).getTime() -
                 new Date(a.lastModified).getTime()
         )
-        .slice(0, 16);
+        .slice(0, 32);
 
     const handleCloseForm = () => {
         setNewProductForm(false);
