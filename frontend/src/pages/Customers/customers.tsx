@@ -157,7 +157,7 @@ export default function Customers() {
                                 .sort((a, b) => 
                                     new Date(b.lastModified).getTime() - 
                                     new Date(a.lastModified).getTime()) // Sort by date a to be where
-                                .slice(0, 8) // Keep only most recent entries
+                                .slice(0, 16) // Keep only most recent entries
                                 .map(customer => (
 
                                 <CustomerBox

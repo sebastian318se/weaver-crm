@@ -349,7 +349,7 @@ export default function Orders() {
                                                 .sort((a, b) => 
                                                     new Date(b.createdAt).getTime() - 
                                                     new Date(a.createdAt).getTime()) // Sort by date a to be where
-                                                .slice(0, 9) // Keep only most recent entries
+                                                .slice(0, 27) // Keep only most recent entries
                                                 .map((job) => (
 
                                                     <SjTable
@@ -398,7 +398,7 @@ export default function Orders() {
                                                 .sort((a, b) => 
                                                     new Date(b.createdAt).getTime() - 
                                                     new Date(a.createdAt).getTime()) // Sort by date a to be where
-                                                .slice(0, 9) // Keep only most recent entries
+                                                .slice(0, 27) // Keep only most recent entries
                                                 .map((sale) => (
 
                                                     <SalesTable
