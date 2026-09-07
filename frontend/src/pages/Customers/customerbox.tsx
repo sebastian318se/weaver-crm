@@ -8,13 +8,13 @@ type CustomerBoxProps = {
     email: string,
     phone: string,
     totalSpent?: number,
-    racketsstrung?: number,
+    totalDue?: number,
     lastvisit: string,
     onEdit: (customerid: number) => void,
     onDelete: (customerid: number) => void
 };
 
-export default function CustomerBox({customerid, name, email, phone, lastvisit, totalSpent, racketsstrung, onEdit, onDelete} : CustomerBoxProps) {
+export default function CustomerBox({customerid, name, email, phone, lastvisit, totalSpent, totalDue, onEdit, onDelete} : CustomerBoxProps) {
 
     const [showActions, setShowActions] = useState(false);
 
@@ -38,9 +38,9 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
         <div className='customerBox' onClick={handleBoxClick}>
             <div className='upperSection'>
                 <span>{name}</span> 
-                {totalSpent === null ? 
-                (<span className='metric'>$0</span>) : 
-                (<span className='metric'>${totalSpent}</span>)}
+                {totalDue === null ? 
+                (<span className='metric'>Nothing due</span>) : 
+                (<span className='metricDue'>${totalSpent} due</span>)}
             </div>
             <div className='lowerSection'>
                 <div className='lowerLeftSection'>
@@ -55,9 +55,9 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
                     <div className='center'><Calendar size={16}/> <span>Last visit: {lastvisit}</span></div>
                 </div>
                 <div>
-                    {racketsstrung === 1 
-                    ? (<span>1 racket strung</span>)
-                    : (<span>{racketsstrung} rackets strung </span>)}
+                    {totalSpent === null ? 
+                    (<span className='metric'>Total $0 spent</span>) : 
+                    (<span className='metric'>Total ${totalSpent} spent</span>)}
                 </div>
             </div>
 

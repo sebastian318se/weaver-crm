@@ -11,8 +11,12 @@ interface Customer {
     customerPhone: string;
     customerEmail: string;
     lastModified: string;
-    totalSpent?: number;
-    racketsStrung?: number;
+    totalSpent?: number; 
+    // Make availabe in customer by reformulating order Post and Put request
+    // Don't forget to add according migrations
+    // Send into customer box
+
+    // racketsStrung?: number;
 }
 
 export default function Customers() {

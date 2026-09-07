@@ -47,6 +47,11 @@
     flex-shrink: 0;
 }
 
+.metricDue{
+    color: #b91c1c;
+    flex-shrink: 0;
+}
+
 .lowerSection{
     justify-content: space-between;
     
