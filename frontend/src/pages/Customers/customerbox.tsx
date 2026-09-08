@@ -38,9 +38,9 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
         <div className='customerBox' onClick={handleBoxClick}>
             <div className='upperSection'>
                 <span>{name}</span> 
-                {totalDue === null ? 
-                (<span className='metric'>Nothing due</span>) : 
-                (<span className='metricDue'>${totalDue} due</span>)}
+                {totalDue === 0 
+                ? (<span className='metric'>Nothing due</span>)
+                : (<span className='metricDue'>${totalDue} due</span>)}
             </div>
             <div className='lowerSection'>
                 <div className='lowerLeftSection'>
@@ -56,8 +56,8 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
                 </div>
                 <div>
                     {totalSpent === null ? 
-                    (<span className='metric'>Total $0 spent</span>) : 
-                    (<span className='metric'>Total ${totalSpent} spent</span>)}
+                    (<span className='metric'>Nothing spent</span>) : 
+                    (<span className='metric'>Total spent ${totalSpent}</span>)}
                 </div>
             </div>
 
