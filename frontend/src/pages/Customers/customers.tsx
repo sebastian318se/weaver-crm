@@ -12,7 +12,7 @@ interface Customer {
     customerEmail: string;
     lastModified: string;
     totalSpent?: number; 
-    totalDue?: number;
+    totalDue: number;
 
     // Send prop into customer box
     racketsStrung?: number;

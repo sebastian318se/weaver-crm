@@ -39,7 +39,8 @@ namespace TennisCrmApiEndpoints
                     c.CustomerPhone,
                     c.LastModified,
                     c.RacketsStrung,
-                    c.TotalSpent))
+                    c.TotalSpent,
+                    c.TotalDue))
                 .ToListAsync();
 
             return Results.Ok(customers);
@@ -62,7 +63,8 @@ namespace TennisCrmApiEndpoints
                     c.CustomerPhone,
                     c.LastModified,
                     c.RacketsStrung,
-                    c.TotalSpent))
+                    c.TotalSpent,
+                    c.TotalDue))
                 .FirstOrDefaultAsync(x => x.CustomerId == id);
 
             return customer is not null
@@ -87,7 +89,8 @@ namespace TennisCrmApiEndpoints
                     c.CustomerPhone,
                     c.LastModified,
                     c.RacketsStrung,
-                    c.TotalSpent))
+                    c.TotalSpent,
+                    c.TotalDue))
                 .ToListAsync();
 
             return Results.Ok(customer);
@@ -122,7 +125,8 @@ namespace TennisCrmApiEndpoints
                     c.CustomerPhone,
                     c.LastModified,
                     c.RacketsStrung,
-                    c.TotalSpent))
+                    c.TotalSpent,
+                    c.TotalDue))
                 .ToListAsync();
 
             return Results.Ok(customer);
@@ -157,7 +161,8 @@ namespace TennisCrmApiEndpoints
                     newCustomer.CustomerPhone,
                     newCustomer.LastModified,
                     newCustomer.RacketsStrung,
-                    newCustomer.TotalSpent
+                    newCustomer.TotalSpent,
+                    newCustomer.TotalDue
             ));
         }
 
