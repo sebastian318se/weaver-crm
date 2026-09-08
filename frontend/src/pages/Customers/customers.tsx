@@ -12,13 +12,10 @@ interface Customer {
     customerEmail: string;
     lastModified: string;
     totalSpent?: number; 
-    // Make availabe in customer by reformulating order Post and Put request
-    // (Status + Order Price should do and shield from price changes in the future)
-    // Handle is deleted!!!!!!!!
-    // Don't forget to add according migrations
-    // Send prop into customer box
+    totalDue?: number;
 
-    // racketsStrung?: number;
+    // Send prop into customer box
+    racketsStrung?: number;
 }
 
 export default function Customers() {
@@ -173,7 +170,7 @@ export default function Customers() {
                                     email={customer.customerEmail}
                                     phone={customer.customerPhone}
                                     totalSpent={customer.totalSpent}
-                                    racketsstrung={customer.racketsStrung}
+                                    totalDue={customer.totalDue}
                                     lastvisit={formatDate(customer.lastModified)}
                                     onEdit={handleEdit}
                                     onDelete={handleDelete}
