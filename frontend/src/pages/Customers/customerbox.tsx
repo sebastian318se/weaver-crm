@@ -8,7 +8,7 @@ type CustomerBoxProps = {
     email: string,
     phone: string,
     totalSpent?: number,
-    totalDue?: number,
+    totalDue: number,
     lastvisit: string,
     onEdit: (customerid: number) => void,
     onDelete: (customerid: number) => void
@@ -34,6 +34,8 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
         onDelete(customerid);
     };
 
+    console.log(totalDue);
+
     return (
         <div className='customerBox' onClick={handleBoxClick}>
             <div className='upperSection'>
@@ -41,7 +43,6 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
                 {totalDue === 0 
                 ? (<span className='metric'>Nothing due</span>)
                 : (<span className='metric'>${totalDue} due</span>)}
-                console.log(totalDue)
             </div>
             <div className='lowerSection'>
                 <div className='lowerLeftSection'>
