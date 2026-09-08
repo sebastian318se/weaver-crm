@@ -162,6 +162,11 @@ namespace TennisCrmApiEndpoints
                 db.Transactions.Add(newTransaction);
 
                 existingCustomer.TotalSpent += newSJ.OrderPrice;
+
+                if (newSJ.Status != OrderStatus.Paid)
+                {
+                    existingCustomer.TotalDue += newSJ.OrderPrice;
+                }                
                 existingCustomer.RacketsStrung += 1;
                 existingCustomer.LastModified = DateTime.UtcNow;
                 
@@ -196,10 +201,11 @@ namespace TennisCrmApiEndpoints
                 if (sj is null) return Results.NotFound("Could not locate sale entry");
 
                 var oldOrderPrice = sj.OrderPrice;
+                var oldStatus = sj.Status;
                 var oldIsStoreOwned = sj.IsStoreOwned;
                 var oldTennisStringId = sj.TennisStringId;
                 var oldIsDeleted = sj.IsDeleted;
-
+                
                 db.Entry(sj).CurrentValues.SetValues(new
                 {
                     updatedSJ.OrderPrice,
@@ -276,18 +282,25 @@ namespace TennisCrmApiEndpoints
 
                 if (existingCustomer is not null)
                 {
-                    if (!oldIsDeleted && updatedSJ.IsDeleted)
-                    {
-                        // Just got deleted: strip out the value it was previously contributing
-                        existingCustomer.TotalSpent -= oldOrderPrice;
-                    }
-                    else
-                    {
-                        existingCustomer.TotalSpent += (updatedSJ.OrderPrice - oldOrderPrice);
-                    }
+                    var oldDue = (!oldIsDeleted && oldStatus != OrderStatus.Paid)
+                        ? oldOrderPrice
+                        : 0;
+
+                    var newDue = (!updatedSJ.IsDeleted && updatedSJ.Status != OrderStatus.Paid)
+                        ? updatedSJ.OrderPrice
+                        : 0;
+
+                    existingCustomer.TotalDue += newDue - oldDue;
+
+                    // TotalSpent is separate
+                    var oldSpent = !oldIsDeleted ? oldOrderPrice : 0;
+                    var newSpent = !updatedSJ.IsDeleted ? updatedSJ.OrderPrice : 0;
+
+                    existingCustomer.TotalSpent += newSpent - oldSpent;
 
                     existingCustomer.LastModified = DateTime.UtcNow;
                 }
+
 
                 await db.SaveChangesAsync();
                 await dbTransaction.CommitAsync();

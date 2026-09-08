@@ -61,7 +61,7 @@ type ExistingStringJob = {
     isDeleted?: boolean;
 }
 
-const STATUS_OPTIONS = ["Collected", "In Progress", "Paid", /*"Cancelled",*/ "Delivered"];
+const STATUS_OPTIONS = ["Collected", "In Progress", "Paid", /*"Cancelled", "Delivered" */];
 
 function toDateInputValue(iso: string | null): string {
     if (!iso) return "";

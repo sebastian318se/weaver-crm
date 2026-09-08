@@ -177,6 +177,12 @@ namespace TennisCrmApiEndpoints
                 }
 
                 existingCustomer.TotalSpent += total;
+
+                if (newSale.Status != OrderStatus.Paid)
+                {
+                    existingCustomer.TotalDue += total;
+                }    
+
                 existingCustomer.LastModified = DateTime.UtcNow;
                 sale.OrderPrice = total;
                 sale.TenantId = user.TenantId;
@@ -230,6 +236,7 @@ namespace TennisCrmApiEndpoints
 
                 var oldOrderPrice = existingSale.OrderPrice;
                 var oldIsDeleted = existingSale.IsDeleted;
+                var oldStatus = existingSale.Status;
 
                 // Snapshot old quantities per product so we can diff against the new items
                 var oldQuantities = existingSale.SaleItems
@@ -332,15 +339,21 @@ namespace TennisCrmApiEndpoints
 
                 if (existingCustomer is not null)
                 {
-                    if (!oldIsDeleted && updatedSale.IsDeleted)
-                    {
-                        // Just got deleted: strip out the value it was previously contributing
-                        existingCustomer.TotalSpent -= oldOrderPrice;
-                    }
-                    else
-                    {
-                        existingCustomer.TotalSpent += (total - oldOrderPrice);
-                    }
+                    var oldDue = (!oldIsDeleted && oldStatus != OrderStatus.Paid)
+                        ? oldOrderPrice
+                        : 0;
+
+                    var newDue = (!updatedSale.IsDeleted && updatedSale.Status != OrderStatus.Paid)
+                        ? total
+                        : 0;
+
+                    existingCustomer.TotalDue += newDue - oldDue;
+
+                    // TotalSpent is separate
+                    var oldSpent = !oldIsDeleted ? oldOrderPrice : 0;
+                    var newSpent = !updatedSale.IsDeleted ? total : 0;
+
+                    existingCustomer.TotalSpent += newSpent - oldSpent;
 
                     existingCustomer.LastModified = DateTime.UtcNow;
                 }

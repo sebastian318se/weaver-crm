@@ -55,6 +55,9 @@ namespace tenniscrm.Migrations
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("TotalDue")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal>("TotalSpent")
                         .HasColumnType("numeric");
 

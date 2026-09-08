@@ -13,8 +13,10 @@ interface Customer {
     lastModified: string;
     totalSpent?: number; 
     // Make availabe in customer by reformulating order Post and Put request
+    // (Status + Order Price should do and shield from price changes in the future)
+    // Handle is deleted!!!!!!!!
     // Don't forget to add according migrations
-    // Send into customer box
+    // Send prop into customer box
 
     // racketsStrung?: number;
 }
