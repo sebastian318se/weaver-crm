@@ -40,7 +40,8 @@ export default function CustomerBox({customerid, name, email, phone, lastvisit, 
                 <span>{name}</span> 
                 {totalDue === 0 
                 ? (<span className='metric'>Nothing due</span>)
-                : (<span className='metricDue'>${totalDue} due</span>)}
+                : (<span className='metric'>${totalDue} due</span>)}
+                console.log(totalDue)
             </div>
             <div className='lowerSection'>
                 <div className='lowerLeftSection'>
