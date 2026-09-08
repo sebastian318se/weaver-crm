@@ -8,6 +8,7 @@ namespace TennisCrmApi
         string? CustomerPhone,
         DateTime LastModified,
         int? RacketsStrung,
-        decimal TotalSpent
+        decimal TotalSpent,
+        decimal TotalDue
     );
 }
