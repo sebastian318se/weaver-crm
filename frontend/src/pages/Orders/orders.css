@@ -97,3 +97,18 @@
     opacity: 1;
     transform: translateY(0);
 }
+
+/* MOBILE */
+@media (max-width: 768px){
+    .salesgrid{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px 20px;
+}
+
+.sjgrid{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 20px 20px;
+}
+}

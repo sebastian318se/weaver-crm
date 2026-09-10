@@ -5,3 +5,13 @@
     margin: 30px;
     gap: 20px;
 }
+
+@media (max-width: 768px){
+    .support{
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+
+    margin: 30px;
+    gap: 20px;
+}
+}
