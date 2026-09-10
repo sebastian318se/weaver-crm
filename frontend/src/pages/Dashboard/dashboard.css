@@ -1,6 +1,6 @@
 .dashboardGrid{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     
     margin-right: 48px;
     margin-left: 48px;
@@ -114,5 +114,14 @@
     .dashboardChartsGrid {
         margin: 24px 24px;
         grid-template-columns: 1fr;
+    }
+
+        .dashboardGrid{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        
+        margin-right: 48px;
+        margin-left: 48px;
+        gap: 20px;
     }
 }
