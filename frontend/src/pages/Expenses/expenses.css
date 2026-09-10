@@ -116,12 +116,6 @@
         margin: 0 24px;
         grid-template-columns: 1fr;
     }
-    .expensesPageDashboardGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin: 0 48px;
-}
 }
 .newexpensebutton{
     background-color: #7c3aed;
