@@ -51,7 +51,6 @@ interface StringJob {
     orderPrice: number;
     isDeleted: boolean;
 }
-// -----------------------------------------------------
 
 interface ChartDataPoint {
     period: string;
