@@ -154,7 +154,7 @@ namespace TennisCrmApiEndpoints
             db.Customers.Add(newCustomer);
             await db.SaveChangesAsync();
 
-            return Results.Created($"Successfully added {newCustomer} added to the database", new CustomerDTO(
+            return Results.Created($"Successfully added {newCustomer} to the database", new CustomerDTO(
                     newCustomer.CustomerId,
                     newCustomer.CustomerName,
                     newCustomer.CustomerEmail,

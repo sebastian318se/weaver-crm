@@ -8,7 +8,7 @@ namespace TennisCrmApi
         // Tenant info
         public string TenantName { get; set; } = string.Empty;
         public int TenantId { get; set;}
-        public string BusinessName { get; set; } = string.Empty;
+        public string ClerkOrganizationId { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public SubscriptionStatus SubscriptionStatus { get; set; } = SubscriptionStatus.Trial;
 
