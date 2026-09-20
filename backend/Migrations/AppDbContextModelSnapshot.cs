@@ -210,7 +210,7 @@ namespace tenniscrm.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TenantId"));
 
-                    b.Property<string>("BusinessName")
+                    b.Property<string>("ClerkOrganizationId")
                         .IsRequired()
                         .HasColumnType("text");
 
