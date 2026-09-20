@@ -4,6 +4,6 @@ namespace TennisCrmApi
     (
         int TenantId,
         string? TenantName,
-        DateTime CreatedAts
+        DateTime CreatedAt
     );
 }
