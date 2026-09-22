@@ -4,18 +4,32 @@ import { useEffect } from "react";
 export default function OnboardingSync() {
     const { getToken, isLoaded, isSignedIn } = useAuth();
 
+    console.log("[OnboardingSync] render", { isLoaded, isSignedIn });
+
     useEffect(() => {
-        if (!isLoaded || !isSignedIn) return;
+        console.log("[OnboardingSync] effect fired", { isLoaded, isSignedIn });
+
+        if (!isLoaded || !isSignedIn) {
+            console.log("[OnboardingSync] bailing out early");
+            return;
+        }
 
         async function sync() {
+            console.log("[OnboardingSync] getting token...");
             const token = await getToken();
+            console.log("[OnboardingSync] token acquired?", !!token);
 
-            await fetch("/api/onboarding/sync", {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            try {
+                const res = await fetch("/api/onboarding/sync", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                console.log("[OnboardingSync] response status", res.status);
+            } catch (err) {
+                console.error("[OnboardingSync] fetch threw", err);
+            }
         }
 
         sync();
