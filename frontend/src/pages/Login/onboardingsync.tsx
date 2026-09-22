@@ -1,18 +1,23 @@
 import { useAuth, useUser, useOrganization } from "@clerk/clerk-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function OnboardingSync() {
     const { getToken, isLoaded, isSignedIn } = useAuth();
     const { user } = useUser();
     const { organization, isLoaded: orgLoaded } = useOrganization();
+    const navigate = useNavigate();
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (!isLoaded || !isSignedIn || !orgLoaded) return;
 
-        async function sync() {
-            const token = await getToken();
+        let cancelled = false;
 
+        async function sync() {
             try {
+                const token = await getToken();
+
                 const res = await fetch("/api/onboarding/sync", {
                     method: "POST",
                     headers: {
@@ -25,14 +30,33 @@ export default function OnboardingSync() {
                         userEmail: user?.primaryEmailAddress?.emailAddress ?? "",
                     }),
                 });
-                console.log("[OnboardingSync] response status", res.status);
+
+                if (!res.ok) {
+                    throw new Error(`Sync failed with status ${res.status}`);
+                }
+
+                if (!cancelled) {
+                    navigate("/dashboard", { replace: true });
+                }
             } catch (err) {
-                console.error("[OnboardingSync] fetch threw", err);
+                if (!cancelled) setError(err.message);
             }
         }
 
         sync();
-    }, [isLoaded, isSignedIn, orgLoaded, getToken, user, organization]);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isLoaded, isSignedIn, orgLoaded, getToken, user, organization, navigate]);
+
+    if (error) {
+        return (
+            <div className="LandingPage">
+                Something went wrong setting up your account: {error}
+            </div>
+        );
+    }
 
     return (
         <div className="LandingPage">
