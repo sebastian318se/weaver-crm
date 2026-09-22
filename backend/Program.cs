@@ -3,6 +3,7 @@ using Microsoft.OpenApi;
 using TennisCrmApiEndpoints;
 using System.Text.Json.Serialization;
 using TennisCrmApi.Authentication;
+using TennisCrmApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddScoped<OnboardingService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<TenantService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -59,6 +64,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<CurrentUserMiddleware>();
+
+app.MapOnboardingEndpoints();
 
 app.MapSJEndpoints();
 app.MapSalesEndpoints();

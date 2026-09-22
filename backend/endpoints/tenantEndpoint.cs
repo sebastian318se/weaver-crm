@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TennisCrmApi.Authentication;
+using TennisCrmApi.Services;
 using TennisCrmApi;
 
 namespace TennisCrmApiEndpoints
@@ -14,34 +15,23 @@ namespace TennisCrmApiEndpoints
             return app;
         }
 
-        public static async Task<IResult> PostTenant(AppDbContext db, CurrentUserService currentUser, Tenant newTenant)
+        public static async Task<IResult> PostTenant(
+            TenantService tenantService,
+            Tenant newTenant)
         {
-            // Get clerk prop to sync db from user service
-            var clerkOrganizationId = currentUser.ClerkOrganizationId;
+            var tenant = await tenantService.CreateTenant(newTenant);
 
-            if (string.IsNullOrWhiteSpace(clerkOrganizationId))
-                return Results.BadRequest(
-                    "No Clerk organization is associated with this user."
-                );
+            if (tenant is null)
+                return Results.BadRequest("Unable to create tenant.");
 
-            // Locate tenant on id match
-            var tenantExists = await db.Tenants
-                .AnyAsync(t => t.ClerkOrganizationId == clerkOrganizationId);
-
-            if (tenantExists) return Results.BadRequest("Tenant already exists.");
-
-            newTenant.ClerkOrganizationId = clerkOrganizationId;
-
-            db.Tenants.Add(newTenant);
-            await db.SaveChangesAsync();
-
-            return Results.Created($"Successfully added {newTenant} to the database", new TenantDTO(
-                newTenant.TenantId,
-                newTenant.TenantName,
-                newTenant.CreatedAt
-            ));
+            return Results.Created(
+                $"/api/tenants/{tenant.TenantId}",
+                new TenantDTO(
+                    tenant.TenantId,
+                    tenant.TenantName,
+                    tenant.CreatedAt
+                )
+            );
         }
-    }
-
-    
+    }   
 }

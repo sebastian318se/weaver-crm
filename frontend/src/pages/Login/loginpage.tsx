@@ -11,7 +11,7 @@ export default function LoginPage() {
         }
 
         if (isSignedIn) {
-            return <Navigate to="/dashboard" replace />;
+            return <Navigate to="/onboarding-sync" replace />;
         }
 
     return (
