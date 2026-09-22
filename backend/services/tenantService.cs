@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TennisCrmApi.Authentication;
+using TennisCrmApi;
 
 namespace TennisCrmApi.Services
 {

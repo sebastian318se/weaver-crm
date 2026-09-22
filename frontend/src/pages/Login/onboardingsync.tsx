@@ -1,30 +1,29 @@
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser, useOrganization } from "@clerk/clerk-react";
 import { useEffect } from "react";
 
 export default function OnboardingSync() {
     const { getToken, isLoaded, isSignedIn } = useAuth();
-
-    console.log("[OnboardingSync] render", { isLoaded, isSignedIn });
+    const { user } = useUser();
+    const { organization, isLoaded: orgLoaded } = useOrganization();
 
     useEffect(() => {
-        console.log("[OnboardingSync] effect fired", { isLoaded, isSignedIn });
-
-        if (!isLoaded || !isSignedIn) {
-            console.log("[OnboardingSync] bailing out early");
-            return;
-        }
+        if (!isLoaded || !isSignedIn || !orgLoaded) return;
 
         async function sync() {
-            console.log("[OnboardingSync] getting token...");
             const token = await getToken();
-            console.log("[OnboardingSync] token acquired?", !!token);
 
             try {
                 const res = await fetch("/api/onboarding/sync", {
                     method: "POST",
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     },
+                    body: JSON.stringify({
+                        tenantName: organization?.name ?? "",
+                        userDisplayName: user?.fullName ?? "",
+                        userEmail: user?.primaryEmailAddress?.emailAddress ?? "",
+                    }),
                 });
                 console.log("[OnboardingSync] response status", res.status);
             } catch (err) {
@@ -33,7 +32,7 @@ export default function OnboardingSync() {
         }
 
         sync();
-    }, [isLoaded, isSignedIn, getToken]);
+    }, [isLoaded, isSignedIn, orgLoaded, getToken, user, organization]);
 
     return (
         <div className="LandingPage">

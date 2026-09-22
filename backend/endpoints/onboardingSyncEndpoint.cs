@@ -15,9 +15,11 @@ namespace TennisCrmApiEndpoints
             return app;
         }
 
-        public static IResult Sync(OnboardingService onboardingService)
+        public static async Task<IResult> Sync(
+            OnboardingService onboardingService,
+            OnboardingSyncRequest request)
         {
-            var success = onboardingService.Sync();
+            var success = await onboardingService.Sync(request);
 
             if (!success)
                 return Results.Unauthorized();
