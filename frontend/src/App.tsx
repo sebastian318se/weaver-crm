@@ -11,6 +11,7 @@ import Support from "./pages/AppSupport/appsupport";
 import Expenses from "./pages/Expenses/expenses";
 import LoginPage from "./pages/Login/loginpage";
 import LandingPage from "./pages/Login/landingpage";
+import OnboardingSync from "./pages/Login/onboardingsync";
 
 export default function App() {
     return (
@@ -19,7 +20,8 @@ export default function App() {
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
-
+                <Route path="/onboarding-sync" element={<OnboardingSync />} />
+                
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
                     <Route element={<Layout />}>
