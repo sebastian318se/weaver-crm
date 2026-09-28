@@ -329,7 +329,15 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                     setCount={setProductCount}
                                 />
                         </div>
-                        <div className="forminput">
+                        <div className="saleforminput">
+                            <span>Sale Creation Date (Default to Current Time):</span>
+                            <input
+                                type="datetime-local"
+                                value={createdAtInput ?? ""}
+                                onChange={(e) => setCreatedAtInput(e.target.value)}    
+                            />
+                        </div>
+                        <div className="saleforminput">
                             <span>Status:</span>
                             <select
                                 value={status}
@@ -339,14 +347,6 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
-                        </div>
-                        <div className="saleforminput">
-                            <span>Sale Creation Date (Default to Current Time):</span>
-                            <input
-                                type="datetime-local"
-                                value={createdAtInput ?? ""}
-                                onChange={(e) => setCreatedAtInput(e.target.value)}    
-                            />
                         </div>
                     </div>
                   
