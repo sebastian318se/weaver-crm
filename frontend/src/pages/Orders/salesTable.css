@@ -23,6 +23,41 @@
     color: #7c3aed;
 }
 
+.status{
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.status span{
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.Cancelled{
+    background-color: rgb(247, 217, 217);
+    color: #cd3e33;
+}
+
+.Collected{
+    background-color: #e9e9e9;
+    color:#5b4b71;
+}
+
+.InProgress{
+    background-color: #e1d5f5;
+    color: #7c3aed;
+}
+
+.Paid{
+    background-color: rgb(218, 247, 217);
+    color: #0ba35a;
+}
+
+.Delivered{
+    background-color: rgb(218, 247, 217);
+    color: #0ba35a;
+}
+
 .salestablecontainer{
     cursor: pointer;
 }

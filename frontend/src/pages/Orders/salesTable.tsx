@@ -25,11 +25,12 @@ type SaleProps = {
     customer: CustomerProps | null,
     orderPrice: number,
     createdAt: string,
+    status: string,
     onEdit: (orderId: number) => void,
     onDelete: (orderId: number) => void
 }
 
-export default function SalesTable({saleItems, customer, orderPrice, createdAt, orderId, onEdit, onDelete } : SaleProps) {
+export default function SalesTable({saleItems, customer, orderPrice, createdAt, orderId, status, onEdit, onDelete } : SaleProps) {
 
     if (!saleItems) return;
 
@@ -51,6 +52,10 @@ export default function SalesTable({saleItems, customer, orderPrice, createdAt, 
         onDelete(orderId);
     };
 
+    const displayStatus = status === "InProgress"
+        ? "In Progress"
+        : status;
+
     return (
 
         <div className="salestablecontainer" onClick={handleContainerClick}>
@@ -66,6 +71,9 @@ export default function SalesTable({saleItems, customer, orderPrice, createdAt, 
                     <Calendar size={15}/>
                     <span className="date"> {new Date(createdAt).toLocaleDateString("en-US")}</span>
                 </div>
+                <div className="status">
+                <span className={status.replaceAll(" ", "")}>{displayStatus}</span>
+            </div>
             </div>
 
             <div className="tablerow">
