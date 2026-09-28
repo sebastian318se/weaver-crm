@@ -212,163 +212,197 @@ namespace TennisCrmApiEndpoints
             }
         }
 
-        // Edit sale entry on ID match
-        public static async Task<IResult> PutSale(AppDbContext db, CurrentUserService currentUser, Sale updatedSale, int id)
+    // Edit sale entry on ID match
+    public static async Task<IResult> PutSale(
+        AppDbContext db,
+        CurrentUserService currentUser,
+        Sale updatedSale,
+        int id)
+    {
+        var user = currentUser.User;
+
+        if (user == null)
+            return Results.Unauthorized();
+
+        await using var dbTransaction = await db.Database.BeginTransactionAsync();
+
+        try
         {
-            var user = currentUser.User;
-            if (user == null)
-                return Results.Unauthorized();
+            var existingSale = await db.Sales
+                .Include(s => s.SaleItems)
+                .FirstOrDefaultAsync(x =>
+                    x.OrderId == id &&
+                    x.TenantId == user.TenantId);
 
-            await using var dbTransaction = await db.Database.BeginTransactionAsync();
+            if (existingSale is null)
+                return Results.NotFound("Could not locate sale entry.");
 
-            try
+            if (updatedSale.SaleItems == null || updatedSale.SaleItems.Count == 0)
+                return Results.BadRequest("No items provided.");
+
+            var oldOrderPrice = existingSale.OrderPrice;
+            var oldIsDeleted = existingSale.IsDeleted;
+            var oldStatus = existingSale.Status;
+
+            // Snapshot old quantities per product
+            var oldQuantities = existingSale.SaleItems
+                .GroupBy(i => i.ProductId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Sum(x => x.ProductQuantity)
+                );
+
+            // Merge duplicate products
+            var groupedItems = updatedSale.SaleItems
+                .GroupBy(i => i.ProductId)
+                .Select(g => new OrderItems
+                {
+                    ProductId = g.Key,
+                    ProductQuantity = g.Sum(x => x.ProductQuantity)
+                })
+                .ToList();
+
+            var newQuantities = groupedItems
+                .ToDictionary(i => i.ProductId, i => i.ProductQuantity);
+
+            decimal total = 0;
+            var newItems = new List<OrderItems>();
+
+            foreach (var item in groupedItems)
             {
-                var existingSale = await db.Sales
-                    .Include(s => s.SaleItems)
+                var existingProduct = await db.Products
                     .FirstOrDefaultAsync(x =>
-                        x.OrderId == id
-                        && x.TenantId == user.TenantId);
+                        x.ProductId == item.ProductId &&
+                        x.TenantId == user.TenantId);
 
-                if (existingSale is null) return Results.NotFound("Could not locate sale entry.");
+                if (existingProduct is null)
+                    return Results.NotFound("Could not locate inventory entry");
 
-                if (updatedSale.SaleItems == null || updatedSale.SaleItems.Count == 0)
-                    return Results.BadRequest("No items provided.");
+                total += existingProduct.ProductPrice * item.ProductQuantity;
 
-                var oldOrderPrice = existingSale.OrderPrice;
-                var oldIsDeleted = existingSale.IsDeleted;
-                var oldStatus = existingSale.Status;
-
-                // Snapshot old quantities per product so we can diff against the new items
-                var oldQuantities = existingSale.SaleItems
-                    .GroupBy(i => i.ProductId)
-                    .ToDictionary(g => g.Key, g => g.Sum(x => x.ProductQuantity));
-
-                // Merge duplicate products (on id), same as PostSale
-                var groupedItems = updatedSale.SaleItems
-                    .GroupBy(i => i.ProductId)
-                    .Select(g => new OrderItems
-                    {
-                        ProductId = g.Key,
-                        ProductQuantity = g.Sum(x => x.ProductQuantity)
-                    })
-                    .ToList();
-
-                var newQuantities = groupedItems.ToDictionary(i => i.ProductId, i => i.ProductQuantity);
-
-                decimal total = 0;
-                var newItems = new List<OrderItems>();
-
-                foreach (var item in groupedItems)
+                newItems.Add(new OrderItems
                 {
-                    var existingProduct = await db.Products
-                        .FirstOrDefaultAsync(x =>
-                            x.ProductId == item.ProductId
-                            && x.TenantId == user.TenantId);
-
-                    if (existingProduct is null) return Results.NotFound("Could not locate inventory entry");
-
-                    total += existingProduct.ProductPrice * item.ProductQuantity;
-
-                    newItems.Add(new OrderItems
-                    {
-                        ProductId = item.ProductId,
-                        ProductQuantity = item.ProductQuantity,
-                        ProductPrice = existingProduct.ProductPrice
-                    });
-                }
-
-                // Reconcile stock: apply (new qty - old qty) delta per product across both sets
-                var allProductIds = oldQuantities.Keys.Union(newQuantities.Keys);
-
-                foreach (var productId in allProductIds)
-                {
-                    oldQuantities.TryGetValue(productId, out var oldQty);
-                    newQuantities.TryGetValue(productId, out var newQty);
-
-                    var delta = newQty - oldQty; // positive = selling more, needs more stock deducted
-                    if (delta == 0) continue;
-
-                    var product = await db.Products
-                        .FirstOrDefaultAsync(x =>
-                            x.ProductId == productId
-                            && x.TenantId == user.TenantId);
-
-                    if (product is null) return Results.NotFound($"Could not locate inventory entry for product #{productId}");
-
-                    if ((product.ProductStockAmount - delta) < 0)
-                        return Results.BadRequest($"Insufficient stock of id #{productId} to execute sale.");
-
-                    product.ProductStockAmount -= delta;
-                    product.LastModified = DateTime.UtcNow;
-                }
-
-                db.Entry(existingSale).CurrentValues.SetValues(new
-                {
-                    OrderPrice = total,
-                    updatedSale.CompletedAt,
-                    updatedSale.IsDeleted,
-                    updatedSale.Status
+                    ProductId = item.ProductId,
+                    ProductQuantity = item.ProductQuantity,
+                    ProductPrice = existingProduct.ProductPrice
                 });
+            }
 
-                // Fully replace sale items so removed items are actually deleted, not orphaned
-                existingSale.SaleItems.Clear();
-                foreach (var item in newItems)
-                {
-                    existingSale.SaleItems.Add(item);
-                }
+            // Reconcile inventory
+            var allProductIds = oldQuantities.Keys.Union(newQuantities.Keys);
 
-                // Keep the linked transaction's value and deleted-state in sync
-                var existingTransaction = await db.Transactions
-                    .FirstOrDefaultAsync(t =>
-                        t.OrderId == existingSale.OrderId
-                        && t.TransactionCategory == TransactionCategory.Sale
-                        && t.TenantId == user.TenantId);
+            foreach (var productId in allProductIds)
+            {
+                oldQuantities.TryGetValue(productId, out var oldQty);
+                newQuantities.TryGetValue(productId, out var newQty);
 
-                if (existingTransaction is not null)
-                {
-                    existingTransaction.TransactionValue = total;
-                    existingTransaction.IsDeleted = updatedSale.IsDeleted;
-                    existingTransaction.LastModified = DateTime.UtcNow;
-                }
+                var delta = newQty - oldQty;
 
-                // Keep customer's lifetime spend in sync with the price delta,
-                // or remove the order's value entirely if it was just soft-deleted
-                var existingCustomer = await db.Customers
+                if (delta == 0)
+                    continue;
+
+                var product = await db.Products
                     .FirstOrDefaultAsync(x =>
-                        x.CustomerId == existingSale.CustomerId
-                        && x.TenantId == user.TenantId);
+                        x.ProductId == productId &&
+                        x.TenantId == user.TenantId);
 
-                if (existingCustomer is not null)
-                {
-                    var oldDue = (!oldIsDeleted && oldStatus != OrderStatus.Paid)
+                if (product is null)
+                    return Results.NotFound(
+                        $"Could not locate inventory entry for product #{productId}"
+                    );
+
+                if ((product.ProductStockAmount - delta) < 0)
+                    return Results.BadRequest(
+                        $"Insufficient stock of id #{productId} to execute sale."
+                    );
+
+                product.ProductStockAmount -= delta;
+                product.LastModified = DateTime.UtcNow;
+            }
+
+            // Update the sale itself
+            db.Entry(existingSale).CurrentValues.SetValues(new
+            {
+                OrderPrice = total,
+                updatedSale.Status,
+                updatedSale.CompletedAt,
+                updatedSale.IsDeleted
+            });
+
+            // Fully replace sale items
+            existingSale.SaleItems.Clear();
+
+            foreach (var item in newItems)
+            {
+                existingSale.SaleItems.Add(item);
+            }
+
+            // Update linked transaction
+            var existingTransaction = await db.Transactions
+                .FirstOrDefaultAsync(t =>
+                    t.OrderId == existingSale.OrderId &&
+                    t.TransactionCategory == TransactionCategory.Sale &&
+                    t.TenantId == user.TenantId);
+
+            if (existingTransaction is not null)
+            {
+                existingTransaction.TransactionValue = total;
+                existingTransaction.IsDeleted = updatedSale.IsDeleted;
+                existingTransaction.LastModified = DateTime.UtcNow;
+                existingTransaction.Description =
+                    "Origin: API sale post transaction. EDITED.";
+            }
+
+            // Update customer's TotalDue and TotalSpent
+            var existingCustomer = await db.Customers
+                .FirstOrDefaultAsync(x =>
+                    x.CustomerId == existingSale.CustomerId &&
+                    x.TenantId == user.TenantId);
+
+            if (existingCustomer is not null)
+            {
+                // What the customer owed before the edit
+                var oldDue =
+                    (!oldIsDeleted && oldStatus != OrderStatus.Paid)
                         ? oldOrderPrice
                         : 0;
 
-                    var newDue = (!updatedSale.IsDeleted && updatedSale.Status != OrderStatus.Paid)
+                // What the customer owes after the edit
+                var newDue =
+                    (!updatedSale.IsDeleted &&
+                    updatedSale.Status != OrderStatus.Paid)
                         ? total
                         : 0;
 
-                    existingCustomer.TotalDue += newDue - oldDue;
+                // Apply only the difference
+                existingCustomer.TotalDue += newDue - oldDue;
 
-                    // TotalSpent is separate
-                    var oldSpent = !oldIsDeleted ? oldOrderPrice : 0;
-                    var newSpent = !updatedSale.IsDeleted ? total : 0;
+                // TotalSpent
+                var oldSpent =
+                    !oldIsDeleted
+                        ? oldOrderPrice
+                        : 0;
 
-                    existingCustomer.TotalSpent += newSpent - oldSpent;
+                var newSpent =
+                    !updatedSale.IsDeleted
+                        ? total
+                        : 0;
 
-                    existingCustomer.LastModified = DateTime.UtcNow;
-                }
+                existingCustomer.TotalSpent += newSpent - oldSpent;
 
-                await db.SaveChangesAsync();
-                await dbTransaction.CommitAsync();
-
-                return Results.Ok("Successfully updated sale entry.");
+                existingCustomer.LastModified = DateTime.UtcNow;
             }
-            catch
-            {
-                await dbTransaction.RollbackAsync();
-                throw;
-            }
+
+            await db.SaveChangesAsync();
+            await dbTransaction.CommitAsync();
+
+            return Results.Ok("Successfully updated sale entry.");
         }
+        catch
+        {
+            await dbTransaction.RollbackAsync();
+            throw;
+        }
+    }
     }
 }
