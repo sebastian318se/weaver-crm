@@ -56,6 +56,9 @@ type ExistingSale = {
     }[];
 }
 
+const STATUS_OPTIONS = ["Collected", "In Progress", "Paid", /*"Cancelled", "Delivered" */];
+
+
 export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBoxProps) {
 
     const { getToken } = useAuth();
@@ -77,7 +80,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
     const [finalProducts, setFinalProducts] = useState<ProductProps[]>([]);
 
     const [createdAtInput, setCreatedAtInput] = useState<string | null>(null);
-
+    const [status, setStatus] = useState<string>("Collected");
     // Normalize names and id's
     const customerEntries = customers.map(customer => ({
         id: customer.customerId,
@@ -93,7 +96,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
     useEffect(() => {
         if (existingSale) {
             setSelectedCustomer(existingSale.customer
-                ? { id: existingSale.customer.customerId, label: existingSale.customer.customerName }
+                ? { id: existingSale.customer.customerId, label: existingSale.customer.customerName}
                 : { id: existingSale.customerId, label: "Unknown customer" });
             setCustomerSearch(existingSale.customer?.customerName ?? "");
 
@@ -107,6 +110,9 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                         price: item.product!.productPrice
                     }))
             );
+
+            setStatus(existingSale.status);
+            
         } else {
             setSelectedCustomer(null); setCustomerSearch("");
             setFinalProducts([]);
@@ -240,12 +246,14 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                 orderPrice: orderPrice,
                 saleItems: saleItems,
                 isDeleted: existingSale!.isDeleted ?? false,
+                status: status.split(' ').join(''),
                 ...createdAtData
             }
             : {
                 customerId: selectedCustomer.id,
                 saleItems: saleItems,
                 orderPrice: orderPrice,
+                status: status.split(' ').join(''),
                 ...createdAtData
             };
 
@@ -274,6 +282,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
         setFinalProducts([]);
         setCustomerSearch(""); setCustomers([]); setSelectedCustomer(null);
         setCreatedAtInput(null);
+        setStatus("Collected");
     }
 
     return (
@@ -328,6 +337,20 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                 onChange={(e) => setCreatedAtInput(e.target.value)}    
                             />
                         </div>
+                        <div className="forminputs">
+                        <div className="forminput">
+                            <span>Status:</span>
+                            <select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                {STATUS_OPTIONS.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
                     </div>
                   
                     {finalProducts.length > 0 && (<hr />)}
