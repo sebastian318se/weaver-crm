@@ -306,7 +306,8 @@ namespace TennisCrmApiEndpoints
                 {
                     OrderPrice = total,
                     updatedSale.CompletedAt,
-                    updatedSale.IsDeleted
+                    updatedSale.IsDeleted,
+                    updatedSale.Status
                 });
 
                 // Fully replace sale items so removed items are actually deleted, not orphaned
