@@ -67,13 +67,15 @@ export default function SalesTable({saleItems, customer, orderPrice, createdAt, 
                     <span className="totalprice">${orderPrice}</span>
                 </div>
 
-                <div className="date">
-                    <Calendar size={15}/>
-                    <span className="date"> {new Date(createdAt).toLocaleDateString("en-US")}</span>
+                <div className="secondary">
+                    <div className="date">
+                        <Calendar size={15}/>
+                        <span className="date"> {new Date(createdAt).toLocaleDateString("en-US")}</span>
+                    </div>
+                    <div className="status">
+                        <span className={status.replaceAll(" ", "")}>{displayStatus}</span>
+                    </div>
                 </div>
-                <div className="status">
-                <span className={status.replaceAll(" ", "")}>{displayStatus}</span>
-            </div>
             </div>
 
             <div className="tablerow">

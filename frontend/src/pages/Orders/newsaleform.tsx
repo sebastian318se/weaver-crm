@@ -337,8 +337,7 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                 onChange={(e) => setCreatedAtInput(e.target.value)}    
                             />
                         </div>
-                        <div className="forminputs">
-                        <div className="forminput">
+                        <div className="saleforminput">
                             <span>Status:</span>
                             <select
                                 value={status}
@@ -349,7 +348,6 @@ export default function NewSaleBox({action, onSaleCreated, existingSale}: saleBo
                                 ))}
                             </select>
                         </div>
-                    </div>
 
                     </div>
                   
